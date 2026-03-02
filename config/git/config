@@ -5,8 +5,8 @@
     autoSetupRemote = true
 
 [user]
-    email = robert@clo4.net
-    name = "clo4"
+    email = "leporuid@icloid.com"
+    name = "leporuid"
 
 [alias]
 	root = rev-parse --show-toplevel
