@@ -126,52 +126,12 @@ function homeserver1 -a verb
     _run $maybe_sudo nixos-rebuild $verb --flake .#homeserver1 $rebuild_args $argv[2..]
 end
 
-function macmini -a verb
+function MacBook-Pro -a verb
     set maybe_sudo
     if test $verb = switch
         set maybe_sudo sudo
     end
-    _run $maybe_sudo darwin-rebuild $verb --flake .#macmini --max-jobs 8 $argv[2..]
-end
-
-function work-macbookpro -a verb
-    set maybe_sudo
-    if test $verb = switch
-        set maybe_sudo sudo
-    end
-    _run $maybe_sudo darwin-rebuild $verb --flake .#work-macbookpro $argv[2..]
-end
-
-function macbook-air -a verb
-    _require pmset timeout home-manager
-
-    set jobs 8
-
-    if test $this_host = macbook-air; and pmset -g batt | grep -q "Battery Power"
-        echo (set_color --dim --italics)"on battery power, testing connection to macmini..."(set_color normal)
-        if timeout 3 nix store info --store ssh-ng://robert@macmini &>/dev/null
-            echo (set_color --dim --italics)"delegating to macmini..."(set_color normal)
-            set jobs 0
-        else
-            echo (set_color --dim --italics)"running on this machine..."(set_color normal)
-        end
-    end
-
-    _run home-manager $verb --flake ".#$USER@macbook-air" --max-jobs $jobs $argv[2..]
-end
-
-function legacy -a verb
-    _require home-manager
-    _run home-manager $verb --flake ".#$USER@legacy" --max-jobs 8 $argv[2..]
-end
-
-function pc3 -a verb
-    _require home-manager
-    set jobs 8
-    if test $this_host = pc3
-        set jobs 32
-    end
-    _run home-manager $verb --flake ".#$USER@pc3" --max-jobs $jobs $argv[2..]
+    _run $maybe_sudo darwin-rebuild $verb --flake .#MacBook-Pro $argv[2..]
 end
 
 # The logic below defines the commands used to build/switch configurations for
