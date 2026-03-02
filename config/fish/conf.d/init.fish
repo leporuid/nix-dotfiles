@@ -5,6 +5,8 @@ function __source
     end
 end
 
+__source starship init fish
+__source mise activate fish
 __source zoxide init fish
 __source direnv hook fish
 __source fzf --fish
