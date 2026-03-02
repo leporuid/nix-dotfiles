@@ -41,24 +41,12 @@
       ".config/atuin/config.toml" = "config/atuin/config.toml";
       ".config/mise/config.toml" = "config/mise/config.toml";
       ".config/zellij" = "config/zellij";
-      ".config/eza" = "config/eza";
       ".config/raycast" = "config/raycast";
       ".config/starship.toml" = "config/starship.toml";
       ".swiftly/env.fish" = "config/swiftly/env.fish";
     };
 
   home.packages = [
-    pkgs.awscli2
-    pkgs.python3
-    pkgs.nss_latest
-    pkgs.vtsls
-    pkgs.mongosh
-    pkgs.typos
-    pkgs.typos-lsp
-    pkgs.glow
-    pkgs.deno
-    pkgs.mongodb-tools
-    pkgs.megabasterd
     perSystem.self.kumono
     perSystem.self.age-plugin-se
     pkgs.atuin
