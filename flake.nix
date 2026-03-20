@@ -2,7 +2,6 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nixpkgs-swift.url = "github:reckenrode/nixpkgs?ref=swift-update-mk2";
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
 
     # blueprint.url = "path:/Users/leporuid/Developer/blueprint";
