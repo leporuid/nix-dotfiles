@@ -10,9 +10,9 @@
   imports =
     with inputs.self.darwinModules;
     [
-     system-defaults
-     fish-environment
-     common
+     inputs.self.darwinModules.system-defaults
+     inputs.self.darwinModules.fish-environment
+     inputs.self.darwinModules.homebrew
       ];
 
  
