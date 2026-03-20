@@ -1,0 +1,14 @@
+default_service = "TwelveFt"
+auto_open_browser = true
+copy_to_clipboard = true
+remember_history = true
+usage_history = []
+max_history_size = 50
+
+[colors]
+service = "bright_magenta"
+info = "bright_cyan"
+error = "bright_red"
+warning = "bright_yellow"
+success = "bright_green"
+url = "bright_blue"

@@ -1,0 +1,118 @@
+# General shell helpers.
+# These are commands that I type enough that I need them
+# to be faster to type.
+abbr -a - "cd -"
+abbr -a .. "cd .."
+if not set -q IS_DARWIN
+    abbr -a cpr "cp -a --reflink=auto"
+    abbr -a cp "cp -a --reflink=auto"
+else
+    abbr -a cpr "cp -ac"
+    abbr -a cp "cp -ac"
+end
+abbr -a % "xargs -I % --"
+abbr -a f "fzf |"
+abbr -a fm "fzf --multi |"
+abbr -a rmf "rm -rf"
+abbr -a md "mkdir -p"
+abbr -a cmv "command -v"
+command -q trash; and abbr -a rm trash
+abbr -a j jj
+abbr -a fns functions
+abbr -a p pnpm
+abbr -a pr "pnpm run"
+abbr -a pa "pnpm add"
+abbr -a pi "pnpm install"
+abbr -a px pnpx
+abbr -a nx "npx nx"
+abbr -a nxr "npx nx run"
+abbr -a nrsl "npm run start-local"
+
+abbr -a r run
+
+if set -q IS_DARWIN
+    abbr -a p pbcopy
+    abbr -a pp pbpaste
+    abbr -a b brew
+end
+
+abbr -a gb "go build"
+abbr -a gb. "go build ./..."
+abbr -a gf "go fmt"
+abbr -a gf. "go fmt ./..."
+abbr -a gt "go test"
+abbr -a gt. "go test ./..."
+abbr -a glint "golangci-lint run"
+
+abbr -a n nix
+abbr -a nxi nix
+abbr -a nd "nix develop"
+abbr -a nb "nix build"
+abbr -a nr "nix run"
+abbr -a ns "nix shell"
+abbr -a nre "nix repl"
+abbr -a nf "nix fmt"
+abbr -a nfs "nix flake show"
+abbr -a nfl "nix flake lock"
+abbr -a nfu "nix flake update"
+abbr -a nfuc "nix flake update --commit-lock-file"
+abbr -a nfc "nix flake check"
+abbr -a nfi "nix flake init"
+abbr -a nfit "nix flake init --template"
+
+# Random abbreviations that are easier to type on some layouts, because I hop
+# around a lot.
+abbr -a nv nvim
+abbr -a he hx
+
+abbr -a t tmux
+abbr -a ta "tmux attach; or tmux"
+abbr -a tk "tmux kill-session"
+abbr -a tl "tmux list-sessions"
+
+abbr -a ts tailscale
+abbr -a tsd tailscaled
+abbr -a tss "tailscale status"
+abbr -a tf terraform # not installed globally, used in projects
+
+abbr -a co cargo
+abbr -a cob "cargo build"
+abbr -a cor "cargo run"
+abbr -a corr "cargo run --release"
+abbr -a cot "cargo test"
+abbr -a coa "cargo add"
+abbr -a coc "cargo check"
+
+abbr -a d docker
+abbr -a dp "docker ps"
+abbr -a dc "docker compose"
+abbr -a dcu "docker compose up"
+abbr -a dcud "docker compose up --detach"
+abbr -a dcs "docker compose stop"
+
+abbr -a g lazygit
+abbr -a ",a" "git add"
+abbr -a ",ap" "git add --patch"
+abbr -a ",aa" "git add -A"
+abbr -a ",r" "git restore"
+abbr -a ",rs" "git restore --staged"
+abbr -a ",re" "git reset"
+abbr -a ",rv" "git remote -v"
+abbr -a ",ra" "git rebase --abort"
+abbr -a ",c" "git commit"
+abbr -a ",ca" "git commit --amend"
+abbr -a ",d" "git diff"
+abbr -a ",dc" "git diff --cached"
+abbr -a ",m" "git merge"
+abbr -a ",s" "git status"
+abbr -a ",p" "git push"
+abbr -a ",pf" "git push --force-with-lease"
+abbr -a ",pu" "git pull"
+abbr -a ",f" "git fetch"
+abbr -a ",fu" "git fetch upstream"
+abbr -a ",sw" "git switch"
+abbr -a ",sc" "git switch -c"
+abbr -a ",b" "git branch"
+abbr -a ",l" "git log"
+
+abbr -a yay paru

@@ -1,0 +1,13 @@
+remember_history = true
+test_history = []
+max_history_size = 50
+test_size_mb = 10
+
+[colors]
+success = "bright_green"
+warning = "bright_yellow"
+error = "bright_red"
+speed_slow = "bright_red"
+info = "bright_cyan"
+speed_medium = "bright_yellow"
+speed_fast = "bright_green"

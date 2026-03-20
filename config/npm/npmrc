@@ -1,0 +1,3 @@
+prefix=${HOME}/.local
+#registry=https://registry.npmmirror.com
+shamefully-hoist=true

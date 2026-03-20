@@ -1,0 +1,9 @@
+[colors]
+size = "bright_yellow"
+info = "bright_blue"
+percentage = "bright_magenta"
+medium = "bright_yellow"
+tiny = "bright_green"
+huge = "bright_magenta"
+large = "bright_red"
+small = "bright_cyan"

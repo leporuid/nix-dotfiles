@@ -1,0 +1,12 @@
+remember_search_history = true
+use_clipboard_fallback = true
+search_history = []
+max_history_size = 100
+
+[colors]
+prompt = "bright_blue"
+info = "bright_cyan"
+link = "bright_magenta"
+success = "bright_green"
+warning = "bright_yellow"
+error = "bright_red"

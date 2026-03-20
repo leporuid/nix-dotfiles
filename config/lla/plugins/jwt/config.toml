@@ -1,0 +1,23 @@
+history = []
+max_history_size = 50
+auto_check_expiration = true
+save_to_history = true
+highlight_claims = [
+    "sub",
+    "iss",
+    "aud",
+    "exp",
+    "iat",
+    "nbf",
+]
+
+[colors]
+error = "bright_red"
+success = "bright_green"
+info = "bright_cyan"
+payload = "bright_magenta"
+claim = "bright_green"
+warning = "bright_yellow"
+valid = "bright_green"
+expired = "bright_red"
+header = "bright_blue"

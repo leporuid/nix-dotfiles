@@ -1,0 +1,15 @@
+{
+  "ui_font_size": 14.0,
+  "buffer_font_size": 14.0,
+  "buffer_font_weight": 400.0,
+  "ui_font_weight": 390.0,
+  "icon_theme": "JetBrains New UI Icons (Dark)",
+  "features": {
+    "edit_prediction_provider": "zed"
+  },
+  "theme": "Fleet Dark",
+  "vim_mode": true,
+  "buffer_font_family": "Maple Mono NF",
+  "ui_font_family": "Maple Mono NF",
+  "format_on_save": "off"
+}

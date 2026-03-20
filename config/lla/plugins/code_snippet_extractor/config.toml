@@ -1,0 +1,12 @@
+max_preview_lines = 10
+
+[colors]
+language = "bright_cyan"
+info = "bright_blue"
+tag = "bright_magenta"
+success = "bright_green"
+error = "bright_red"
+name = "bright_yellow"
+
+[syntax_themes]
+default = "Solarized (dark)"

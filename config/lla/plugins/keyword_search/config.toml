@@ -1,0 +1,36 @@
+keywords = []
+case_sensitive = false
+use_regex = false
+context_lines = 2
+max_matches = 5
+file_extensions = [
+    "txt",
+    "md",
+    "rs",
+    "py",
+    "js",
+    "java",
+    "c",
+    "cpp",
+    "h",
+    "hpp",
+    "go",
+    "rb",
+    "php",
+    "html",
+    "css",
+    "json",
+    "yaml",
+    "yml",
+    "toml",
+    "ini",
+    "conf",
+]
+
+[colors]
+info = "bright_cyan"
+file = "bright_blue"
+keyword = "bright_red"
+line_number = "bright_yellow"
+success = "bright_green"
+context = "bright_black"

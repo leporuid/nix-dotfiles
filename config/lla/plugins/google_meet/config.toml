@@ -1,0 +1,11 @@
+auto_copy_link = true
+browser_profiles = []
+meet_history = []
+max_history_size = 50
+
+[colors]
+warning = "bright_yellow"
+info = "bright_cyan"
+error = "bright_red"
+link = "bright_blue"
+success = "bright_green"

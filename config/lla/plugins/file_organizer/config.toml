@@ -1,0 +1,85 @@
+[colors]
+path = "bright_yellow"
+success = "bright_green"
+info = "bright_blue"
+error = "bright_red"
+
+[extension]
+enabled = true
+create_nested = true
+
+[date]
+enabled = true
+format = "%Y/%m/%d"
+group_by = "month"
+
+[type_strategy]
+enabled = true
+
+[type_strategy.categories]
+videos = [
+    "mp4",
+    "mov",
+    "avi",
+    "mkv",
+]
+archives = [
+    "zip",
+    "rar",
+    "7z",
+    "tar",
+    "gz",
+]
+documents = [
+    "pdf",
+    "doc",
+    "docx",
+    "txt",
+    "md",
+]
+audio = [
+    "mp3",
+    "wav",
+    "flac",
+    "m4a",
+]
+images = [
+    "jpg",
+    "jpeg",
+    "png",
+    "gif",
+    "svg",
+]
+
+[size]
+enabled = true
+
+[[size.ranges]]
+name = "tiny"
+max_bytes = 102400
+
+[[size.ranges]]
+name = "small"
+max_bytes = 1048576
+
+[[size.ranges]]
+name = "medium"
+max_bytes = 104857600
+
+[[size.ranges]]
+name = "large"
+max_bytes = 1073741824
+
+[[size.ranges]]
+name = "huge"
+
+[ignore]
+patterns = [
+    ".git",
+    "node_modules",
+    "target",
+]
+extensions = [
+    ".tmp",
+    ".bak",
+]

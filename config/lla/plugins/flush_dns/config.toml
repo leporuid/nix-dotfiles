@@ -1,0 +1,10 @@
+confirm_before_flush = true
+show_verbose_output = true
+flush_history = []
+max_history_size = 50
+
+[colors]
+warning = "bright_yellow"
+error = "bright_red"
+info = "bright_cyan"
+success = "bright_green"

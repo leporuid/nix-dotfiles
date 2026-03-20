@@ -1,0 +1,10 @@
+[colors]
+staged = "bright_green"
+untracked = "bright_blue"
+commit = "bright_yellow"
+name = "bright_yellow"
+clean = "bright_green"
+conflict = "bright_red"
+modified = "bright_yellow"
+info = "bright_blue"
+branch = "bright_cyan"

@@ -1,0 +1,17 @@
+default_topic = "Top"
+story_count = 30
+cache_duration_secs = 300
+
+[cached_stories]
+
+[colors]
+author = "bright_magenta"
+error = "bright_red"
+comments = "bright_cyan"
+warning = "bright_yellow"
+time = "bright_black"
+score = "bright_yellow"
+success = "bright_green"
+domain = "bright_blue"
+title = "bright_white"
+info = "bright_cyan"

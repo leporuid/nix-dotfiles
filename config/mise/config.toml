@@ -1,0 +1,28 @@
+[tools]
+#node = "latest"
+# "aqua:nodejs/node" = "latest"
+#python = "latest"
+#usage = "latest"
+#tuist = "latest"
+
+# "spm:realm/SwiftLint" = "latest"
+# "spm:tuist/tuist" = "latest"
+#java = "liberica-javafx-8u482"
+#"nix:go" = "latest"
+#"nix:nodejs" = "latest"
+#"npm:@eslint-community/eslint-utils" = "latest"
+#"npm:eslint-plugin-vue" = "latest"
+#"npm:@eslint/compat" = "2.0.2"
+#"npm:eslint" = "latest"
+#"nix:bun" = "latest"
+#"npm:prettier" = "latest"
+#vfox = "latest"
+#"aqua:gradle/gradle-distributions" = "latest"
+#"aqua:gradle/gradle" = "latest"
+# "aqua:maven" = "latest"
+# "aqua:gradle" = "latest"
+
+
+[settings]
+experimental = true
+pipx_uvx = true
