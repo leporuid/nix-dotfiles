@@ -1,7 +1,0 @@
-[global]
-load_dotenv = true
-strict_env = true
-warn_timeout = 0
-
-[whitelist]
-prefix = ["~/Developer/leporuid", "~/Developer/nix-dotfiles","~/.config/nix-dotfiles", "~/Repos"]
