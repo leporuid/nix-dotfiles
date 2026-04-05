@@ -6,14 +6,23 @@
   config,
   ...
 }:
+let
+  system = pkgs.stdenv.hostPlatform.system;
+  perSystem = builtins.mapAttrs (
+    _: i:
+    if builtins.isAttrs i then
+      (i.legacyPackages.${system} or { }) // (i.packages.${system} or { })
+    else
+      i
+  ) inputs;
+in
 {
-  imports =
-    with inputs.self.darwinModules;
-    [
-     inputs.self.darwinModules.system-defaults
-     inputs.self.darwinModules.fish-environment
-     inputs.self.darwinModules.homebrew
-      ];
+  imports = [
+    inputs.self.darwinModules.system-defaults
+    inputs.self.darwinModules.fish-environment
+    inputs.self.darwinModules.homebrew
+    inputs.home-manager.darwinModules.home-manager
+  ];
 
  
   users.users.leporuid = {
@@ -60,6 +69,12 @@
   system.primaryUser = "leporuid";
   
   home-manager.backupFileExtension = "hm-backup";
+  home-manager.useGlobalPkgs = true;
+  home-manager.useUserPackages = true;
+  home-manager.extraSpecialArgs = {
+    inherit inputs flake perSystem;
+  };
+  home-manager.users.leporuid = import ./users/leporuid/home-configuration.nix;
 
   nix-homebrew.enable = true;
   # A user needs to own the prefix, so we'll make it my account

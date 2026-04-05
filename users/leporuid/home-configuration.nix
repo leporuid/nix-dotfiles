@@ -8,7 +8,7 @@
 }:
 {
   imports = [
-   inputs.self.modules.common.determinate
+    inputs.self.homeModules.determinate
     ./shared.nix
   ];
 
