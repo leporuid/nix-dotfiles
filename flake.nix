@@ -2,7 +2,6 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
 
     # blueprint.url = "path:/Users/leporuid/Developer/blueprint";
     # blueprint.url = "github:numtide/blueprint";
@@ -27,12 +26,17 @@
 
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
 
+    motrix-next.url = "github:AnInsomniacy/motrix-next";
+    motrix-next.flake = false;
+   
     darwin-vz-nix.url = "github:takeokunn/darwin-vz-nix";
 
     agenix.url = "github:ryantm/agenix";
     agenix.inputs.nixpkgs.follows = "nixpkgs";
     agenix.inputs.darwin.follows = "nix-darwin";
     agenix.inputs.home-manager.follows = "home-manager";
+
+   determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
   };
 
   outputs =
