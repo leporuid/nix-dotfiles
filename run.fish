@@ -1,6 +1,6 @@
 # @fish-lsp-disable 2002 4004
 
-# If the devshell isn't active, the functiond defined in this file cannot be
+# If the devshell isn't active, the functions defined in this file cannot be
 # used, so ensure that the dev environment is always active.
 if not set -q IN_NIX_CONFIG_DEVSHELL
     alias devshell "nix develop"
@@ -48,24 +48,24 @@ function dry -d "Dry-run a function (replaces _run with _pretty_print)"
     $argv
 end
 
-function mc-rcon -d "Connect to dream-router and begin an interactive RCON session"
-    echo (set_color --italics)"connecting to dream-router and executing rcon-cli..."(set_color normal)
-    _run ssh robert@dream-router "sudo podman exec -i minecraft-family rcon-cli"
+function mc-rcon -d "Connect to homeserver1 and begin an interactive RCON session"
+    echo (set_color --italics)"connecting to homeserver1 and executing rcon-cli..."(set_color normal)
+    _run ssh robert@homeserver1 "sudo podman exec -i minecraft-family rcon-cli"
 end
 
 function mc-stop
-    echo (set_color --italics)"connecting to dream-router and stopping server..."(set_color normal)
-    _run ssh robert@dream-router "sudo systemctl stop podman-minecraft-family.service"
+    echo (set_color --italics)"connecting to homeserver1 and stopping server..."(set_color normal)
+    _run ssh robert@homeserver1 "sudo systemctl stop podman-minecraft-family.service"
 end
 
 function mc-start
-    echo (set_color --italics)"connecting to dream-router and stopping server..."(set_color normal)
-    _run ssh robert@dream-router "sudo systemctl start podman-minecraft-family.service"
+    echo (set_color --italics)"connecting to homeserver1 and stopping server..."(set_color normal)
+    _run ssh robert@homeserver1 "sudo systemctl start podman-minecraft-family.service"
 end
 
 function mc-logs
-    echo (set_color --italics)"connecting to dream-router and stopping server..."(set_color normal)
-    _run ssh robert@dream-router "journalctl -xefu podman-minecraft-family.service"
+    echo (set_color --italics)"connecting to homeserver1 and stopping server..."(set_color normal)
+    _run ssh robert@homeserver1 "journalctl -xefu podman-minecraft-family.service"
 end
 
 function check-applied -d "Check if the currently applied configuration needs to be updated"
@@ -98,32 +98,32 @@ end
 # --- Functions for building/switching hosts
 #
 
-function dream-router -a verb
+function homeserver1 -a verb
     set rebuild_args
     set maybe_sudo
 
-    if test $this_host != dream-router
-        # If not building on dream-router, set dream-router to be the target.
+    if test $this_host != homeserver1
+        # If not building on homeserver1, set homeserver1 to be the target.
         # Otherwise, it is definitely a mistake to switch on the local system.
-        set --append rebuild_args --use-remote-sudo --target-host robert@dream-router
-        echo (set_color --dim --italics)"not on dream-router, targeting remote host..."(set_color normal)
+        set --append rebuild_args --use-remote-sudo --target-host robert@homeserver1
+        echo (set_color --dim --italics)"not on homeserver1, targeting remote host..."(set_color normal)
 
-        # If the current system isn't x86-64 Linux, then dream-router needs to build
+        # If the current system isn't x86-64 Linux, then homeserver1 needs to build
         # its own configuration. --fast (--no-build-nix) is also required because
         # the local system will attempt to execute a version of `nix` that it can't
         # run.
         if test (nix eval --impure --raw --expr 'builtins.currentSystem') != x86_64-linux
-            set --append rebuild_args --build-host robert@dream-router --fast
+            set --append rebuild_args --build-host robert@homeserver1 --fast
             echo (set_color --dim --italics)"not on x86_64-linux, performing remote build..."(set_color normal)
         end
 
     else
-        # If, for whatever reason, we *are* on dream-router, then we need to use sudo.
+        # If, for whatever reason, we *are* on homeserver1, then we need to use sudo.
         set maybe_sudo sudo
-        echo (set_color --dim --italics)"on dream-router, using sudo..."(set_color normal)
+        echo (set_color --dim --italics)"on homeserver1, using sudo..."(set_color normal)
     end
 
-    _run $maybe_sudo nixos-rebuild $verb --flake .#dream-router $rebuild_args $argv[2..]
+    _run $maybe_sudo nixos-rebuild $verb --flake .#homeserver1 $rebuild_args $argv[2..]
 end
 
 function macmini -a verb
@@ -134,30 +134,30 @@ function macmini -a verb
     _run $maybe_sudo darwin-rebuild $verb --flake .#macmini --max-jobs 8 $argv[2..]
 end
 
-function MagiHoHo -a verb
+function work-macbookpro -a verb
     set maybe_sudo
     if test $verb = switch
         set maybe_sudo sudo
     end
-    _run $maybe_sudo darwin-rebuild $verb --flake .#MagiHoHo $argv[2..]
+    _run $maybe_sudo darwin-rebuild $verb --flake .#work-macbookpro $argv[2..]
 end
 
-function magihoho -a verb
+function macbook-air -a verb
     _require pmset timeout home-manager
 
     set jobs 8
 
-    if test $this_host = MacBook-Pro; and pmset -g batt | grep -q "Battery Power"
+    if test $this_host = macbook-air; and pmset -g batt | grep -q "Battery Power"
         echo (set_color --dim --italics)"on battery power, testing connection to macmini..."(set_color normal)
-        if timeout 3 nix store info --store ssh-ng://leporuid@MagiHoHo &>/dev/null
-            echo (set_color --dim --italics)"delegating to MacBook-Pro..."(set_color normal)
+        if timeout 3 nix store info --store ssh-ng://robert@macmini &>/dev/null
+            echo (set_color --dim --italics)"delegating to macmini..."(set_color normal)
             set jobs 0
         else
             echo (set_color --dim --italics)"running on this machine..."(set_color normal)
         end
     end
 
-    _run home-manager $verb --flake ".#$USER@MagiHoHo" --max-jobs $jobs $argv[2..]
+    _run home-manager $verb --flake ".#$USER@macbook-air" --max-jobs $jobs $argv[2..]
 end
 
 function legacy -a verb
@@ -172,6 +172,14 @@ function pc3 -a verb
         set jobs 32
     end
     _run home-manager $verb --flake ".#$USER@pc3" --max-jobs $jobs $argv[2..]
+end
+
+function MagiHoHo -a verb
+    set maybe_sudo
+    if test $verb = switch
+        set maybe_sudo sudo
+    end
+    _run $maybe_sudo darwin-rebuild $verb --flake .#MagiHoHo $argv[2..]
 end
 
 # The logic below defines the commands used to build/switch configurations for

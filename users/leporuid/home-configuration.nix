@@ -36,7 +36,6 @@ my.config.source =
     {
       "${platformConfig}/nushell" = "config/nushell";
       ".config/atuin/config.toml" = "config/atuin/config.toml";
-      ".config/mise/config.toml" = "config/mise/config.toml";
       ".config/zellij" = "config/zellij";
       ".config/raycast" = "config/raycast";
       ".config/starship.toml" = "config/starship.toml";
@@ -51,7 +50,6 @@ my.config.source =
     pkgs.starship
     pkgs.uv
     pkgs.ffmpeg
-    pkgs.mise
     #pkgs.hydrus
     pkgs.qpdf
     pkgs.zellij
