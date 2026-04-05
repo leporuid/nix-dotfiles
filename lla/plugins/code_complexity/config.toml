@@ -1,0 +1,39 @@
+[languages.Rust]
+extensions = ["rs"]
+function_patterns = ["fn "]
+class_patterns = [
+    "struct ",
+    "impl ",
+    "trait ",
+]
+branch_patterns = [
+    "if ",
+    "match ",
+    "else",
+]
+loop_patterns = [
+    "for ",
+    "while ",
+    "loop",
+]
+comment_patterns = [
+    "//",
+    "/*",
+]
+max_line_length = 100
+max_function_lines = 50
+
+[thresholds]
+low = 10.0
+medium = 20.0
+high = 30.0
+very_high = 40.0
+
+[colors]
+medium = "bright_yellow"
+info = "bright_blue"
+success = "bright_green"
+very_high = "red"
+low = "bright_green"
+high = "bright_red"
+name = "bright_yellow"

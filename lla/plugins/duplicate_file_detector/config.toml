@@ -1,0 +1,7 @@
+[colors]
+has_duplicates = "bright_yellow"
+name = "bright_yellow"
+success = "bright_green"
+info = "bright_blue"
+duplicate = "bright_red"
+path = "bright_cyan"

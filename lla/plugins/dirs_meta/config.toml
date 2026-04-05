@@ -1,0 +1,12 @@
+cache_size = 1000
+max_scan_depth = 100
+parallel_threshold = 1000
+
+[colors]
+files = "bright_cyan"
+info = "bright_blue"
+time = "bright_magenta"
+name = "bright_yellow"
+success = "bright_green"
+dirs = "bright_green"
+size = "bright_yellow"

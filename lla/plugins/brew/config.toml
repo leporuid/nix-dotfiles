@@ -1,0 +1,12 @@
+greedy_upgrades = true
+show_caveats = true
+
+[colors]
+formula = "bright_blue"
+info = "bright_cyan"
+warning = "bright_yellow"
+success = "bright_green"
+version = "bright_yellow"
+error = "bright_red"
+outdated = "bright_red"
+cask = "bright_magenta"

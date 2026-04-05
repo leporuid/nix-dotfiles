@@ -1,0 +1,6 @@
+[colors]
+sha256 = "bright_yellow"
+sha1 = "bright_green"
+info = "bright_blue"
+name = "bright_yellow"
+success = "bright_green"
