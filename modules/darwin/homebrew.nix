@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, config, ... }:
 let
   mkGreedy = caskName: {
     name = caskName;
@@ -9,7 +9,9 @@ in
   imports = [
             inputs.nix-homebrew.darwinModules.nix-homebrew
           ];
-
+  nix-homebrew.taps = with inputs; {
+              "AnInsomniacy/motrix-next" = motrix-next;
+            };
   homebrew = {
             enable = true;
             global.autoUpdate = false;
@@ -19,7 +21,7 @@ in
               cleanup = "zap";
             };
 
-
+    taps = builtins.attrNames config.nix-homebrew.taps;
     brews = [
        "unxip"
        "mas"
@@ -31,14 +33,15 @@ in
       "bettertouchtool"
       "glance-chamburr"
       "prettyclean"
-      "qlvideo"
       "raycast"
       "ghostty@tip"
       "syntax-highlight"
       "zed"
+      "zen"
       "keka"
       "iina"
       "adguard-vpn"
+      "motrix-next"
       "suspicious-package"
       "sf-symbols"
       "font-maple-mono"

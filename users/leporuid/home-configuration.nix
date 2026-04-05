@@ -20,9 +20,9 @@
   # fall back to plugins and homebrew when stuff doesn't work right.
   home.sessionVariables = {
     ATUIN_NOBIND = "true";
+    BAT_THEME="Catppuccin Mocha";
     FZF_DEFAULT_OPTS = "--no-sort --reverse --margin=0,1 --exit-0 --select-1 --pointer ▸▹ --prompt • --color bg+:#414559,bg:#303446,spinner:#f2d5cf,hl:#e78284,fg:#c6d0f5,header:#e78284,info:#ca9ee6,pointer:#f2d5cf,marker:#babbf1,fg+:#c6d0f5,prompt:#ca9ee6,hl+:#e78284,selected-bg:#51576d,border:#414559,label:#c6d0f5";
   };
-
 my.config.source =
     let
       # Some tools prefer to place their configuration in the correct directory
@@ -40,16 +40,17 @@ my.config.source =
       ".config/zellij" = "config/zellij";
       ".config/raycast" = "config/raycast";
       ".config/starship.toml" = "config/starship.toml";
-      ".swiftly/env.fish" = "config/swiftly/env.fish";
-      ".swiftly/env.sh" = "config/swiftly/env.sh";
+      ".config/lla" = "config/lla";
     };
    
   home.packages = [
     pkgs.atuin
-    pkgs.aria2
     pkgs.bun
+    pkgs.bat
+    pkgs.lla
     pkgs.starship
     pkgs.uv
+    pkgs.ffmpeg
     pkgs.mise
     #pkgs.hydrus
     pkgs.qpdf
@@ -58,4 +59,24 @@ my.config.source =
     perSystem.self.kumono
     perSystem.self.age-plugin-se
   ];
+
+ programs.bat = {
+    config.theme = pkgs.themes.bat;
+    extraPackages = with pkgs.bat-extras; [
+      batdiff
+      batman
+      batgrep
+      batwatch
+    ];
+    syntaxes = { };
+    themes.${pkgs.themes.bat} = {
+      src = pkgs.fetchFromGitHub {
+        owner = "catppuccin";
+        repo = "bat";
+        rev = "699f60fc8ec434574ca7451b444b880430319941";
+        sha256 = "sha256-6fWoCH90IGumAMc4buLRWL0N61op+AuMNN9CAR9/OdI=";
+      };
+      file = "themes/${pkgs.themes.bat}.tmTheme";
+    };
+  };
 }

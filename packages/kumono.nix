@@ -6,9 +6,9 @@ pkgs.rustPlatform.buildRustPackage {
     owner = "APT37";
     repo = pname;
     rev = "master";
-    hash = "sha256-CD3PmXgV21wzp1+t6MDWoLAeaxb1T4odYbXlT3BHiq0=";
+    hash = "sha256-AEhLeVxIWb5uMVestaKxZ9HNIVVTh6jkKG8hdrY3/mc=";
   };
-  cargoHash = "sha256-z8qGwE83HdBGcVBofezPH4d/sNFfPD/N7x6CcTAh6M0=";
+  cargoHash = "sha256-nzC+yhDy2kO4cPuxcmaenZ0NXRUbIGVc7Ku2mUdkO30=";
 
   meta = {
     description = "Media ripper for coomer.su and kemono.su";
