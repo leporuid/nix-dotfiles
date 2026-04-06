@@ -5,7 +5,7 @@ max_history_size = 50
 
 [colors]
 warning = "bright_yellow"
-info = "bright_cyan"
 error = "bright_red"
+info = "bright_cyan"
 link = "bright_blue"
 success = "bright_green"

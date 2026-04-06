@@ -24,13 +24,13 @@ default_format = "default"
 # Whether to show icons by default
 # When true, file and directory icons will be displayed in all views
 # Default: false
-show_icons = false
+show_icons = true
 
 # Whether to include directory sizes in file listings
 # When true, directory sizes will be calculated recursively
 # This may impact performance for large directories
 # Default: false
-include_dirs = false
+include_dirs = true
 
 # Format for displaying file permissions
 # Possible values:
@@ -45,7 +45,7 @@ permission_format = "symbolic"
 # The theme to use for coloring
 # Place custom themes in ~/.config/lla/themes/
 # Default: "default"
-theme = "default"
+theme = "catppuccin_mocha"
 
 # List of enabled plugins
 # Each plugin provides additional functionality
@@ -139,7 +139,7 @@ hide_group = false
 relative_dates = false
 
 # Column order for long view (use built-in keys or field:<custom_field> for plugin data)
-columns = ["permissions", "size", "modified", "user", "group", "name"]
+columns = ["permissions", "size", "modified", "user", "group", "name", "path", "plugins"]
 
 # Table formatter configuration
 [formatters.table]

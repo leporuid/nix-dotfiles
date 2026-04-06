@@ -28,9 +28,9 @@ file_extensions = [
 ]
 
 [colors]
-info = "bright_cyan"
 file = "bright_blue"
-keyword = "bright_red"
 line_number = "bright_yellow"
+keyword = "bright_red"
+info = "bright_cyan"
 success = "bright_green"
 context = "bright_black"

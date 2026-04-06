@@ -3,9 +3,9 @@ registry = "https://registry.npmjs.org"
 package_manager = "npm"
 
 [colors]
-warning = "bright_yellow"
-success = "bright_green"
-info = "bright_cyan"
 version = "bright_magenta"
 error = "bright_red"
+info = "bright_cyan"
 package = "bright_blue"
+success = "bright_green"
+warning = "bright_yellow"

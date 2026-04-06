@@ -1,12 +1,12 @@
 max_preview_lines = 10
 
 [colors]
-language = "bright_cyan"
-info = "bright_blue"
-tag = "bright_magenta"
-success = "bright_green"
-error = "bright_red"
 name = "bright_yellow"
+language = "bright_cyan"
+error = "bright_red"
+tag = "bright_magenta"
+info = "bright_blue"
+success = "bright_green"
 
 [syntax_themes]
 default = "Solarized (dark)"
