@@ -529,7 +529,8 @@
         "nix-homebrew": "nix-homebrew",
         "nixpkgs": "nixpkgs_4",
         "nixpkgs-unstable": "nixpkgs-unstable",
-        "red-tape": "red-tape"
+        "red-tape": "red-tape",
+        "ktoolbox": "ktoolbox"
       }
     },
     "rust-overlay": {

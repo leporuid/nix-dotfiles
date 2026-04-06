@@ -6,6 +6,9 @@
     red-tape.url = "github:phaer/red-tape";
     red-tape.inputs.nixpkgs.follows = "nixpkgs";
 
+    ktoolbox.url = "github:leporuid/KToolBox";
+    ktoolbox.inputs.nixpkgs.follows = "nixpkgs";
+
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -32,12 +35,16 @@
 
   outputs =
     inputs:
+    let
+      darwin-contrib = import "${inputs.red-tape}/contrib/darwin.nix";
+      home-manager-contrib = import "${inputs.red-tape}/contrib/home-manager.nix";
+    in
     inputs.red-tape.mkFlake {
       inherit inputs;
       src = ./.;
       modules = [
-        (import "${inputs.red-tape}/contrib/darwin.nix")
-        (import "${inputs.red-tape}/contrib/home-manager.nix")
+        darwin-contrib
+        home-manager-contrib
       ];
     };
 }

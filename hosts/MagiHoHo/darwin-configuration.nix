@@ -18,10 +18,10 @@ let
 in
 {
   imports = [
+    inputs.home-manager.darwinModules.home-manager
     inputs.self.darwinModules.system-defaults
     inputs.self.darwinModules.fish-environment
     inputs.self.darwinModules.homebrew
-    inputs.home-manager.darwinModules.home-manager
   ];
 
  
@@ -68,24 +68,28 @@ in
   
   system.primaryUser = "leporuid";
   
-  home-manager.backupFileExtension = "hm-backup";
-  home-manager.useGlobalPkgs = true;
-  home-manager.useUserPackages = true;
-  home-manager.extraSpecialArgs = {
-    inherit inputs flake perSystem;
+  home-manager = {
+    backupFileExtension = "hm-backup";
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    extraSpecialArgs = {
+      inherit flake inputs perSystem;
+    };
+    users.leporuid.imports = [
+      "${flake}/hosts/MagiHoHo/users/leporuid/home-configuration.nix"
+    ];
   };
-  home-manager.users.leporuid = import ./users/leporuid/home-configuration.nix;
 
   nix-homebrew.enable = true;
   # A user needs to own the prefix, so we'll make it my account
   nix-homebrew.user = config.system.primaryUser;
-  nix-homebrew.autoMigrate= true;
+  nix-homebrew.autoMigrate = true;
 
   environment.systemPackages = [
     pkgs.fish
   ];
 
- # Not sure about adding in vendor_conf.d because tools can just dump their init into it,
+  # Not sure about adding in vendor_conf.d because tools can just dump their init into it,
   # and because it will be included in a directory in $NIX_PROFILES, therefore
   # also $XDG_DATA_DIRS, it will be sourced during startup. This is probably fine, but
   # I want total control over what runs in my fish config.
@@ -95,19 +99,17 @@ in
     "/share/fish/vendor_functions.d"
   ];
 
- nixpkgs.hostPlatform = "aarch64-darwin";
- 
- nix.enable = true;
+  nixpkgs.hostPlatform = "aarch64-darwin";
+  nixpkgs.config.allowUnfree = true;
 
- nix.nixPath = lib.mkForce [
+  # determinateNix (enabled in system-defaults) takes over Nix management;
+  # nix.enable must not be set to true as it conflicts with determinateNix.
+  # mkForce satisfies home-manager's nix.package access even when nix is disabled.
+  nix.package = lib.mkForce pkgs.nix;
+
+  nix.nixPath = lib.mkForce [
     "nixpkgs=${inputs.nixpkgs}"
     "home-manager=${inputs.home-manager}"
   ];
-
- nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
- nix.settings.trusted-users = [ "@admin" ];
- nix.channel.enable = false;
+  nix.channel.enable = false;
 }
