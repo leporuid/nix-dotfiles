@@ -31,9 +31,9 @@ very_high = 40.0
 
 [colors]
 medium = "bright_yellow"
-success = "bright_green"
-high = "bright_red"
 info = "bright_blue"
-low = "bright_green"
-name = "bright_yellow"
+success = "bright_green"
 very_high = "red"
+low = "bright_green"
+high = "bright_red"
+name = "bright_yellow"

@@ -1,9 +1,9 @@
 [colors]
+large = "bright_red"
 size = "bright_yellow"
-info = "bright_blue"
-percentage = "bright_magenta"
 medium = "bright_yellow"
+percentage = "bright_magenta"
 tiny = "bright_green"
 huge = "bright_magenta"
-large = "bright_red"
+info = "bright_blue"
 small = "bright_cyan"

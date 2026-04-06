@@ -1,8 +1,8 @@
 [colors]
-path = "bright_yellow"
-success = "bright_green"
-info = "bright_blue"
 error = "bright_red"
+info = "bright_blue"
+success = "bright_green"
+path = "bright_yellow"
 
 [extension]
 enabled = true
@@ -23,13 +23,6 @@ videos = [
     "avi",
     "mkv",
 ]
-archives = [
-    "zip",
-    "rar",
-    "7z",
-    "tar",
-    "gz",
-]
 documents = [
     "pdf",
     "doc",
@@ -37,18 +30,25 @@ documents = [
     "txt",
     "md",
 ]
-audio = [
-    "mp3",
-    "wav",
-    "flac",
-    "m4a",
-]
 images = [
     "jpg",
     "jpeg",
     "png",
     "gif",
     "svg",
+]
+archives = [
+    "zip",
+    "rar",
+    "7z",
+    "tar",
+    "gz",
+]
+audio = [
+    "mp3",
+    "wav",
+    "flac",
+    "m4a",
 ]
 
 [size]

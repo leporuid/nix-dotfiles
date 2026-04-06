@@ -10,7 +10,7 @@ let
 in
 {
 # Workaround: Disable HM manual to suppress Determinate Nix warning
-# about options.json referencing store paths without proper 
+# about options.json referencing store paths without proper dependency tracking.
 # Upstream issue: https://github.com/nix-community/home-manager/issues/7935
 nix.package = lib.mkForce determinateNix;
 manual.manpages.enable = false;

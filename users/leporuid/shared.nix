@@ -35,7 +35,7 @@ in
     inputs.self.homeModules.my-config
     inputs.self.homeModules.my-programs-fish
     inputs.self.homeModules.my-programs-neovim
-    inputs.self.modules.common.nixpkgs-unstable
+    inputs.self.homeModules.nixpkgs-unstable
     ./darwin.nix
 
     "${flake}/config/nvim/plugins.nix"
@@ -164,14 +164,13 @@ in
     })
   ];
 
-  #home.sessionVariables.NIX_CONFIG_REV = flake.rev or flake.dirtyRev;
+  home.sessionVariables.NIX_CONFIG_REV = flake.rev or flake.dirtyRev;
   home.sessionVariables.NIX_CONFIG_DIR = config.my.config.directory;
-  #home.sessionVariables.NIX_CONFIG_LAST_MODIFIED = builtins.toString flake.lastModified;
+  home.sessionVariables.NIX_CONFIG_LAST_MODIFIED = builtins.toString flake.lastModified;
 
   nix.registry = {
     nixpkgs.flake = inputs.nixpkgs;
     nixpkgs-unstable.flake = inputs.nixpkgs-unstable;
-    red-tape.flake = inputs.red-tape;
     home-manager.flake = inputs.home-manager;
     nix-darwin.flake = inputs.nix-darwin;
     helix.flake = inputs.helix;

@@ -1,6 +1,6 @@
 [colors]
+info = "bright_blue"
+hash = "bright_yellow"
 author = "bright_cyan"
 time = "bright_green"
-hash = "bright_yellow"
-info = "bright_blue"
 name = "bright_yellow"

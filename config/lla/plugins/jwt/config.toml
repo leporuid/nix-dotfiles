@@ -12,12 +12,12 @@ highlight_claims = [
 ]
 
 [colors]
-error = "bright_red"
+expired = "bright_red"
+valid = "bright_green"
 success = "bright_green"
 info = "bright_cyan"
 payload = "bright_magenta"
-claim = "bright_green"
 warning = "bright_yellow"
-valid = "bright_green"
-expired = "bright_red"
+claim = "bright_green"
 header = "bright_blue"
+error = "bright_red"

@@ -1,7 +1,7 @@
 [colors]
-name = "bright_yellow"
-info = "bright_blue"
 has_duplicates = "bright_yellow"
+name = "bright_yellow"
 success = "bright_green"
-path = "bright_cyan"
+info = "bright_blue"
 duplicate = "bright_red"
+path = "bright_cyan"
