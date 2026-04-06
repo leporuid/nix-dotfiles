@@ -488,7 +488,6 @@
     "root": {
       "inputs": {
         "agenix": "agenix",
-        "blueprint": "blueprint",
         "darwin-vz-nix": "darwin-vz-nix",
         "determinate": "determinate",
         "helix": "helix",
@@ -497,7 +496,9 @@
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
         "nixpkgs": "nixpkgs_4",
-        "nixpkgs-unstable": "nixpkgs-unstable"
+        "nixpkgs-unstable": "nixpkgs-unstable",
+        "red-tape": "red-tape",
+        "ktoolbox": "ktoolbox"
       }
     },
     "rust-overlay": {
