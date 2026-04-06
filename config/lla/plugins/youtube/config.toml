@@ -4,9 +4,9 @@ search_history = []
 max_history_size = 100
 
 [colors]
-prompt = "bright_blue"
-info = "bright_cyan"
 link = "bright_magenta"
-success = "bright_green"
+prompt = "bright_blue"
 warning = "bright_yellow"
 error = "bright_red"
+success = "bright_green"
+info = "bright_cyan"

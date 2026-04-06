@@ -3,7 +3,7 @@ if status is-interactive
     # This isn't critical to be in config.fish, but it's good to know that all other configuration
     # has already been applied before any setup is done.
     if not set -q tide_left_prompt_items; and type -q tide
-        tide configure --auto --style='Lean' --prompt_colors='16 colors' --show_time='No' --lean_prompt_height='One line' --prompt_spacing='Compact' --icons='Few icons' --transient='Yes'
+        tide configure --auto --style='Lean' --prompt_colors='16 colors' --show_time='No' --lean_prompt_height='One line' --prompt_spacing='Compact' --icons='Few icons' --transient='No'
 
         set -g __setup__clear_screen_prompt_count 0
         function __setup__clear_screen --on-event fish_prompt

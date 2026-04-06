@@ -5,13 +5,13 @@ cache_duration_secs = 300
 [cached_stories]
 
 [colors]
-author = "bright_magenta"
-error = "bright_red"
-comments = "bright_cyan"
-warning = "bright_yellow"
-time = "bright_black"
-score = "bright_yellow"
-success = "bright_green"
-domain = "bright_blue"
 title = "bright_white"
 info = "bright_cyan"
+success = "bright_green"
+author = "bright_magenta"
+domain = "bright_blue"
+warning = "bright_yellow"
+comments = "bright_cyan"
+score = "bright_yellow"
+error = "bright_red"
+time = "bright_black"

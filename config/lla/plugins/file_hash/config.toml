@@ -1,6 +1,6 @@
 [colors]
-name = "bright_yellow"
-info = "bright_blue"
-sha1 = "bright_green"
 sha256 = "bright_yellow"
+sha1 = "bright_green"
+info = "bright_blue"
+name = "bright_yellow"
 success = "bright_green"

@@ -3,10 +3,10 @@ max_scan_depth = 100
 parallel_threshold = 1000
 
 [colors]
-info = "bright_blue"
-name = "bright_yellow"
-time = "bright_magenta"
 files = "bright_cyan"
-dirs = "bright_green"
+info = "bright_blue"
+time = "bright_magenta"
+name = "bright_yellow"
 success = "bright_green"
+dirs = "bright_green"
 size = "bright_yellow"

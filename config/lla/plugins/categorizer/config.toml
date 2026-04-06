@@ -62,6 +62,13 @@ size_ranges = [[
 description = "Source code files"
 
 [rules.subcategories]
+Systems = [
+    "rs",
+    "c",
+    "cpp",
+    "h",
+    "hpp",
+]
 Scripts = [
     "py",
     "rb",
@@ -74,11 +81,4 @@ Web = [
     "html",
     "css",
     "php",
-]
-Systems = [
-    "rs",
-    "c",
-    "cpp",
-    "h",
-    "hpp",
 ]
