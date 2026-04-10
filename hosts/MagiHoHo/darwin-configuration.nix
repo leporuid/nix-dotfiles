@@ -6,19 +6,8 @@
   config,
   ...
 }:
-let
-  system = pkgs.stdenv.hostPlatform.system;
-  perSystem = builtins.mapAttrs (
-    _: i:
-    if builtins.isAttrs i then
-      (i.legacyPackages.${system} or { }) // (i.packages.${system} or { })
-    else
-      i
-  ) inputs;
-in
 {
   imports = [
-    inputs.home-manager.darwinModules.home-manager
     inputs.self.darwinModules.system-defaults
     inputs.self.darwinModules.fish-environment
     inputs.self.darwinModules.homebrew
@@ -68,17 +57,7 @@ in
   
   system.primaryUser = "leporuid";
   
-  home-manager = {
-    backupFileExtension = "hm-backup";
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    extraSpecialArgs = {
-      inherit flake inputs perSystem;
-    };
-    users.leporuid.imports = [
-      "${flake}/hosts/MagiHoHo/users/leporuid/home-configuration.nix"
-    ];
-  };
+  home-manager.backupFileExtension = "hm-backup";
 
   nix-homebrew.enable = true;
   # A user needs to own the prefix, so we'll make it my account
