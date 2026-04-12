@@ -3,8 +3,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
-    blueprint.url = "github:leporuid/blueprint/generic-users";
-    blueprint.inputs.nixpkgs.follows = "nixpkgs";
+    red-tape.url = "github:phaer/red-tape";
 
     ktoolbox.url = "github:leporuid/KToolBox";
     ktoolbox.inputs.nixpkgs.follows = "nixpkgs";
@@ -33,5 +32,13 @@
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
   };
 
-  outputs = inputs: inputs.blueprint { inherit inputs; nixpkgs.config.allowUnfree = true; };
+  outputs = inputs:
+    inputs.red-tape.mkFlake {
+      inherit inputs;
+      src = ./.;
+      modules = [
+        (import "${inputs.red-tape}/contrib/darwin.nix")
+        (import "${inputs.red-tape}/contrib/home-manager.nix")
+      ];
+    };
 }
