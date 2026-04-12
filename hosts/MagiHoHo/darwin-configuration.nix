@@ -84,6 +84,7 @@
   # determinateNix (enabled in system-defaults) takes over Nix management;
   # nix.enable must not be set to true as it conflicts with determinateNix.
   # mkForce satisfies home-manager's nix.package access even when nix is disabled.
+  nix.enable = false;
   nix.package = lib.mkForce pkgs.nix;
 
   nix.nixPath = lib.mkForce [
