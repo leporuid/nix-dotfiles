@@ -1,4 +1,4 @@
-{ inputs, flake, config, pkgs, lib, ...}:
+{ inputs, flake, config, pkgs, lib, username, ...}:
 with lib;
 {
   imports = [
@@ -61,7 +61,7 @@ with lib;
       . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
     fi
   '';
-  system.configurationRevision = self.rev or self.dirtyRev or null;
+  system.configurationRevision = flake.rev or flake.dirtyRev or null;
   ids.gids.nixbld = 350;
 
   # ============================================================================
@@ -83,7 +83,7 @@ with lib;
       trusted-users = [
         "root"
         "@admin"
-        "${config.system.primaryUser}"
+        username
       ];
       accept-flake-config = true;
       substituters = [

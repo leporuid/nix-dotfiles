@@ -46,8 +46,9 @@
     { self, ... }@inputs:
     let
       system = "aarch64-darwin";
-
-      pkgs = import inputs.nixpkgs {
+      username = "leporuid";
+      
+     pkgs = import inputs.nixpkgs {
         inherit system;
         config.allowUnfree = true;
       };
@@ -105,6 +106,7 @@
         inherit system;
         specialArgs = {
           inherit inputs;
+          inherit username;
           flake = self;
         };
         modules = [

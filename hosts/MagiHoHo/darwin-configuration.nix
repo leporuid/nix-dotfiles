@@ -4,6 +4,7 @@
   lib,
   flake,
   config,
+  username,
   ...
 }:
 {
@@ -14,9 +15,9 @@
   ];
 
  
-  users.users.leporuid = {
+  users.users.${username} = {
     description = "Yu-Min Peng";
-    home = "/Users/leporuid";
+    home = "/Users/${username}";
     openssh.authorizedKeys.keys = [
       # My iPhone, blink terminal
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINaZLCaoAppOpXqJmBrB8AOCEc7zffCWU3G0P+9W4tnL"
@@ -55,13 +56,13 @@
 
   system.stateVersion = 6;
   
-  system.primaryUser = "leporuid";
+  system.primaryUser = username;
   
   home-manager.backupFileExtension = "hm-backup";
 
   nix-homebrew.enable = true;
   # A user needs to own the prefix, so we'll make it my account
-  nix-homebrew.user = config.system.primaryUser;
+  nix-homebrew.user = username;
   nix-homebrew.autoMigrate = true;
 
   environment.systemPackages = [
@@ -85,7 +86,6 @@
   # nix.enable must not be set to true as it conflicts with determinateNix.
   # mkForce satisfies home-manager's nix.package access even when nix is disabled.
   nix.enable = false;
-  nix.package = lib.mkForce pkgs.nix;
 
   nix.nixPath = lib.mkForce [
     "nixpkgs=${inputs.nixpkgs}"
