@@ -1,4 +1,4 @@
-inputs: _: prev:
+inputs: final: prev:
   let
     determinateNix = inputs.determinate.inputs.nix.packages.${prev.stdenv.system}.default;
   in
