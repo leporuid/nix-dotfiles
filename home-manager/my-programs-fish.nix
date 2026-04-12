@@ -141,7 +141,7 @@ in
       fishIndent "99_generated_completions.fish" ''
         set -l genpath ${config.xdg.dataHome}/fish/generated_completions
 
-        if test -d $genpath; and not contains -- genpath $PATH
+        if test -d $genpath; and not contains -- $genpath $fish_complete_path
           set --append fish_complete_path $genpath
         end
       '';

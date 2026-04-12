@@ -35,11 +35,11 @@ with lib;
       # Runs during every build — slight build-time cost for ongoing savings
       # Default: false
       auto-optimise-store = true;
-      trusted-users = [      
-      "root"
-      "@admin"
-      "${config.system.primaryUser}"
-     ];
+      trusted-users = [
+        "root"
+        "@admin"
+        "${config.system.primaryUser}"
+      ];
       accept-flake-config = true;
       substituters = [
         "https://cache.nixos.org?priority=10"
@@ -100,26 +100,26 @@ with lib;
         #_FXShowPosixPathInTitle = true; # title bar full path
         ShowPathbar = true; # breadcrumb nav at bottom
         ShowStatusBar = true; # file count & disk space
-    	# This magic string makes it search the current folder by default
-    	FXDefaultSearchScope = "SCcf";
-    	# Use the column view by default (the obviously correct and best view)
-    	FXPreferredViewStyle = "clmv";
+        # This magic string makes it search the current folder by default
+        FXDefaultSearchScope = "SCcf";
+        # Use the column view by default (the obviously correct and best view)
+        FXPreferredViewStyle = "clmv";
       };
       
       dock.autohide = true;
 
       NSGlobalDomain = {
         ApplePressAndHoldEnabled = true;
-    	AppleShowAllExtensions = true;
-    	NSAutomaticCapitalizationEnabled = false;
-    	NSAutomaticPeriodSubstitutionEnabled = false;
-    	NSAutomaticSpellingCorrectionEnabled = false;
-    	NSWindowShouldDragOnGesture = true;
-    	InitialKeyRepeat = 15;
-    	KeyRepeat = 2;
-    	# Explicitly enabling media keys because the media keycodes themselves are
-    	# used for some shortcuts
-    	"com.apple.keyboard.fnState" = false;
+        AppleShowAllExtensions = true;
+        NSAutomaticCapitalizationEnabled = false;
+        NSAutomaticPeriodSubstitutionEnabled = false;
+        NSAutomaticSpellingCorrectionEnabled = false;
+        NSWindowShouldDragOnGesture = true;
+        InitialKeyRepeat = 15;
+        KeyRepeat = 2;
+        # Explicitly enabling media keys because the media keycodes themselves are
+        # used for some shortcuts
+        "com.apple.keyboard.fnState" = false;
       };
     };
   };

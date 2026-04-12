@@ -172,7 +172,6 @@ in
   nix.registry = {
     nixpkgs.flake = inputs.nixpkgs;
     nixpkgs-unstable.flake = inputs.nixpkgs-unstable;
-    blueprint.flake = inputs.blueprint;
     home-manager.flake = inputs.home-manager;
     nix-darwin.flake = inputs.nix-darwin;
     helix.flake = inputs.helix;
