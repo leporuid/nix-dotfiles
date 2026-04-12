@@ -1,5 +1,5 @@
 # This is the shared user configuration applied and customised by each
-# host's `robert` user.
+# host's `leporuid` user.
 {
   pkgs,
   pkgs',
@@ -35,7 +35,8 @@ in
     inputs.self.homeModules.my-config
     inputs.self.homeModules.my-programs-fish
     inputs.self.homeModules.my-programs-neovim
-    inputs.self.homeModules.nixpkgs-unstable
+    inputs.self.modules.common.nixpkgs-unstable
+    inputs.self.modules.common.determinate
     ./darwin.nix
 
     "${flake}/config/nvim/plugins.nix"
@@ -164,13 +165,14 @@ in
     })
   ];
 
-  home.sessionVariables.NIX_CONFIG_REV = flake.rev or flake.dirtyRev;
+  #home.sessionVariables.NIX_CONFIG_REV = flake.rev or flake.dirtyRev;
   home.sessionVariables.NIX_CONFIG_DIR = config.my.config.directory;
-  home.sessionVariables.NIX_CONFIG_LAST_MODIFIED = builtins.toString flake.lastModified;
+  #home.sessionVariables.NIX_CONFIG_LAST_MODIFIED = builtins.toString flake.lastModified;
 
   nix.registry = {
     nixpkgs.flake = inputs.nixpkgs;
     nixpkgs-unstable.flake = inputs.nixpkgs-unstable;
+    blueprint.flake = inputs.blueprint;
     home-manager.flake = inputs.home-manager;
     nix-darwin.flake = inputs.nix-darwin;
     helix.flake = inputs.helix;

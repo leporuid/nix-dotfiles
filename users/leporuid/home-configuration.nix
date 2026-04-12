@@ -8,7 +8,6 @@
 }:
 {
   imports = [
-    inputs.self.homeModules.determinate
     ./shared.nix
   ];
 
@@ -35,7 +34,7 @@ my.config.source =
     in
     {
       "${platformConfig}/nushell" = "config/nushell";
-      ".config/atuin/config.toml" = "config/atuin/config.toml";
+      ".config/atuin" = "config/atuin";
       ".config/zellij" = "config/zellij";
       ".config/raycast" = "config/raycast";
       ".config/starship.toml" = "config/starship.toml";
@@ -56,6 +55,7 @@ my.config.source =
 
     perSystem.self.kumono
     perSystem.self.age-plugin-se
+    perSystem.ktoolbox.default
   ];
 
  programs.bat = {
