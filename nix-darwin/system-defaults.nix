@@ -4,6 +4,51 @@ with lib;
   imports = [
   inputs.determinate.darwinModules.default
   ];
+ documentation.enable = true;
+
+  environment.etc."nix/flake-registry.json".text =
+    let
+      entry = id: to: {
+        from = {
+          inherit id;
+          type = "indirect";
+        };
+        inherit to;
+      };
+
+      flakehub =
+        id: org: flake: version:
+        entry id {
+          type = "tarball";
+          url = "https://flakehub.com/f/${org}/${flake}/${version}";
+        };
+
+      github =
+        id: owner: repo:
+        entry id {
+          type = "github";
+          inherit owner repo;
+        };
+    in
+    builtins.toJSON {
+      flakes = [
+        (flakehub "flakehub" "DeterminateSystems" "flakehub" "0.1")
+        (flakehub "home-manager" "nix-community" "home-manager" "0")
+        (flakehub "nix" "DeterminateSystems" "nix-src" "3")
+        (flakehub "nix-darwin" "nix-darwin" "nix-darwin" "0")
+        (flakehub "nixos-generators" "nix-community" "nixos-generators" "0.1")
+        (flakehub "nixpkgs" "DeterminateSystems" "nixpkgs-weekly" "0.1")
+        (flakehub "nuenv" "DeterminateSystems" "nuenv" "0.1")
+        (flakehub "pdfs" "DeterminateSystems" "pdfs" "0.1")
+        (flakehub "schemas" "DeterminateSystems" "flake-schemas" "0")
+        (flakehub "secure-packages" "DeterminateSystems" "secure-packages-rolling" "0.1")
+        (flakehub "stable" "NixOS" "nixpkgs" "0")
+        (flakehub "templates" "DeterminateSystems" "flake-templates" "0.1")
+        (flakehub "unstable" "DeterminateSystems" "nixpkgs-weekly" "0.1")
+      ];
+      version = 2;
+    };
+
   environment.systemPackages = with pkgs; [
     coreutils
     mosh  # system-level so non-interactive SSH can find mosh-server
@@ -16,7 +61,7 @@ with lib;
       . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
     fi
   '';
-  system.configurationRevision = inputs.self.rev or inputs.self.dirtyRev or null;
+  system.configurationRevision = self.rev or self.dirtyRev or null;
   ids.gids.nixbld = 350;
 
   # ============================================================================
