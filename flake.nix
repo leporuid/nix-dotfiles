@@ -33,5 +33,9 @@
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
   };
 
-  outputs = inputs: inputs.blueprint { inherit inputs; nixpkgs.config.allowUnfree = true; };
+  outputs = inputs: inputs.blueprint {
+    inherit inputs;
+    nixpkgs.config.allowUnfree = true;
+    nixpkgs.overlays = [ (import ./overlays/determinate-nix.nix inputs) ];
+  };
 }
