@@ -176,6 +176,7 @@ in
     home-manager.flake = inputs.home-manager;
     nix-darwin.flake = inputs.nix-darwin;
     helix.flake = inputs.helix;
+    determinate.flake = inputs.determinate;
   };
   nix.settings.log-lines = 25;
 }
