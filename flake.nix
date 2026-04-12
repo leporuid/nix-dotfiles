@@ -142,6 +142,8 @@
           ];
         shellHook = ''
           export IN_NIX_CONFIG_DEVSHELL=1
+          export NIX_CONFIG_REV=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+          export NIX_CONFIG_LAST_MODIFIED=$(git log -1 --format=%at 2>/dev/null || echo "0")
         '';
       };
     };
