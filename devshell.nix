@@ -1,15 +1,9 @@
-{
-  pkgs,
-  inputs,
-  perSystem,
-}:
+{ pkgs, inputs, perSystem, ... }:
 pkgs.mkShellNoCC {
+  name = "nix-dotfiles";
   packages = [
     perSystem.home-manager.default
     perSystem.agenix.default
-    # In my normal shell, run is a function. In any other shell,
-    # or on a system without my configuration, it will instead
-    # be the "packaged" version of that function.
     perSystem.self.run
     pkgs.nixos-rebuild
     pkgs.nixos-anywhere
@@ -17,17 +11,11 @@ pkgs.mkShellNoCC {
     pkgs.taplo
     pkgs.age
     pkgs.deno
-  ]
-  ++ pkgs.lib.optional pkgs.stdenv.isDarwin [
-    perSystem.nix-darwin.default
+    perSystem.nix-darwin.darwin-rebuild
   ];
-  # buildInputs =
-  #   [ ]
-  #   ++ pkgs.lib.optional pkgs.stdenv.isDarwin [
-  #     pkgs.clang
-  #     pkgs.darwin.cctools # I've been burned in the past by not having this
-  #   ];
   shellHook = ''
-   export IN_NIX_CONFIG_DEVSHELL=1  
+    export IN_NIX_CONFIG_DEVSHELL=1
+    export NIX_CONFIG_REV=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+    export NIX_CONFIG_LAST_MODIFIED=$(git log -1 --format=%at 2>/dev/null || echo "0")
   '';
 }

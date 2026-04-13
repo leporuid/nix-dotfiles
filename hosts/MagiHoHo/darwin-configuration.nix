@@ -6,17 +6,41 @@
   config,
   ...
 }:
+let
+  username = "leporuid";
+  system = pkgs.stdenv.hostPlatform.system;
+  # Mirrors red-tape's perSystem convention so home-manager modules can access
+  # per-system packages from all flake inputs (including self).
+  perSystem = builtins.mapAttrs (
+    _: input:
+    if builtins.isAttrs input && input ? packages && input.packages ? ${system} then
+      input.packages.${system}
+    else
+      { }
+  ) inputs
+  // { self = inputs.self.packages.${system};};
+in
 {
   imports = [
     inputs.self.darwinModules.system-defaults
     inputs.self.darwinModules.fish-environment
     inputs.self.darwinModules.homebrew
+    inputs.home-manager.darwinModules.home-manager
   ];
 
- 
-  users.users.leporuid = {
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    backupFileExtension = "hm-backup";
+    extraSpecialArgs = {
+      inherit inputs perSystem flake;
+    };
+    users.leporuid = "${flake}/hosts/MagiHoHo/users/leporuid/home-configuration.nix";
+  };
+
+  users.users.${username} = {
     description = "Yu-Min Peng";
-    home = "/Users/leporuid";
+    home = "/Users/${username}";
     openssh.authorizedKeys.keys = [
       # My iPhone, blink terminal
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINaZLCaoAppOpXqJmBrB8AOCEc7zffCWU3G0P+9W4tnL"
@@ -55,13 +79,11 @@
 
   system.stateVersion = 6;
   
-  system.primaryUser = "leporuid";
-  
-  home-manager.backupFileExtension = "hm-backup";
+  system.primaryUser = username;
 
   nix-homebrew.enable = true;
   # A user needs to own the prefix, so we'll make it my account
-  nix-homebrew.user = config.system.primaryUser;
+  nix-homebrew.user = username;
   nix-homebrew.autoMigrate = true;
 
   environment.systemPackages = [
@@ -84,8 +106,7 @@
   # determinateNix (enabled in system-defaults) takes over Nix management;
   # nix.enable must not be set to true as it conflicts with determinateNix.
   # mkForce satisfies home-manager's nix.package access even when nix is disabled.
-  nix.enable = false;
-  nix.package = lib.mkForce pkgs.nix;
+  nix.enable = !config.determinateNix.enable;
 
   nix.nixPath = lib.mkForce [
     "nixpkgs=${inputs.nixpkgs}"

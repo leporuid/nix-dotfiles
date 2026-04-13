@@ -39,8 +39,13 @@ my.config.source =
       ".config/raycast" = "config/raycast";
       ".config/starship.toml" = "config/starship.toml";
       ".config/lla" = "config/lla";
+      ".swiftly/env.sh" = "config/swiftly/env.sh";
+      ".swiftly/env.fish" = "config/swiftly/env.fish";
+      ".config/zed" = "config/zed";
     };
-   
+
+    home.file.".btt_autoload_preset.json".source = "${flake}/config/btt/Default.bttpreset";
+
   home.packages = [
     pkgs.atuin
     pkgs.bun
