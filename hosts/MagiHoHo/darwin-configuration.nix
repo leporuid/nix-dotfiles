@@ -4,17 +4,40 @@
   lib,
   flake,
   config,
-  username,
   ...
 }:
+let
+  username = "leporuid";
+  system = pkgs.stdenv.hostPlatform.system;
+  # Mirrors red-tape's perSystem convention so home-manager modules can access
+  # per-system packages from all flake inputs (including self).
+  perSystem = builtins.mapAttrs (
+    _: input:
+    if builtins.isAttrs input && input ? packages && input.packages ? ${system} then
+      input.packages.${system}
+    else
+      { }
+  ) inputs
+  // { self = inputs.self.packages.${system}; };
+in
 {
   imports = [
+    inputs.home-manager.darwinModules.home-manager
     inputs.self.darwinModules.system-defaults
     inputs.self.darwinModules.fish-environment
     inputs.self.darwinModules.homebrew
   ];
 
- 
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    backupFileExtension = "hm-backup";
+    extraSpecialArgs = {
+      inherit inputs perSystem flake;
+    };
+    users.leporuid = "${flake}/hosts/MagiHoHo/users/leporuid/home-configuration.nix";
+  };
+
   users.users.${username} = {
     description = "Yu-Min Peng";
     home = "/Users/${username}";
@@ -57,8 +80,6 @@
   system.stateVersion = 6;
   
   system.primaryUser = username;
-  
-  home-manager.backupFileExtension = "hm-backup";
 
   nix-homebrew.enable = true;
   # A user needs to own the prefix, so we'll make it my account

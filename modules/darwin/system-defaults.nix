@@ -1,4 +1,5 @@
-{ inputs, flake, config, pkgs, lib, username, ...}:
+{ inputs, flake, config, pkgs, lib, ...}:
+let username = "leporuid"; in
 with lib;
 {
   imports = [
