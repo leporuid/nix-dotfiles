@@ -1,13 +1,12 @@
-{ inputs, flake, config, pkgs, lib, ...}:
+{ inputs, flake, config, pkgs, lib, self, ...}:
 let username = "leporuid"; in
 with lib;
 {
   imports = [
   inputs.determinate.darwinModules.default
   ];
- documentation.enable = true;
 
-  environment.etc."nix/flake-registry.json".text =
+  environment.etc."nix/flake-registry.json" = 
     let
       entry = id: to: {
         from = {
@@ -31,39 +30,25 @@ with lib;
           inherit owner repo;
         };
     in
-    builtins.toJSON {
-      flakes = [
-        (flakehub "flakehub" "DeterminateSystems" "flakehub" "0.1")
-        (flakehub "home-manager" "nix-community" "home-manager" "0")
-        (flakehub "nix" "DeterminateSystems" "nix-src" "3")
-        (flakehub "nix-darwin" "nix-darwin" "nix-darwin" "0")
-        (flakehub "nixos-generators" "nix-community" "nixos-generators" "0.1")
-        (flakehub "nixpkgs" "DeterminateSystems" "nixpkgs-weekly" "0.1")
-        (flakehub "nuenv" "DeterminateSystems" "nuenv" "0.1")
-        (flakehub "pdfs" "DeterminateSystems" "pdfs" "0.1")
-        (flakehub "schemas" "DeterminateSystems" "flake-schemas" "0")
-        (flakehub "secure-packages" "DeterminateSystems" "secure-packages-rolling" "0.1")
-        (flakehub "stable" "NixOS" "nixpkgs" "0")
-        (flakehub "templates" "DeterminateSystems" "flake-templates" "0.1")
-        (flakehub "unstable" "DeterminateSystems" "nixpkgs-weekly" "0.1")
-      ];
+    lib.mkIf (config.determinateNix.registry != null) {
+    text = builtins.toJSON {
       version = 2;
+      flakes = lib.mapAttrsToList (_n: v: {inherit (v) from to exact;}) config.determinateNix.registry;
     };
+  };
 
-  environment.systemPackages = with pkgs; [
-    coreutils
-    mosh  # system-level so non-interactive SSH can find mosh-server
-    tmux  # better than zellij for iOS terminals (scroll mode works with touch)
-  ];
-  environment.extraInit = ''
-    [[ -d /opt/homebrew ]] && eval "$(/opt/homebrew/bin/brew shellenv)"
+  environment.systemPackages = with inputs.nix-darwin.packages.${pkgs.stdenv.hostPlatform.system}; [
+        darwin-option
+        darwin-rebuild
+        darwin-version
+        darwin-uninstaller
+      ];
 
-    if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ] && [ -n "''${SSH_CONNECTION:-}" ] && [ "''${SHLVL:-0}" -eq 1 ]; then
-      . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-    fi
-  '';
-  system.configurationRevision = flake.rev or flake.dirtyRev or null;
   ids.gids.nixbld = 350;
+  programs.fish.useBabelfish = true;
+  environment.variables = {
+        MANPATH = "${config.system.path}/share/man";
+     };
 
   # ============================================================================
   # Determinate Nix Integration
@@ -72,7 +57,12 @@ with lib;
   # /etc/nix/nix.custom.conf + /etc/determinate/config.json declaratively.
   determinateNix = {
     enable = true;
-
+    distributedBuilds = true;
+    determinateNixd = {
+      builder.cpuCount = 4;
+      builder.memoryBytes = 16 * 1024 * 1024;
+      builder.state = "disabled";
+    };
     # ============================================================================
     # Nix Store Settings (written to /etc/nix/nix.custom.conf)
     # ============================================================================
@@ -80,24 +70,30 @@ with lib;
       # Hard-link identical files in the store to save disk space
       # Runs during every build — slight build-time cost for ongoing savings
       # Default: false
+      eval-cores = 0;
       auto-optimise-store = true;
-      trusted-users = [
-        "root"
-        "@admin"
-        username
-      ];
+      trusted-users = [      
+      "root"
+      "@admin"
+      username
+     ];
       accept-flake-config = true;
       substituters = [
-        "https://cache.nixos.org?priority=10"
-        "https://nix-community.cachix.org"
-      ];
-      trusted-public-keys = [
-        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      ];
+          # high priority since it's almost always used
+          "https://cache.nixos.org?priority=10"
+          "https://install.determinate.systems"
+          "https://nix-community.cachix.org"
+        ];
+        trusted-public-keys = [
+          "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+          "cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM"
+          "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+        ];
       extra-experimental-features = [
-      "build-time-fetch-tree" # Enables build-time flake inputs
-      "parallel-eval" # Enables parallel evaluation
+        "build-time-fetch-tree"
+        "external-builders"
+        "parallel-eval"
+        "wasm-builtin"
       ];
       builders-use-substitutes = true;
       fallback = true;
@@ -117,24 +113,12 @@ with lib;
       # keep-build-log = true;       # Retain build logs for debugging
       # keep-derivations = true;     # Keep .drv files (needed for nix log)
       # keep-outputs = true;         # Keep outputs reachable from installed packages
-    };
-
-    # ============================================================================
-    # Determinate Nixd Garbage Collector
-    # ============================================================================
-    # Built-in to determinate-nixd — no launchd daemon needed.
-    # Automatic mode targets: 30GB minimum free, 5-20% steady-state free,
-    # urgent cleanup below 5% free.
-    determinateNixd = {
-      garbageCollector = {
-        # "automatic" — determinate-nixd manages GC in the background
-        # "disabled" — no automatic GC (manual only: nix-collect-garbage -d)
-        strategy = "automatic";
-      };
+      log-lines = 25;
     };
   };
 
   system = {
+    configurationRevision = config._module.args.self.rev or config._module.args.self.dirtyRev or null;
     defaults = {
       loginwindow = {
         GuestEnabled = false;

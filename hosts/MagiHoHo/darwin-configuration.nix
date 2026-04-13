@@ -18,14 +18,14 @@ let
     else
       { }
   ) inputs
-  // { self = inputs.self.packages.${system}; };
+  // { self = inputs.self.packages.${system};};
 in
 {
   imports = [
-    inputs.home-manager.darwinModules.home-manager
     inputs.self.darwinModules.system-defaults
     inputs.self.darwinModules.fish-environment
     inputs.self.darwinModules.homebrew
+    inputs.home-manager.darwinModules.home-manager
   ];
 
   home-manager = {
@@ -106,7 +106,7 @@ in
   # determinateNix (enabled in system-defaults) takes over Nix management;
   # nix.enable must not be set to true as it conflicts with determinateNix.
   # mkForce satisfies home-manager's nix.package access even when nix is disabled.
-  nix.enable = false;
+  nix.enable = !config.determinateNix.enable;
 
   nix.nixPath = lib.mkForce [
     "nixpkgs=${inputs.nixpkgs}"
