@@ -12,12 +12,14 @@ pkgs.maven.buildMavenPackage {
 
   mvnHash = "sha256-b7+17CXmBB65fMG472FPjOvr+9nAsUurdBC/7esalCE=";
 
-  nativeBuildInputs = with pkgs; [ makeWrapper ];
+  nativeBuildInputs = with pkgs; [
+    makeWrapper
+  ];
 
   installPhase = with pkgs; ''
     runHook preInstall
 
-    jar_filename=MegaBasterd-${version}-jar-with-dependencies.jar
+    jar_filename="MegaBasterd-8.22-jar-with-dependencies.jar"
 
     mkdir -p $out/bin $out/share/megabasterd
     install -Dm644 target/$jar_filename $out/share/megabasterd

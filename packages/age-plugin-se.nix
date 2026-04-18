@@ -1,8 +1,4 @@
-{
-  pkgs,
-  perSystem,
-  ...
-}:
+{ pkgs, ... }:
 pkgs.stdenvNoCC.mkDerivation (
   finalAttrs:
   let
@@ -45,7 +41,9 @@ pkgs.stdenvNoCC.mkDerivation (
         version = "v${version}";
       };
 
-      help = with pkgs;runCommand "test-age-plugin-se-help" { nativeBuildInputs = [ finalAttrs.finalPackage ]; } ''
+      help = with pkgs; runCommand "test-age-plugin-se-help" {
+        nativeBuildInputs = [ finalAttrs.finalPackage ];
+      } ''
         age-plugin-se --help
         touch $out
       '';

@@ -1,10 +1,8 @@
 {
   lib,
-  pkgs,
   config,
   ...
 }:
-
 let
   cfg = config.my.programs.neovim;
 
@@ -16,7 +14,7 @@ let
     {
       "${config.xdg.dataHome}/nvim/site/pack/${group}/${subdir}/${p.name}" = {
         source = p.src;
-        recursive = p.recursive;
+        recursive = p.recursive or false;
       };
     };
 
@@ -31,36 +29,31 @@ let
       options = {
         name = lib.mkOption {
           type = lib.types.str;
-          description = "Directory name used with :packadd.";
         };
         src = lib.mkOption {
           type = lib.types.path;
-          description = "Plugin source derivation.";
         };
         start = lib.mkOption {
           type = lib.types.bool;
           default = false;
-          description = "Install under start/ when true, opt/ when false.";
         };
         recursive = lib.mkOption {
           type = lib.types.bool;
           default = false;
-          description = "Symlink the plugin files recursively when true, or the entire directory when false.";
         };
       };
     }
   );
-
 in
 {
   options.my.programs.neovim = with lib; {
     enable = mkEnableOption "Install NeoVim plugins via packpath" // {
       default = true;
     };
+
     packages = mkOption {
       type = types.attrsOf (types.listOf pluginType);
       default = { };
-      description = "Mapping from pack group to plugin list.";
     };
   };
 
