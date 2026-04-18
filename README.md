@@ -6,7 +6,7 @@ This is my dead-simple configuration, inspired by [clo4](https://github.com/clo4
 
 ```
 .
-├── flake.nix            # Unified flake: inputs, packages, darwinConfigurations, devShell
+├── flake.nix            # Use flake with red-tape
 ├── run.fish             # Task runner (source of truth for all commands)
 ├── hosts/               # Host-specific configurations
 ├── modules              # Shared NixOS/nix-darwin/home-manager modules
