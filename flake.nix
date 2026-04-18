@@ -1,5 +1,5 @@
 {
-  description = "leporuid's Nix home";
+  description = "Nix dotfiles for leporuid";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -25,13 +25,21 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
+    determinate = {
+      url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
-    motrix-next.url = "github:AnInsomniacy/motrix-next";
-    motrix-next.flake = false;
-
-    darwin-vz-nix.url = "github:takeokunn/darwin-vz-nix";
-
+    motrix-next = {
+      url = "github:AnInsomniacy/motrix-next";
+      flake = false;
+    };
+    
+    ktoolbox = {
+  	url = "github:leporuid/KToolBox/uv-migration";
+  	inputs.nixpkgs.follows = "nixpkgs";
+    };
+    
     agenix = {
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -39,23 +47,83 @@
       inputs.home-manager.follows = "home-manager";
     };
 
-    ktoolbox = {
-      url = "github:leporuid/KToolBox";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
+    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
   };
 
-  outputs =
-    { self, ... }@inputs:
-    inputs.red-tape.mkFlake {
+  outputs = inputs@{ self, nixpkgs, nixpkgs-unstable, red-tape, ... }:
+    let
+      username = "leporuid";
+      systems = [ "aarch64-darwin" ];
+
+      overlay = import ./overlays/default.nix { inherit inputs; };
+
+      forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f system);
+
+      pkgsFor = system: import nixpkgs {
+      inherit system;
+      overlays = [ overlay ];
+      config.allowUnfree = true;
+    };
+    pkgs' = system: import nixpkgs-unstable {
+      inherit system;
+      overlays = [ overlay ];
+      config.allowUnfree = true;
+    };     
+    in
+    (red-tape.mkFlake {
       inherit inputs self;
       src = ./.;
+
       modules = [
+        ({ ... }: {
+          _module.args = {
+            inherit username;
+          };
+          _module.args.pkgs' = system: import nixpkgs-unstable {
+            inherit system;
+            overlays = [ overlay ];
+            config.allowUnfree = true;
+     	  };
+        })
+
         (import "${inputs.red-tape}/contrib/darwin.nix")
         (import "${inputs.red-tape}/contrib/home-manager.nix")
       ];
+    }) // {
+      overlays.default = overlay;
+
+      packages = forAllSystems (system: {
+        default = import ./packages/run.nix {
+          pkgs = pkgsFor system;
+          flake = self;
+        };
+
+        run = import ./packages/run.nix {
+          pkgs = pkgsFor system;
+          flake = self;
+        };
+
+        hx = import ./packages/helix.nix {
+          pkgs = pkgsFor system;
+          flake = self;
+        };
+
+        helix = import ./packages/helix-clo4.nix {
+          pkgs = pkgsFor system;
+          perSystem = self.packages.${system};
+          flake = self;
+        };
+      });
+
+      devShells = forAllSystems (system: {
+  	default = import ./devshell.nix {
+    	pkgs = pkgsFor system;
+    	flake = self;
+    	home-manager = inputs.home-manager.packages.${system}.default;
+    	agenix = inputs.agenix.packages.${system}.default;
+    	run = self.packages.${system}.run;
+    	nix-darwin = inputs.nix-darwin.packages.${system}.default;
+      };
+    });
     };
 }
-

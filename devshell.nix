@@ -1,18 +1,18 @@
-{ pkgs, inputs, perSystem, ... }:
+{ pkgs, home-manager, agenix, run, nix-darwin, flake, ... }:
 pkgs.mkShellNoCC {
-  name = "nix-dotfiles";
   packages = [
-    perSystem.home-manager.default
-    perSystem.agenix.default
-    perSystem.self.run
-    pkgs.nixos-rebuild
-    pkgs.nixos-anywhere
+    home-manager
+    agenix
+    run
     pkgs.nixd
     pkgs.taplo
     pkgs.age
     pkgs.deno
-    perSystem.nix-darwin.darwin-rebuild
-  ];
+    nix-darwin
+  ]
+  ++ pkgs.lib.optional pkgs.stdenv.isLinux pkgs.nixos-rebuild
+  ++ pkgs.lib.optional pkgs.stdenv.isLinux pkgs.nixos-anywhere;
+
   shellHook = ''
     export IN_NIX_CONFIG_DEVSHELL=1
     export NIX_CONFIG_REV=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
