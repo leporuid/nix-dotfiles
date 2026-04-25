@@ -1,5 +1,6 @@
 { pname, pkgs, ... }:
-pkgs.rustPlatform.buildRustPackage {
+with pkgs;
+rustPlatform.buildRustPackage {
   inherit pname;
   version = "master";
   src = pkgs.fetchFromGitHub {
@@ -13,7 +14,7 @@ pkgs.rustPlatform.buildRustPackage {
   meta = {
     description = "Media ripper for coomer.su and kemono.su";
     homepage = "https://github.com/APT37/kumono";
-    license = pkgs.lib.licenses.mit;
+    license = lib.licenses.mit;
     maintainers = [ ];
   };
 }

@@ -1,5 +1,6 @@
 { pkgs, ... }:
-pkgs.stdenvNoCC.mkDerivation (
+with pkgs;
+stdenvNoCC.mkDerivation (
   finalAttrs:
   let
     inherit (finalAttrs) version;

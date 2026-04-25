@@ -1,9 +1,10 @@
 { pname, pkgs, ... }:
-pkgs.maven.buildMavenPackage {
+with pkgs;
+maven.buildMavenPackage {
   inherit pname;
   version = "8.22";
 
-  src = pkgs.fetchFromGitHub {
+  src = fetchFromGitHub {
     owner = "tonikelope";
     repo = pname;
     rev = "master";
@@ -12,11 +13,11 @@ pkgs.maven.buildMavenPackage {
 
   mvnHash = "sha256-b7+17CXmBB65fMG472FPjOvr+9nAsUurdBC/7esalCE=";
 
-  nativeBuildInputs = with pkgs; [
+  nativeBuildInputs = [
     makeWrapper
   ];
 
-  installPhase = with pkgs; ''
+  installPhase = ''
     runHook preInstall
 
     jar_filename="MegaBasterd-8.22-jar-with-dependencies.jar"
@@ -34,7 +35,7 @@ pkgs.maven.buildMavenPackage {
     description = "Yet another unofficial (and ugly) cross-platform MEGA downloader/uploader/streaming suite";
     homepage = "https://github.com/tonikelope/megabasterd";
     changelog = "https://github.com/tonikelope/megabasterd/releases";
-    license = pkgs.lib.licenses.gpl3Plus;
+    license = lib.licenses.gpl3Plus;
     maintainers = [ ];
     mainProgram = "megabasterd";
   };

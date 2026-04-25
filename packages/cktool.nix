@@ -1,8 +1,9 @@
 { pname, pkgs, ... }:
-pkgs.rustPlatform.buildRustPackage {
+with pkgs;
+rustPlatform.buildRustPackage {
   inherit pname;
   version = "main";
-  src = pkgs.fetchFromGitHub {
+  src = fetchFromGitHub {
     owner = "HermesMaker";
     repo = pname;
     rev = "main";
@@ -13,7 +14,7 @@ pkgs.rustPlatform.buildRustPackage {
   meta = {
     description = "Command line interface to convert strings into any case";
     homepage = "https://github.com/HermesMaker/cktool";
-    license = pkgs.lib.licenses.mit;
+    license = lib.licenses.mit;
     maintainers = [ ];
   };
 }

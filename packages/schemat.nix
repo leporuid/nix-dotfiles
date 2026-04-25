@@ -1,9 +1,10 @@
 { pname, pkgs, ... }:
-pkgs.rustPlatform.buildRustPackage {
+with pkgs;
+rustPlatform.buildRustPackage {
   inherit pname;
   version = "main";
 
-  src = pkgs.fetchFromGitHub {
+  src = fetchFromGitHub {
     owner = "raviqqe";
     repo = pname;
     rev = "main";
@@ -19,7 +20,7 @@ pkgs.rustPlatform.buildRustPackage {
   meta = {
     description = "Code formatter for Scheme, Lisp, and any S-expressions";
     homepage = "github.com/raviqqe/schemat";
-    license = pkgs.lib.licenses.unlicense;
+    license = lib.licenses.unlicense;
     maintainers = [ ];
   };
 }
