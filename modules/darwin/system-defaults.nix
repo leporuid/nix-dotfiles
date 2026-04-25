@@ -1,4 +1,4 @@
-{ inputs, flake, config, pkgs, lib, self, ... }:
+{ inputs, flake, config, pkgs, lib,  ... }:
 let
   username = "leporuid";
 in
@@ -78,7 +78,7 @@ with lib;
   };
 
   system = {
-    configurationRevision = config._module.args.self.rev or config._module.args.self.dirtyRev or null;
+    configurationRevision = flake.rev or flake.dirtyRev or "unknown";
 
     defaults = {
       loginwindow.GuestEnabled = false;

@@ -1,10 +1,9 @@
-{ config, pkgs, lib, ... }@args:
+{ config, pkgs, lib, perSystem, ... }@args:
 {
   imports = [
     ./shared.nix
   ];
 
-  manual.manpages.enable = false;
   home.sessionVariables = {
     ATUIN_NOBIND = "true";
     BAT_THEME = "Catppuccin Mocha";
@@ -31,9 +30,9 @@
     pkgs.ffmpeg
     pkgs.qpdf
     pkgs.zellij
-    pkgs.my.kumono
-    pkgs.my.ktoolbox
-    pkgs.my.age-plugin-se
+    perSystem.self.kumono
+    perSystem.ktoolbox.ktoolbox
+    perSystem.self.age-plugin-se
   ];
 
   programs.bat = {
