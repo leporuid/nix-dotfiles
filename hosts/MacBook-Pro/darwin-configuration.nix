@@ -2,6 +2,7 @@
 let
   username = "leporuid";
   hostname = "MacBook-Pro";
+  darwinConfigurations.default = self.darwinConfigurations.${hostname};
 in
 {
   imports = [
@@ -10,9 +11,8 @@ in
     inputs.self.darwinModules.homebrew
   ];
 
-  networking.hostName = hostname;
+  networking.localHostName = hostname;
   nixpkgs.hostPlatform = "aarch64-darwin";
-  nixpkgs.config.allowUnfree = true;
 
   users.users.${username} = {
     description = "Yu-Min Peng";
@@ -20,6 +20,8 @@ in
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINaZLCaoAppOpXqJmBrB8AOCEc7zffCWU3G0P+9W4tnL"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDrcoI6oOTch+FI7XVlJ5eYJaGx4ZO2noO9GcXVFMhn9"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAyz8c5h0/9ejDcYYkUZ568FUw0OAQEPfRnIbbbd4xGe"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAAIJNFFaMxFGkxbzGvTtFfu+DPlxtqK0NoaExRVDvCt"
     ];
     openssh.authorizedKeys.keyFiles = [
       "${flake}/hosts/${hostname}/users/leporuid/id_ed25519.pub"

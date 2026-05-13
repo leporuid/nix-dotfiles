@@ -12,14 +12,23 @@ with lib;
       "nixpkgs=${inputs.nixpkgs}"
       "home-manager=${inputs.home-manager}"
     ];
- 
-  environment.systemPackages = with inputs.nix-darwin.packages.${pkgs.stdenv.hostPlatform.system}; [
+
+   users.users.root = {
+        home = "/var/root";
+        shell = "/bin/zsh";
+        openssh.authorizedKeys.keyFiles = config.users.users.${username}. openssh.authorizedKeys.keyFiles;
+        openssh.authorizedKeys.keys = config.users.users.${username}. openssh.authorizedKeys.keys;
+      };
+
+  environment.systemPackages = with pkgs; [
+   pkg-config
+   mas
+   ] ++ (with inputs.nix-darwin.packages.${pkgs.stdenv.hostPlatform.system}; [
     darwin-option
     darwin-rebuild
     darwin-version
     darwin-uninstaller
-  ];
-
+    ]);
   ids.gids.nixbld = 350;
 
   environment.pathsToLink = [
@@ -34,10 +43,10 @@ with lib;
 
   determinateNix = {
     enable = true;
-    
+    distributedBuilds = true;
     customSettings = {
       flake-registry = "https://install.determinate.systems/flake-registry/stable/flake-registry.json";
-      trusted-users = [ "root" "@admin" username ];
+      trusted-users = [ "@admin" ];
       extra-substituters = [
         "https://cache.nixos.org"
         "https://nix-community.cachix.org"
@@ -63,10 +72,7 @@ with lib;
       max-free = 5368709120;
       min-free = 1073741824;
       warn-dirty = false;
-      extra-platforms = [
-        "x86_64-darwin"
-        "aarch64-darwin"
-      ];
+      extra-platforms = "x86_64-darwin";
       log-lines = 25;
     };
 

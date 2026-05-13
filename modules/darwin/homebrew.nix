@@ -26,8 +26,6 @@
     ];
 
     brews = [
-      "unxip"
-      "mas"
     ];
 
     casks = map
@@ -35,12 +33,13 @@
         inherit name;
         greedy = true;
       }) [
+	"adguard-vpn"
         "archaeology"
         "appcleaner"
         "discord"
         "bettertouchtool"
         "glance-chamburr"
-        "prettyclean"
+        "prettyclean"w
         "raycast"
         "ghostty@tip"
         "syntax-highlight"
@@ -48,7 +47,6 @@
         "zen"
         "keka"
         "iina"
-        "adguard-vpn"
         "motrix-next"
         "suspicious-package"
         "sf-symbols"

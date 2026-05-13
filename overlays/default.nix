@@ -1,5 +1,6 @@
 final: prev: {
     # Use the real determinate here if you want it available!
+    
     catppuccin-bat-theme = prev.stdenv.mkDerivation {
       pname = "catppuccin-bat-theme";
       version = "699f60f";
@@ -23,5 +24,4 @@ final: prev: {
     themes = (prev.themes or {}) // {
       bat = prev.catppuccin-bat-theme;
    };
-   inherit (import ./direnv.nix { inherit (prev) lib; } final prev) direnv;
 }

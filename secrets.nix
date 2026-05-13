@@ -8,6 +8,5 @@ let
   ];
 in
 {
-  "hosts/MagiHoHo/tailscale-authkey.age".publicKeys = [ system ] ++ leporuid;
   "hosts/MacBook-Pro/tailscale-authkey.age".publicKeys = [ system ] ++ leporuid;
  }

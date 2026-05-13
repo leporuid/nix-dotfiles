@@ -46,9 +46,9 @@ in
     # perSystem.helix.helix-cogs
     # steelWithLsp
     perSystem.self.has-ancestor
-    perSystem.self.schemat
+    # perSystem.self.schemat
     perSystem.self.ccase # Case conversion used in my Helix keybindings (TODO: port to scheme plugin?)
-    
+
     neovimWithDependencies
     pkgs.ast-grep
     pkgs.curl
@@ -69,8 +69,9 @@ in
     pkgs.just
     pkgs.lazygit
     pkgs.mise
+    neovimWithDependencies
     pkgs.nix-direnv
-    pkgs.nixfmt
+    pkgs.nixfmt-rfc-style
     pkgs.nix-output-monitor
     pkgs.nushell
     pkgs.ripgrep
@@ -81,8 +82,7 @@ in
     pkgs.vim
     pkgs.wget
     pkgs.zoxide
-  
-  # Fonts
+    # Fonts
     pkgs.nerd-fonts.roboto-mono
   ];
 

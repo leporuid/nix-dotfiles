@@ -14,25 +14,28 @@
   my.config.source = {
     ".config/atuin" = "config/atuin";
     ".config/zellij" = "config/zellij";
+    ".config/ghostty/themes" = "config/ghostty/themes";
     ".config/raycast" = "config/raycast";
     ".config/starship.toml" = "config/starship.toml";
     ".config/lla" = "config/lla";
     ".config/zed" = "config/zed";
   };
 
-  home.packages = [
-    pkgs.atuin
-    pkgs.bun
-    pkgs.bat
-    pkgs.lla
-    pkgs.starship
-    pkgs.uv
-    pkgs.ffmpeg
-    pkgs.qpdf
-    pkgs.zellij
+  home.packages = with pkgs; [
+    atuin
+    bat
+    bun
+    ffmpeg
+    lla
+    mas
+    qpdf
+    starship
+    uv
+    zellij
     perSystem.self.kumono
-    perSystem.ktoolbox.ktoolbox
     perSystem.self.age-plugin-se
+    perSystem.self.unxip
+    perSystem.ktoolbox.ktoolbox
   ];
 
   programs.bat = {
