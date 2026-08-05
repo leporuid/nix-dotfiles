@@ -48,6 +48,7 @@ in
     perSystem.self.has-ancestor
     # perSystem.self.schemat
     perSystem.self.ccase # Case conversion used in my Helix keybindings (TODO: port to scheme plugin?)
+    perSystem.self.comview
 
     neovimWithDependencies
     pkgs.ast-grep
@@ -69,9 +70,8 @@ in
     pkgs.just
     pkgs.lazygit
     pkgs.mise
-    neovimWithDependencies
     pkgs.nix-direnv
-    pkgs.nixfmt-rfc-style
+    pkgs.nixfmt
     pkgs.nix-output-monitor
     pkgs.nushell
     pkgs.ripgrep

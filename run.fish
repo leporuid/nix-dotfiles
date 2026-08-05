@@ -134,7 +134,7 @@ function MacBook-Pro -a verb
     _run $maybe_sudo darwin-rebuild $verb --flake .#MacBook-Pro --max-jobs 8 $argv[2..]
 end
 
-function MagiHoHo -a verb
+function macbook-pro -a verb
     _require pmset timeout home-manager
 
     set jobs 8

@@ -1,90 +1,141 @@
 { inputs, flake, config, pkgs, lib,  ... }:
 let
-  username = "leporuid";
+  hostname = "MacBook-Pro";
 in
 with lib;
 {
   imports = [
     inputs.determinate.darwinModules.default
   ];
-
-  nix.nixPath = lib.mkForce [
-      "nixpkgs=${inputs.nixpkgs}"
-      "home-manager=${inputs.home-manager}"
+  
+  users.users."${config.system.primaryUser}" = {
+    description = "Yu-Min Peng";
+    home = "/Users/${config.system.primaryUser}";
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINaZLCaoAppOpXqJmBrB8AOCEc7zffCWU3G0P+9W4tnL"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDrcoI6oOTch+FI7XVlJ5eYJaGx4ZO2noO9GcXVFMhn9"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAyz8c5h0/9ejDcYYkUZ568FUw0OAQEPfRnIbbbd4xGe"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAAIJNFFaMxFGkxbzGvTtFfu+DPlxtqK0NoaExRVDvCt"
     ];
+    openssh.authorizedKeys.keyFiles = [
+      "${flake}/hosts/${hostname}/users/leporuid/id_ed25519.pub"
+      "${flake}/hosts/${hostname}/id_ed25519.pub"
+    ];
+   };
 
-   users.users.root = {
-        home = "/var/root";
-        shell = "/bin/zsh";
-        openssh.authorizedKeys.keyFiles = config.users.users.${username}. openssh.authorizedKeys.keyFiles;
-        openssh.authorizedKeys.keys = config.users.users.${username}. openssh.authorizedKeys.keys;
-      };
+
+  environment.pathsToLink = [
+    "/Applications" 
+    "/share/fish/vendor_completions.d"
+    "/share/fish/vendor_functions.d"
+  ];
+
+  documentation.doc.enable = false;
+  programs.zsh.enable = true;
+  environment.enableAllTerminfo = true;
+  environment.variables = {
+    MANPATH = "${config.system.path}/share/man";
+  };
 
   environment.systemPackages = with pkgs; [
-   pkg-config
-   mas
+    pkg-config
+    mas
+    inputs.determinate.inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system}.starship
+    (pkgs.writeShellScriptBin "tailscale" ''
+      export TAILSCALE_BE_CLI=1
+      exec /Applications/Tailscale.app/Contents/MacOS/Tailscale "$@"
+    '')
    ] ++ (with inputs.nix-darwin.packages.${pkgs.stdenv.hostPlatform.system}; [
     darwin-option
     darwin-rebuild
     darwin-version
     darwin-uninstaller
-    ]);
-  ids.gids.nixbld = 350;
+   ]);
+  
 
-  environment.pathsToLink = [
-    "/share/fish/vendor_completions.d"
-    "/share/fish/vendor_functions.d"
-    "/Applications" 
-  ];
+  environment.etc."nix/registry.json".text = builtins.toJSON {
+          version = 2;
+          flakes = [
+            {
+              from = {
+                type = "indirect";
+                id = "nixpkgs";
+              };
+              to = {
+                type = "path";
+                path = inputs.self.outPath;
+              };
+            }
+          ];
+        };
 
-  environment.variables = {
-    MANPATH = "${config.system.path}/share/man";
-  };
+
+  time.timeZone = "Asia/Taipei";
+  ids.gids.nixbld = 30000;
 
   determinateNix = {
     enable = true;
     distributedBuilds = true;
     customSettings = {
-      flake-registry = "https://install.determinate.systems/flake-registry/stable/flake-registry.json";
-      trusted-users = [ "@admin" ];
+      flake-registry = "";
+      trusted-users = [
+        "root"
+        "@admin"
+      ];
+      http2 = false;
+      lazy-trees = true;
       extra-substituters = [
+        "https://cache.numtide.com"
         "https://cache.nixos.org"
         "https://nix-community.cachix.org"
         "https://nixpkgs.cachix.org"
         "https://crane.cachix.org"
       ];
       extra-trusted-public-keys = [
+        "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
         "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
         "nixpkgs.cachix.org-1:q91R6hxbwFvDqTSDKwDAV4T5PxqXGxswD8vhONFMeOE="
         "crane.cachix.org-1:8Scfpmn9w+hGdXH/Q9tTLiYAE/2dnJYRJP7kl80GuRk="
       ];
-      accept-flake-config = true;
       builders-use-substitutes = true;
       extra-experimental-features = [
         "build-time-fetch-tree"
         "external-builders"
         "parallel-eval"
         "wasm-builtin"
+        "parse-toml-timestamps"
+        "pipe-operators"
+        "blake3-hashes"
+        "verified-fetches"
+        "fetch-tree"
+        "git-hashing"
       ];
+      max-substitution-jobs = 64;
+      http-connections = 35;
+      connect-timeout = 5;
+      warn-dirty = false;
       keep-derivations = true;
       keep-outputs = true;
-      max-free = 5368709120;
-      min-free = 1073741824;
-      warn-dirty = false;
-      extra-platforms = "x86_64-darwin";
-      log-lines = 25;
+      keep-going = true;
+      stalled-download-timeout = 20;
+      sandbox = true;
+      sandbox-fallback = false;
     };
 
     determinateNixd = {
-      builder.cpuCount = 4;
-      builder.memoryBytes = 16 * 1024 * 1024 * 1024;
-      builder.state = "disabled";
+      garbageCollector.strategy = "automatic";
+      builder.state = "enabled";
     };
   };
 
   system = {
-    configurationRevision = flake.rev or flake.dirtyRev or "unknown";
+    tools.darwin-uninstaller.enable = false;
+    configurationRevision = flake.rev or flake.dirtyRev or null;
+    stateVersion = 5;
+    activationScripts.postActivation.text = ''
+    sudo -u ${config.system.primaryUser} /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
+  '';
 
     defaults = {
       loginwindow.GuestEnabled = false;
@@ -93,7 +144,6 @@ with lib;
         AppleShowAllFiles = true;
         AppleShowAllExtensions = true;
         ShowPathbar = true;
-        ShowStatusBar = true;
         FXDefaultSearchScope = "SCcf";
         FXPreferredViewStyle = "clmv";
       };

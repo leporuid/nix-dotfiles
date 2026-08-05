@@ -1,7 +1,8 @@
-{ config, pkgs, lib, perSystem, ... }@args:
+{ config, pkgs, lib, perSystem, inputs, flake, ... }@args:
 {
   imports = [
     ./shared.nix
+    inputs.determinate.homeManagerModules.default
   ];
 
   home.sessionVariables = {
@@ -26,6 +27,7 @@
     bat
     bun
     ffmpeg
+    gallery-dl
     lla
     mas
     qpdf
@@ -34,10 +36,13 @@
     zellij
     perSystem.self.kumono
     perSystem.self.age-plugin-se
+    megabasterd
     perSystem.self.unxip
     perSystem.ktoolbox.ktoolbox
   ];
 
+  programs.ssh.matchBlocks."*".extraOptions.UseKeychain = "yes";
+  programs.starship.settings = builtins.fromTOML (builtins.readFile "${config.home.homeDirectory}/.config/starship.toml");
   programs.bat = {
     config.theme = pkgs.themes.bat;
     extraPackages = with pkgs.bat-extras; [

@@ -15,8 +15,13 @@ pkgs.mkShellNoCC {
       pkgs.age
       pkgs.deno
     ]
-    ++ pkgs.lib.optional pkgs.stdenv.isLinux pkgs.nixos-rebuild
-    ++ pkgs.lib.optional pkgs.stdenv.isLinux pkgs.nixos-anywhere;
+    ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
+      pkgs.nixos-rebuild
+      pkgs.nixos-anywhere
+    ]
+    ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
+      perSystem.nix-darwin.default
+    ];
 
   shellHook = ''
     export IN_NIX_CONFIG_DEVSHELL=1
