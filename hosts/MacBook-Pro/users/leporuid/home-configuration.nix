@@ -7,7 +7,7 @@
   perSystem,
   ...
 }: {
-  home.stateVersion = "26.05";
+  home.stateVersion = "26.11";
 
   imports = [
     "${flake}/users/leporuid/home-configuration.nix"

@@ -1,9 +1,4 @@
 { inputs, pkgs, config, lib, flake, self, perSystem, ... }:
-let
-  username = "leporuid";
-  hostname = "MacBook-Pro";
-  darwinConfigurations.default = self.darwinConfigurations.${hostname};
-in
 {
   imports = [
     inputs.self.darwinModules.system-defaults
@@ -11,38 +6,32 @@ in
     inputs.self.darwinModules.homebrew
   ];
 
-  networking.localHostName = hostname;
+  
+
+  networking.hostName = "MacBook-Pro";
+   
+   
   nixpkgs.hostPlatform = "aarch64-darwin";
-
-  users.users.${username} = {
-    description = "Yu-Min Peng";
-    home = "/Users/${username}";
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINaZLCaoAppOpXqJmBrB8AOCEc7zffCWU3G0P+9W4tnL"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDrcoI6oOTch+FI7XVlJ5eYJaGx4ZO2noO9GcXVFMhn9"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAyz8c5h0/9ejDcYYkUZ568FUw0OAQEPfRnIbbbd4xGe"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAAIJNFFaMxFGkxbzGvTtFfu+DPlxtqK0NoaExRVDvCt"
-    ];
-    openssh.authorizedKeys.keyFiles = [
-      "${flake}/hosts/${hostname}/users/leporuid/id_ed25519.pub"
-      "${flake}/hosts/${hostname}/id_ed25519.pub"
-    ];
-  };
-
-  services.tailscale.enable = true;
+  
   services.openssh.enable = true;
 
-  security.pam.services.sudo_local.touchIdAuth = true;
-  security.pam.services.sudo_local.reattach = true;
+  security.pam.services.sudo_local = {
+    enable = true;
+    touchIdAuth = true; # Enable sudo authentication with Touch ID
+    reattach = true; # This fixes Touch ID for sudo not working inside tmux and screen.
+  };
 
   environment.systemPackages = [
     pkgs.fish
-  ];
+   ];
 
-  system.primaryUser = username;
-  system.stateVersion = 6;
-
+  system.primaryUser = "leporuid";  
   nix.enable = !config.determinateNix.enable;
 
   nix.channel.enable = false;
+  nix.nixPath = lib.mkForce [
+      "nixpkgs=${inputs.nixpkgs}"
+      "home-manager=${inputs.home-manager}"
+    ];
+  system.stateVersion = 6;
 }
