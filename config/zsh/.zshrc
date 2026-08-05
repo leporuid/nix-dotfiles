@@ -48,3 +48,4 @@ if [[ -d "$HOME/.local/share/mise/shims" ]]; then
 fi
 
 HISTFILE=$HOME/.local/share/zsh/.zsh_history
+eval "$(starship init zsh)"
