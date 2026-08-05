@@ -29,22 +29,16 @@ test -d $sqlite_history_dir; or mkdir -p $sqlite_history_dir
 if test -d $HOME/.local/bin; and not contains -- $HOME/.local/bin $PATH
     set --append PATH $HOME/.local/bin
 end
-# swiftly
-set -x SWIFTLY_HOME_DIR "$HOME/.swiftly"
-set -x SWIFTLY_BIN_DIR "$HOME/.swiftly/bin"
-set -x SWIFTLY_TOOLCHAINS_DIR "$HOME/Library/Developer/Toolchains"
-if test -d $SWIFTLY_BIN_DIR; and not contains -- $SWIFTLY_BIN_DIR $PATH
-    set --append PATH $SWIFTLY_BIN_DIR
-end
-# DeterminateNix
-if test -d /nix/var/nix/profiles/system/sw/bin; and not contains -- /nix/var/nix/profiles/system/sw/bin $PATH
- set --append PATH /nix/var/nix/profiles/system/sw/bin
-end
 
 # Homebrew should be available, but I don't want anything installed by
 # it to take precendence over anything installed by Nix.
 if test -d /opt/homebrew/bin; and not contains -- /opt/homebrew/bin $PATH
     set --append PATH /opt/homebrew/bin
+end
+
+# If deno is installing binaries to its own directory, include that in the path
+if test -d $HOME/.deno/bin; and not contains -- $HOME/.deno/bin $PATH
+    set --prepend PATH $HOME/.deno/bin
 end
 
 # Mise needs to be at the front of the PATH
@@ -102,4 +96,12 @@ if test $fish_complete_path[1] != $HOME/.config/fish/completions
         end
     end
     echo
+end
+if test -d ~/.swiftly
+  set -x SWIFTLY_HOME_DIR "$HOME/.swiftly"
+  set -x SWIFTLY_BIN_DIR "$HOME/.swiftly/bin"
+  set -x SWIFTLY_TOOLCHAINS_DIR "$HOME/Library/Developer/Toolchains"
+  if not contains "$SWIFTLY_BIN_DIR" $PATH
+    set -x PATH "$SWIFTLY_BIN_DIR" $PATH
+  end
 end

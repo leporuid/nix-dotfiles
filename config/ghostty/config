@@ -4,8 +4,8 @@ font-family = Maple Mono Normal NF CN
 font-feature = "zero, cv01, cv02, cv33, cv34, cv35, cv36, cv96, cv97, cv98, cv99, ss03, ss05, ss07, ss08"
 font-codepoint-map = U+E000-U+E00A,U+E0A0-U+E0A3,U+E0B0-U+E0C8,U+E0CA,U+E0CC-U+E0D7,U+E200-U+E2A9,U+E300-U+E3E3,U+E5FA-U+E6B7,U+E700-U+E8EF,U+EA60-U+EC1E,U+ED00-U+F2FF,U+EE00-U+EE0B,U+F300-U+F381,U+F400-U+F533,U+F0001-U+F1AF0=Maple Mono Normal NF CN
 font-size = 12
-window-height = 60
-window-width = 170
+window-height = 30
+window-width = 80
 window-theme = auto
 background-opacity = 0.83
 theme = "glass"

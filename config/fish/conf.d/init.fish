@@ -5,7 +5,6 @@ function __source
     end
 end
 
-
 __source zoxide init fish
 __source direnv hook fish
 __source fzf --fish
