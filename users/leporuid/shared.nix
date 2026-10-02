@@ -75,7 +75,7 @@ in
     pkgs.nix-output-monitor
     pkgs.nushell
     pkgs.ripgrep
-    pkgs.stripe-cli
+    # pkgs.stripe-cli
     pkgs.tealdeer
     pkgs.tmux
     pkgs.tree
