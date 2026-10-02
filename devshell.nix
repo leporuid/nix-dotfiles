@@ -14,8 +14,7 @@ pkgs.mkShellNoCC {
       pkgs.taplo
       pkgs.age
       pkgs.deno
-    ]
-    ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+      
       pkgs.nixos-rebuild
       pkgs.nixos-anywhere
     ]
