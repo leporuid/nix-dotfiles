@@ -34,7 +34,7 @@
     starship
     uv
     zellij
-  ] ++ lib.optionals pkgs.stdenv.isDarwin [
+  ] ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
     perSystem.self.kumono
     perSystem.self.age-plugin-se
     megabasterd
