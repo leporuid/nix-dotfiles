@@ -30,18 +30,18 @@
     bun
     ffmpeg
     gallery-dl
-    mas
     qpdf
     starship
     uv
     zellij
+  ] ++ lib.optionals pkgs.stdenv.isDarwin [
     perSystem.self.kumono
     perSystem.self.age-plugin-se
     megabasterd
     perSystem.self.unxip
     perSystem.ktoolbox.default
-  ];
- 
+    mas
+];
   programs.starship.settings = builtins.fromTOML (builtins.readFile "${flake}/config/starship.toml");
 
   programs.bat = {
