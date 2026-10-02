@@ -86,7 +86,7 @@ in
     pkgs.nerd-fonts.roboto-mono
   ];
 
-  fonts.fontconfig.enable = !pkgs.stdenv.isDarwin;
+  fonts.fontconfig.enable = !pkgs.stdenv.hostPlatform.isDarwin;
 
   my.config.source =
     let
@@ -96,12 +96,12 @@ in
       # '~/Library/Application Support'.
       # Unfortunately, this isn't common - most tools simply use ~/.config
       # regardless of platform conventions.
-      platformConfig = if pkgs.stdenv.isDarwin then "Library/Application Support" else ".config";
+      platformConfig = if pkgs.stdenv.hostPlatform.isDarwin then "Library/Application Support" else ".config";
     in
     {
       ".config/ghostty/config" = "config/ghostty/config";
       ".config/ghostty/os-config" =
-        if pkgs.stdenv.isDarwin then
+        if pkgs.stdenv.hostPlatform.isDarwin then
           "config/ghostty/os-config-darwin"
         else
           "config/ghostty/os-config-linux";
@@ -154,17 +154,7 @@ in
   home.file.".config/direnv/lib/nix-direnv.sh".source =
     "${pkgs.nix-direnv}/share/nix-direnv/direnvrc";
 
-  my.programs.fish.plugins = [
-    (pkgs.fetchFromGitHub {
-      owner = "IlanCosman";
-      repo = "tide";
-      # TODO: Update this once the changes for fish 4.3 are merged
-      rev = "fcda500d2c2996e25456fb46cd1a5532b3157b16"; # as of 2026-01-06
-      hash = "sha256-dzYEYC1bYP0rWpmz0fmBFwskxWYuKBMTssMELXXz5H0=";
-    })
-  ];
-
   home.sessionVariables.NIX_CONFIG_REV = (import ../../flake.nix).rev or "unknown";
   home.sessionVariables.NIX_CONFIG_DIR = config.my.config.directory;
-  home.sessionVariables.NIX_CONFIG_LAST_MODIFIED = toString (import ../../flake.nix).lastModified or "0";
+  home.sessionVariables.NIX_CONFIG_LAST_MODIFIED = flake.rev or flake.dirtyRev or "0";
 }

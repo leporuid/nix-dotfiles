@@ -40,8 +40,8 @@ in
     #   in
     #   babelfishTranslate sessionVars "hm-session-vars";
 
-    xdg.dataFile."fish/vendor_conf.d/00_source_plugins.fish".source = lib.mkIf (cfg.plugins != [ ]) (
-      fishIndent "source_plugins.fish" ''
+    xdg.dataFile."fish/vendor_conf.d/00_source_plugins.fish" = lib.mkIf (cfg.plugins != [ ]) {
+      source = fishIndent "source_plugins.fish" ''
         for plugin in ${lib.concatStringsSep " " cfg.plugins}
           if test -d $plugin/functions
             set fish_function_path $fish_function_path[1] $plugin/functions $fish_function_path[2..]
@@ -57,8 +57,8 @@ in
             and source $file
           end
         end
-      ''
-    );
+      '';
+    };
 
     # The following has been adapted from the Fish module of home-manager:
     # https://github.com/nix-community/home-manager/blob/0d7908bd09165db6699908b7e3970f137327cbf0/modules/programs/fish.nix#L4

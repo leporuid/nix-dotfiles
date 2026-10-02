@@ -4,18 +4,18 @@ stdenvNoCC.mkDerivation (
   finalAttrs:
   let
     inherit (finalAttrs) version;
-    sources = with pkgs; {
+    sources = {
       "aarch64-darwin" = fetchzip {
         url = "https://github.com/remko/age-plugin-se/releases/download/v${version}/age-plugin-se-v${version}-macos.zip";
-        sha256 = "sha256-9dJ7tPaFQy2xNeaRt8JnIxVu/+cMYNluKqRAWyJ7RQk=";
+        hash = "sha256-9dJ7tPaFQy2xNeaRt8JnIxVu/+cMYNluKqRAWyJ7RQk=";
       };
       "aarch64-linux" = fetchzip {
         url = "https://github.com/remko/age-plugin-se/releases/download/v${version}/age-plugin-se-v${version}-aarch64-linux.tgz";
-        sha256 = "sha256-66mnfTXk3MuReoLltFBLM6V4FC9FDj+FNpH5NfvZqFo=";
+        hash = "sha256-66mnfTXk3MuReoLltFBLM6V4FC9FDj+FNpH5NfvZqFo=";
       };
       "x86_64-linux" = fetchzip {
         url = "https://github.com/remko/age-plugin-se/releases/download/v${version}/age-plugin-se-v${version}-x86_64-linux.tgz";
-        sha256 = "sha256-LvF094XcnndqVk7jVDkcCUV/ElW52JjmrKCFKAUwwQ8=";
+        hash = "sha256-LvF094XcnndqVk7jVDkcCUV/ElW52JjmrKCFKAUwwQ8=";
       };
     };
   in
@@ -23,9 +23,11 @@ stdenvNoCC.mkDerivation (
     pname = "age-plugin-se";
     version = "0.2.1";
 
-    src = sources.${pkgs.stdenvNoCC.targetPlatform.system};
+    src = sources.${stdenvNoCC.hostPlatform.system};
 
-    installPhase = with pkgs; ''
+    installPhase = ''
+      runHook preInstall
+
       if [ -d $src/usr/bin ]; then
         install -Dm755 $src/usr/bin/age-plugin-se $out/bin/age-plugin-se
       elif [ -f $src/age-plugin-se ]; then
@@ -34,23 +36,23 @@ stdenvNoCC.mkDerivation (
         echo "error: age-plugin-se not found in $src" >&2
         exit 1
       fi
+
+      runHook postInstall
     '';
 
-    passthru.tests = with pkgs; {
+    passthru.tests = {
       version = testers.testVersion {
         package = finalAttrs.finalPackage;
         version = "v${version}";
       };
 
-      help = with pkgs; runCommand "test-age-plugin-se-help" {
-        nativeBuildInputs = [ finalAttrs.finalPackage ];
-      } ''
+      help = runCommand "test-age-plugin-se-help" { nativeBuildInputs = [ finalAttrs.finalPackage ]; } ''
         age-plugin-se --help
         touch $out
       '';
     };
 
-    meta = with pkgs; {
+    meta = {
       inherit (age-plugin-se.meta) description homepage license;
       sourceProvenance = [ lib.sourceTypes.binaryNativeCode ];
       mainProgram = "age-plugin-se";

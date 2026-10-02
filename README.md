@@ -41,7 +41,7 @@ run switch-host
 Or directly:
 
 ```bash
-darwin-rebuild switch --flake .#MacBook-Pro
+darwin-rebuild switch --flake .#MagiHoHo
 ```
 
 ### Update flake inputs

@@ -3,7 +3,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
- 
+
     blueprint = {
       url = "github:leporuid/blueprint/generic-users";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -24,34 +24,33 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nix-homebrew = {
-  	url = "github:zhaofengli/nix-homebrew";
-  	inputs.brew-src.url = "github:Homebrew/brew/master";
-    };
-    
+    nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
+
     ktoolbox = {
-      url = "github:leporuid/KToolBox/uv-migration";
+      url = "github:leporuid/KToolBox/uv-pawchive";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    
-    motrix-next = {
-      url = "github:AnInsomniacy/motrix-next";
+
+    homebrew-rayburst = {
+      url = "github:AnInsomniacy/homebrew-rayburst";
       flake = false;
     };
 
     agenix = {
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.darwin.follows = "nix-darwin";
-      inputs.home-manager.follows = "home-manager";
-    };    
+    };
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-   outputs =
+  outputs =
     inputs:
     inputs.blueprint {
       inherit inputs;
       nixpkgs.config.allowUnfree = true;
-      nixpkgs.overlays = [ (import overlays/default.nix)];
+      nixpkgs.overlays = [ (import overlays/default.nix) ];
     };
 }

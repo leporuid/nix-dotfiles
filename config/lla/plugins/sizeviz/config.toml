@@ -1,9 +1,0 @@
-[colors]
-large = "bright_red"
-size = "bright_yellow"
-medium = "bright_yellow"
-percentage = "bright_magenta"
-tiny = "bright_green"
-huge = "bright_magenta"
-info = "bright_blue"
-small = "bright_cyan"

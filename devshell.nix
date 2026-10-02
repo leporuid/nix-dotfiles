@@ -15,11 +15,11 @@ pkgs.mkShellNoCC {
       pkgs.age
       pkgs.deno
     ]
-    ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
+    ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
       pkgs.nixos-rebuild
       pkgs.nixos-anywhere
     ]
-    ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
+    ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
       perSystem.nix-darwin.default
     ];
 

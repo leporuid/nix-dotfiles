@@ -8,6 +8,5 @@ end
 __source zoxide init fish
 __source direnv hook fish
 __source fzf --fish
-__source starship init fish --print-full-init
 
 functions -e __source

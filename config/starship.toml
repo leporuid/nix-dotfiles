@@ -1,10 +1,12 @@
 # version: 1.0.0
 "$schema" = 'https://starship.rs/config-schema.json'
-add_newline = true
+add_newline = false
 continuation_prompt = "[▸▹ ](dimmed white)"
 
-format = """($nix_shell$container$fill$git_metrics)\n
-$sudo$character"""
+format = """($nix_shell$container$fill$git_metrics$hostname)\n
+$sudo\
+$character
+"""
 
 # move the rest of the prompt to the right
 right_format = """$all"""
@@ -40,6 +42,10 @@ format = "[⭘ $user]($style) "
 disabled = true
 show_always = false
 
+[hostname]
+format = "[ $ssh_symbol]($style)"
+ssh_symbol = ""
+
 [directory]
 home_symbol = "⌂"
 #home_symbol = "󰋞"
@@ -65,6 +71,7 @@ repo_root_format = '[$before_root_path]($before_repo_root_style)[$repo_root]($re
 
 [cmd_duration]
 format = "[◄ $duration ](italic white)"
+disabled = true
 
 [jobs]
 format = "[$symbol$number]($style) "
@@ -74,7 +81,7 @@ symbol = "[▶](blue italic)"
 [localip]
 ssh_only = true
 format = " ◯[$localipv4](bold magenta)"
-disabled = false
+disabled = true
 
 [time]
 disabled = true

@@ -2,7 +2,6 @@
 {
   imports = [
     ./shared.nix
-    inputs.determinate.homeManagerModules.default
   ];
 
   home.sessionVariables = {
@@ -12,14 +11,17 @@
     JJ_CONFIG = "${config.home.homeDirectory}/.config/jj/config.toml";
   };
 
-  my.config.source = {
+  my.config.source =
+   let
+     platformConfig = if pkgs.stdenv.hostPlatform.isDarwin then "Library/Application Support" else ".config";
+   in
+   {
     ".config/atuin" = "config/atuin";
-    ".config/zellij" = "config/zellij";
-    ".config/ghostty/themes" = "config/ghostty/themes";
+    ".config/zellij" = "config/zellij";    
     ".config/raycast" = "config/raycast";
-    ".config/starship.toml" = "config/starship.toml";
-    ".config/lla" = "config/lla";
+    ".config/ghostty/themes" = "config/ghostty/themes";
     ".config/zed" = "config/zed";
+    ".config/starship.toml" = "config/starship.toml";
   };
 
   home.packages = with pkgs; [
@@ -28,7 +30,6 @@
     bun
     ffmpeg
     gallery-dl
-    lla
     mas
     qpdf
     starship
@@ -38,13 +39,14 @@
     perSystem.self.age-plugin-se
     megabasterd
     perSystem.self.unxip
-    perSystem.ktoolbox.ktoolbox
+    perSystem.ktoolbox.default
   ];
+ 
+  programs.starship.settings = builtins.fromTOML (builtins.readFile "${flake}/config/starship.toml");
 
-  programs.ssh.matchBlocks."*".extraOptions.UseKeychain = "yes";
-  programs.starship.settings = builtins.fromTOML (builtins.readFile "${config.home.homeDirectory}/.config/starship.toml");
   programs.bat = {
-    config.theme = pkgs.themes.bat;
+    # Just use the exact string name of the theme
+    config.theme = "Catppuccin Mocha";
     extraPackages = with pkgs.bat-extras; [
       batdiff
       batman
@@ -52,14 +54,14 @@
       batwatch
     ];
     syntaxes = { };
-    themes.${pkgs.themes.bat} = {
+    themes."Catppuccin Mocha" = {
       src = pkgs.fetchFromGitHub {
         owner = "catppuccin";
         repo = "bat";
         rev = "699f60fc8ec434574ca7451b444b880430319941";
         sha256 = "sha256-6fWoCH90IGumAmc4buLRWL0N61op+AuMNN9CAR9/OdI=";
       };
-      file = "themes/${pkgs.themes.bat}.tmTheme";
+      file = "themes/Catppuccin Mocha.tmTheme";
     };
   };
 }

@@ -1,6 +1,5 @@
 command = /bin/sh -c "/bin/wait4path /nix/store && exec -l $SHELL"
 
-# auto-update-channel = tip
 
 macos-option-as-alt = true
 macos-titlebar-style = tabs
@@ -12,7 +11,7 @@ keybind = clear
 
 # On my Mac, I use native 4k (no scaling) which results in almost unreadable
 # text at the default size.
-font-size = 13
+font-size = 12
 
 # All keybinds are "command-first" - if it's possible to bind just using
 # command, that should be the preference. Nothing in the terminal will use
