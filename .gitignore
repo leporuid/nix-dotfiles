@@ -3,3 +3,4 @@ result-*
 .direnv
 _*
 secrets/keys.txt
+config/age
