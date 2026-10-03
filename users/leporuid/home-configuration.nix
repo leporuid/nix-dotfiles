@@ -29,6 +29,7 @@
     bat
     bun
     ffmpeg
+    yt-dlp
     gallery-dl
     qpdf
     starship
