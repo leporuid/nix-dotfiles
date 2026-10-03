@@ -105,15 +105,15 @@ function nixos -a verb
     if test $this_host != nixos
         # If not building on nixos, set nixos to be the target.
         # Otherwise, it is definitely a mistake to switch on the local system.
-        set --append rebuild_args --use-remote-sudo --target-host leporuid@nixos
+        set --append rebuild_args --elevate=sudo --target-host leporuid@nixos
         echo (set_color --dim --italics)"not on nixos, targeting remote host..."(set_color normal)
 
         # If the current system isn't x86-64 Linux, then nixos needs to build
-        # its own configuration. --fast (--no-build-nix) is also required because
+        # its own configuration. --no-reexec (--no-build-nix) is also required because
         # the local system will attempt to execute a version of `nix` that it can't
         # run.
         if test (nix eval --impure --raw --expr 'builtins.currentSystem') != aarch64-linux
-            set --append rebuild_args --build-host leporuid@nixos --fast
+            set --append rebuild_args --build-host leporuid@nixos --no-reexec
             echo (set_color --dim --italics)"not on aarch64-linux, performing remote build..."(set_color normal)
         end
 
