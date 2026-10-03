@@ -27,7 +27,7 @@
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
 
     ktoolbox = {
-      url = "github:leporuid/KToolBox/uv-pawchive";
+      url = "github:leporuid/KToolBox/fix-test";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
