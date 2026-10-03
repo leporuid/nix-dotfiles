@@ -28,13 +28,17 @@ final: prev: {
   };
   
   n-m3u8dl-re = (prev.n-m3u8dl-re.override {
-    buildDotnetModule = args: prev.buildDotnetModule (args // {
-      dotnet-sdk = prev.dotnetCorePackages.sdk_8_0;
-      dotnet-runtime = prev.dotnetCorePackages.runtime_8_0;
-    });
+    buildDotnetModule = args: prev.buildDotnetModule (
+      finalAttrs: (args finalAttrs) // {
+        dotnet-sdk = prev.dotnetCorePackages.sdk_9_0;
+        dotnet-runtime = prev.dotnetCorePackages.runtime_9_0;
+        
+        projectFile = "src/N_m3u8DL-RE/N_m3u8DL-RE.csproj";
+        doCheck = false;
+      }
+    );
   }).overrideAttrs (old: {
-
-    version = "main";
+    version = "0.0.0-unstable";
 
     src = prev.fetchFromGitHub {
       owner = "nilaoda";
@@ -44,6 +48,21 @@ final: prev: {
     };
 
     nugetDeps = ./n-m3u8dl-re-deps.nix;
+    patches = [];
+
+    postPatch = (old.postPatch or "") + ''
+      # 1. 降級未穩定的目標框架
+      find . -type f \( -name "*.csproj" -o -name "*.props" \) -exec sed -i 's/net10\.0/net9.0/g' {} +
+      
+      # 🌟 2. 精準清空 AOT 標籤，避免誤刪 XML 結構
+      find . -type f \( -name "*.csproj" -o -name "*.props" \) -exec sed -i 's/<PublishTrimmed>true<\/PublishTrimmed>//g' {} +
+      find . -type f \( -name "*.csproj" -o -name "*.props" \) -exec sed -i 's/<PublishAot>true<\/PublishAot>//g' {} +
+      find . -type f \( -name "*.csproj" -o -name "*.props" \) -exec sed -i 's/<PublishSingleFile>true<\/PublishSingleFile>//g' {} +
+      
+      # 3. 物理超渡解決方案與測試專案
+      rm -f src/N_m3u8DL-RE.sln
+      rm -rf src/N_m3u8DL-RE.Tests
+    '';
   });
 
   megabasterd = prev.megabasterd.overrideAttrs (old: rec {
