@@ -11,8 +11,8 @@ final: prev: {
       sha256 = "sha256-6fWoCH90IGumAmc4buLRWL0N61op+AuMNN9CAR9/OdI=";
     };
     installPhase = ''
-      mkdir -p $out
-      cp $src/themes/*.tmTheme $out/
+      mkdir -p $out/themes
+      cp $src/themes/*.tmTheme $out/themes/
     '';
     meta = {
       description = "Catppuccin themes for bat";
@@ -26,4 +26,24 @@ final: prev: {
     # FIX: Changed `prev` to `final` to reference the package defined above
     bat = final.catppuccin-bat-theme;
   };
+
+  megabasterd = prev.megabasterd.overrideAttrs (old: rec {
+    version = "8.61"; 
+    src = final.fetchFromGitHub {
+      owner = "tonikelope";
+      repo = "megabasterd";
+      tag = "v${version}";
+      hash = "sha256-H3nW+phtT30nhKIBxlS3CAqVxFIWcBvStbNlnobWEiQ="; 
+    };
+    installPhase = ''
+      runHook preInstall
+
+      makeWrapper ${final.jre}/bin/java $out/bin/megabasterd \
+        --add-flags "-jar $out/share/java/MegaBasterd-${version}-jar-with-dependencies.jar"
+
+      install -Dm644 target/MegaBasterd-${version}-jar-with-dependencies.jar $out/share/java/MegaBasterd-${version}-jar-with-dependencies.jar
+
+      runHook postInstall
+    '';
+  });
 }

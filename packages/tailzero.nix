@@ -11,17 +11,17 @@ let
     "x86_64-linux" = {
       os = "linux";
       arch = "amd64";
-      hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # 一般 x86 Linux
+      hash = "sha256-YAq6mAbBwXIiYrywowPOT8XjuPIeVh02VjOyZIEqQoE="; # 一般 x86 Linux
     };
     "aarch64-darwin" = {
       os = "darwin";
       arch = "arm64";
-      hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # M1/M2/M3 Mac
+      hash = "sha256-pWeD40KRs5nPwoh8ukNHD9KcDTcEAy6F7wH1QKnCXtY="; # M1/M2/M3 Mac
     };
     "x86_64-darwin" = {
       os = "darwin";
       arch = "amd64";
-      hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # Intel Mac
+      hash = "sha256-EdTHqqXTU0F3bYDWWMj5/3XpER9bfpEW6ynHFRjqp+Q="; # Intel Mac
     };
   };
 
