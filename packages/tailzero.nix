@@ -6,7 +6,7 @@ let
     "aarch64-linux" = {
       os = "linux";
       arch = "arm64";
-      hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # Oracle ARM
+      hash = "sha256-H2PcspfmvoWt/CU1Tc4J+5+gKCRV2HxIzFdtS5FvJJE="; # Oracle ARM
     };
     "x86_64-linux" = {
       os = "linux";
