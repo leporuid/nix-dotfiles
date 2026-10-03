@@ -27,7 +27,18 @@ final: prev: {
     bat = final.catppuccin-bat-theme;
   };
   
-  #n-m3u8dl-re-bin = prev.callPackage ./n-m3u8dl-re-bin.nix { };
+  n-m3u8dl-re = prev.n-m3u8dl-re.overrideAttrs (old: {
+    version = "unstable-main";
+
+    src = prev.fetchFromGitHub {
+      owner = "nilaoda";
+      repo = "N_m3u8DL-RE";
+      rev = "main";
+      hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    };
+
+    nugetDeps = ./n-m3u8dl-re-deps.nix; 
+  });
 
   megabasterd = prev.megabasterd.overrideAttrs (old: rec {
     version = "8.61"; 
