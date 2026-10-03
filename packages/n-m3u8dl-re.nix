@@ -9,7 +9,7 @@ buildDotnetModule rec {
     repo = pname;
     rev = "main";
     # ⚠️ 因為程式碼來源變了，請先使用全 0 假 Hash 讓 Nix 報錯並給出正確的新 Hash
-    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    hash = "sha256-2esn4ULbYmgmxv8c35s7LMiK7xPWrh32S+zDNjbo+JM=";
   };
 
   projectFile = "src/N_m3u8DL-RE/N_m3u8DL-RE.csproj";
