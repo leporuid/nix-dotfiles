@@ -2,5 +2,5 @@ result
 result-*
 .direnv
 _*
-secrets/keys.txt
+secrets/*
 config/age
