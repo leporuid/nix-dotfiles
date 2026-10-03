@@ -36,6 +36,7 @@
     uv
     zellij
   ] ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
+    perSystem.self."n-m3u8dl-re"
     perSystem.self.kumono
     perSystem.self.age-plugin-se
     megabasterd

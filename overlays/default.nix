@@ -26,6 +26,8 @@ final: prev: {
     # FIX: Changed `prev` to `final` to reference the package defined above
     bat = final.catppuccin-bat-theme;
   };
+  
+  #n-m3u8dl-re-bin = prev.callPackage ./n-m3u8dl-re-bin.nix { };
 
   megabasterd = prev.megabasterd.overrideAttrs (old: rec {
     version = "8.61"; 
