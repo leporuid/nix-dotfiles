@@ -140,7 +140,7 @@ function macbook-pro -a verb
 
     set jobs 8
 
-    if test $this_host = macbook-air; and pmset -g batt | grep -q "Battery Power"
+    if test $this_host = MacBook-Pro; and pmset -g batt | grep -q "Battery Power"
         echo (set_color --dim --italics)"on battery power, testing connection to macmini..."(set_color normal)
         if timeout 3 nix store info --store ssh-ng://leporuid@MacBook-Pro &>/dev/null
             echo (set_color --dim --italics)"delegating to macmini..."(set_color normal)
