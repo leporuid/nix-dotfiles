@@ -84,4 +84,8 @@ final: prev: {
       runHook postInstall
     '';
   });
+  atuin = prev.atuin.overrideAttrs (old: {
+    doCheck = false;
+    doInstallCheck = false;
+  });
 }

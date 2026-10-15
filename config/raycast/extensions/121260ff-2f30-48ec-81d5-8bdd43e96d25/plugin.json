@@ -1,0 +1,20 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "openqr",
+  "description": "Generate QR codes and manage dynamic (editable) QR codes with scan analytics, straight from Raycast.",
+  "author": {
+    "name": "sam_moreton"
+  },
+  "license": "MIT",
+  "keywords": [
+    "qr",
+    "qr-code",
+    "qrcode",
+    "dynamic-qr",
+    "openqr",
+    "short-link"
+  ],
+  "version": "1.1.0",
+  "homepage": "https://openqr.uk/api",
+  "repository": "https://github.com/open-qr/openqr.git"
+}
