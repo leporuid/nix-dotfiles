@@ -14,7 +14,8 @@ in
     ./disk-config.nix
     inputs.agenix.nixosModules.default
     inputs.disko.nixosModules.disko
-    
+    inputs.determinate.nixosModules.default
+
     ../../modules/nixos/age-secrets.nix
     ../../modules/nixos/auto-upgrade.nix
     ../../modules/nixos/base.nix
