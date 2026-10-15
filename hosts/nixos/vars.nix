@@ -8,6 +8,7 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAAIJNFFaMxFGkxbzGvTtFfu+DPlxtqK0NoaExRVDvCt"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL7u84aJ0ObCzO1tbh6VccXpqUMVU+Y5nUzf7/w9Vv8k"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDk311ALajXHKtFUSPfuCiN9i4Spe02kRM1x9VSoBOnL"
+    "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBN6rDDWpOzuVy7v8foYFJdjlcNJBZpmZcwZWWhoa3dbprqJGRClVKyg1NYNj1a3D43XvxeA+Vd1AgaAQDrSIbIE= #SSH ID - @leporuid"
   ];
   locale = "en_US.UTF-8";
   timezone = "Asia/Taipei";
