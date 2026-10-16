@@ -51,15 +51,15 @@ final: prev: {
     patches = [];
 
     postPatch = (old.postPatch or "") + ''
-      # 1. 降級未穩定的目標框架
+      
       find . -type f \( -name "*.csproj" -o -name "*.props" \) -exec sed -i 's/net10\.0/net9.0/g' {} +
       
-      # 🌟 2. 精準清空 AOT 標籤，避免誤刪 XML 結構
+      
       find . -type f \( -name "*.csproj" -o -name "*.props" \) -exec sed -i 's/<PublishTrimmed>true<\/PublishTrimmed>//g' {} +
       find . -type f \( -name "*.csproj" -o -name "*.props" \) -exec sed -i 's/<PublishAot>true<\/PublishAot>//g' {} +
       find . -type f \( -name "*.csproj" -o -name "*.props" \) -exec sed -i 's/<PublishSingleFile>true<\/PublishSingleFile>//g' {} +
       
-      # 3. 物理超渡解決方案與測試專案
+      
       rm -f src/N_m3u8DL-RE.sln
       rm -rf src/N_m3u8DL-RE.Tests
     '';
