@@ -24,5 +24,6 @@ pkgs.mkShellNoCC {
 
   shellHook = ''
     export IN_NIX_CONFIG_DEVSHELL=1
+    export PATH="/nix/var/nix/profiles/default/bin:$PATH"
   '';
 }
