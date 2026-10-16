@@ -41,6 +41,11 @@ if test -d $HOME/.deno/bin; and not contains -- $HOME/.deno/bin $PATH
     set --prepend PATH $HOME/.deno/bin
 end
 
+# If bun is installing binaries to its own directory, include that in the path
+if test -d $HOME/.bun/bin; and not contains -- $HOME/.bun/bin $PATH
+    set --prepend PATH $HOME/.bun/bin
+end
+
 # Mise needs to be at the front of the PATH
 if test -d $HOME/.local/share/mise/shims; and not contains -- $HOME/.local/share/mise/shims $PATH
     set --prepend PATH $HOME/.local/share/mise/shims

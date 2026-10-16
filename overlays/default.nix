@@ -43,7 +43,7 @@ final: prev: {
     src = prev.fetchFromGitHub {
       owner = "nilaoda";
       repo = "N_m3u8DL-RE";
-      rev = "main";
+      rev = "9d995eb5e88ff63886a7d7e2f112905a8bbbb4c5";
       hash = "sha256-2esn4ULbYmgmxv8c35s7LMiK7xPWrh32S+zDNjbo+JM=";
     };
 
