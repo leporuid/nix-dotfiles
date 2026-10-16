@@ -43,7 +43,6 @@ in
 
   home.packages = [
     perSystem.helix.helix
-    #(if pkgs.stdenv.hostPlatform.isDarwin then perSystem.helix.helix else pkgs.helix)
     # perSystem.helix.helix-cogs
     # steelWithLsp
     perSystem.self.has-ancestor
