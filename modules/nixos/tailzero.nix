@@ -49,7 +49,7 @@ in
   };
 
   age.secrets.tailzero-token = {
-    file = ../../secrets/tailzero-token.age;
+    file = ../../hosts/nixos/tailzero-token.age;
     owner = "root";
     group = "root";
     mode = "0400";
