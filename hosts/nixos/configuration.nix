@@ -39,7 +39,6 @@ in
     initrd.systemd.enable = true;
   };
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
   fileSystems."/boot".options = [ "umask=0077" ];
   systemd.targets.multi-user.enable = true;
 
@@ -53,6 +52,7 @@ in
     isNormalUser = true;
     extraGroups = [ "networkmanager" "wheel" ];
     openssh.authorizedKeys.keys = vars.sshKeys;
+    shell = pkgs.zsh;
   };
 
   security.sudo.extraRules = [
@@ -83,7 +83,6 @@ in
   documentation.enable = false;
 
   nix.registry.nixpkgs.flake = inputs.nixpkgs;
-  
   nix.registry.self.flake = flake;
 
   system.stateVersion = "26.11";
