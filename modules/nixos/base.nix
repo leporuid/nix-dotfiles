@@ -1,5 +1,9 @@
-{ ... }: 
+{ inputs, flake, ... }:
 {
+imports = [
+    inputs.determinate.nixosModules.default
+  ];
+
   nix.settings.auto-optimise-store = true;
   nix.optimise.automatic = true;
 
