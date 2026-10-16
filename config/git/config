@@ -7,20 +7,15 @@
 [user]
     email = "leporuid@icloid.com"
     name = "leporuid"
-	signingkey = /Users/leporuid/.ssh/id_ed25519.pub
-[commit]
-    gpgsign = true
-[gpg]
-    format = ssh
 
 [alias]
 	root = rev-parse --show-toplevel
 
-[includeIf "gitdir:~/Developer/**"]
-	path = ~/Developer/.gitconfig
+[includeIf "gitdir:~/Developer/Work/**"]
+	path = ~/Developer/Work/.gitconfig
 
-[includeIf "gitdir:~/Repos/**"]
-	path = ~/Repos/.gitconfig
+[includeIf "gitdir:~/Repos/Work/**"]
+	path = ~/Repos/Work/.gitconfig
 
 [core]
 	pager = delta
@@ -33,5 +28,3 @@
 
 [merge]
 	conflictStyle = zdiff3
-[credential]
-	helper = 
