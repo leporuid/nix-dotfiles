@@ -20,7 +20,7 @@
     ".config/zed" = "config/zed";
   };
 
-  home.packages = with pkgs; [] ++ with pkgs; lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
+  home.packages = with pkgs; [
     atuin
     ffmpeg
     n-m3u8dl-re
@@ -33,6 +33,6 @@
     perSystem.self.unxip
     perSystem.ktoolbox.default
     mas
-];
+   ];
   
 }
