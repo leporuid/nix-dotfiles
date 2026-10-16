@@ -1,4 +1,9 @@
-{ inputs, config, lib, ... }:
+{
+  inputs,
+  config,
+  lib,
+  ...
+}:
 
 {
   imports = [
@@ -17,54 +22,58 @@
       autoUpdate = true;
       cleanup = "none";
       upgrade = true;
-      extraFlags = [ "--zap" "--force-cleanup" "--quiet" ];
+      extraFlags = [
+        "--zap"
+        "--force-cleanup"
+        "--quiet"
+      ];
     };
 
-    taps = lib.map 
-     (name: {
-  	inherit name;
- 	trusted = true;
-     }) (builtins.attrNames config.nix-homebrew.taps);
+    taps = lib.map (name: {
+      inherit name;
+      trusted = true;
+    }) (builtins.attrNames config.nix-homebrew.taps);
 
     brews = [ ];
 
-    casks = map
-      (name: {
-        inherit name;
-        greedy = true;
-      }) [
-        "adguard-vpn"
-        "archaeology"
-        "appcleaner"
-        "discord"
-        "bettertouchtool"
-        "glance-chamburr"
-        "prettyclean"
-        "raycast"
-        "ghostty"
-        "syntax-highlight"
-        "zed"
-        "zen"
-        "keka"
-        "iina"
-        "suspicious-package"
-        "sf-symbols"
-        "font-maple-mono"
-        "font-maple-mono-nf"
-        "font-maple-mono-cn"
-        "font-maple-mono-nf-cn"
-        "font-maple-mono-normal"
-        "font-maple-mono-normal-nf"
-        "font-maple-mono-normal-cn"
-        "font-maple-mono-normal-nf-cn"
-        "font-sf-mono"
-        "font-sf-pro"
-        "font-sketchybar-app-font"
-        "orion"
-        "arc"
-        "aninsomniacy/rayburst/rayburst"
-        "tailscale-app"
-      ];
+    casks =
+      map
+        (name: {
+          inherit name;
+          greedy = true;
+        })
+        [
+          "adguard-vpn"
+          "archaeology"
+          "appcleaner"
+          "discord"
+          "bettertouchtool"
+          "prettyclean"
+          "raycast"
+          "ghostty"
+          "syntax-highlight"
+          "zed"
+          "zen"
+          "keka"
+          "iina"
+          "suspicious-package"
+          "sf-symbols"
+          "font-maple-mono"
+          "font-maple-mono-nf"
+          "font-maple-mono-cn"
+          "font-maple-mono-nf-cn"
+          "font-maple-mono-normal"
+          "font-maple-mono-normal-nf"
+          "font-maple-mono-normal-cn"
+          "font-maple-mono-normal-nf-cn"
+          "font-sf-mono"
+          "font-sf-pro"
+          "font-sketchybar-app-font"
+          "orion"
+          "arc"
+          "aninsomniacy/rayburst/rayburst"
+          "tailscale-app"
+        ];
   };
 
   nix-homebrew = {
@@ -77,12 +86,12 @@
   };
 
   system.activationScripts.preActivation.text = lib.mkAfter ''
-   if [ -x ${config.homebrew.prefix}/bin/brew ]; then
-      # shellcheck disable=SC2043
-      for tap in ${lib.escapeShellArgs (builtins.map (t: t.name) config.homebrew.taps)}; do
-        sudo --user=${lib.escapeShellArg config.system.primaryUser} --set-home \
-          ${config.homebrew.prefix}/bin/brew trust "$tap" >/dev/null 2>&1 || true
-      done
-    fi
+    if [ -x ${config.homebrew.prefix}/bin/brew ]; then
+       # shellcheck disable=SC2043
+       for tap in ${lib.escapeShellArgs (builtins.map (t: t.name) config.homebrew.taps)}; do
+         sudo --user=${lib.escapeShellArg config.system.primaryUser} --set-home \
+           ${config.homebrew.prefix}/bin/brew trust "$tap" >/dev/null 2>&1 || true
+       done
+     fi
   '';
 }
