@@ -3,6 +3,7 @@
   services.tailscale = {
     enable = true;
     interfaceName = "userspace-networking";
+    authKeyFile = config.age.secrets.tailscale-oracle.path;
     useRoutingFeatures = "both";
     extraUpFlags = [
       "--advertise-exit-node"

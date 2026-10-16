@@ -10,7 +10,7 @@ in {
   "hosts/MacBook-Pro/tailscale-authkey.age".publicKeys = [ system ] ++ leporuid;
   "hosts/MacBook-Pro/flakehub.age".publicKeys = [ system ] ++ leporuid;
 
-  # 確保舊有的 tailzero*.age 檔案已經複製到 nix-dotfiles/secrets/ 下
   "hosts/nixos/tailzero-invite.age".publicKeys = [ nixos ] ++ leporuid;
   "hosts/nixos/tailzero-token.age".publicKeys = [ nixos ] ++ leporuid;
+  "hosts/nixos/tailscale-oracle.age".publicKeys = [ nixos ] ++ leporuid;
 }

@@ -81,9 +81,9 @@ in
 
   services.getty.autologinUser = null;
   documentation.enable = false;
-
+  
   nix.registry.nixpkgs.flake = inputs.nixpkgs;
   nix.registry.self.flake = flake;
-
+  age.secrets.tailscale-oracle.file = ./tailscale-oracle.age;
   system.stateVersion = "26.11";
 }
