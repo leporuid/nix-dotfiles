@@ -25,18 +25,18 @@
   };
 
   home.packages = with pkgs; [
-    atuin
     bat
     bun
-    ffmpeg
-    yt-dlp
-    gallery-dl
-    qpdf
     starship
     uv
     zellij
   ] ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
-    pkgs.n-m3u8dl-re
+    atuin
+    ffmpeg
+    n-m3u8dl-re
+    yt-dlp
+    gallery-dl
+    qpdf
     perSystem.self.kumono
     perSystem.self.age-plugin-se
     megabasterd
