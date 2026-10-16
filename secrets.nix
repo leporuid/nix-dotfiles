@@ -8,6 +8,8 @@ let
   ];
 in {
   "hosts/MacBook-Pro/tailscale-authkey.age".publicKeys = [ system ] ++ leporuid;
+  "secrets/tailscale-unifi.age".publicKeys = [ system ] ++ leporuid;
+  "hosts/MacBook-Pro/tailscale-ios.age".publicKeys = [ system ] ++ leporuid;
   "hosts/MacBook-Pro/flakehub.age".publicKeys = [ system ] ++ leporuid;
 
   "hosts/nixos/tailzero-invite.age".publicKeys = [ nixos ] ++ leporuid;
