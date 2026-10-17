@@ -40,7 +40,7 @@ final: prev: {
   }).overrideAttrs (old: {
     version = "0.0.0-unstable-${inputs.n-m3u8dl-re.shortRev or "dirty"}";
 
-    src = inputs.n-m3u8dl-re
+    src = inputs.n-m3u8dl-re;
 
     nugetDeps = ./n-m3u8dl-re-deps.nix;
     patches = [];
