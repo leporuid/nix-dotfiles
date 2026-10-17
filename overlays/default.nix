@@ -40,12 +40,7 @@ final: prev: {
   }).overrideAttrs (old: {
     version = "0.0.0-unstable-${inputs.n-m3u8dl-re.shortRev or "dirty"}";
 
-    src = prev.fetchFromGitHub {
-      owner = "nilaoda";
-      repo = "N_m3u8DL-RE";
-      rev = "main";
-      hash = "sha256-hbzcYAq6o6utmAOtSTZT8NeqbSaPUvSgT+Zr2GgykFw=";
-    };
+    src = inputs.n-m3u8dl-re
 
     nugetDeps = ./n-m3u8dl-re-deps.nix;
     patches = [];
