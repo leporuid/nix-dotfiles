@@ -38,7 +38,7 @@ final: prev: {
       }
     );
   }).overrideAttrs (old: {
-    version = "0.0.0-unstable";
+    version = "0.0.0-unstable-${inputs.n-m3u8dl-re.shortRev or "dirty"}";
 
     src = prev.fetchFromGitHub {
       owner = "nilaoda";

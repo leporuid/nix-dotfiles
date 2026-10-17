@@ -36,6 +36,11 @@
       flake = false;
     };
 
+    n-m3u8dl-re = {
+      url = "github:nilaoda/N_m3u8DL-RE/main";
+      flake = false;
+    };
+
     agenix = {
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -51,6 +56,6 @@
     inputs.blueprint {
       inherit inputs;
       nixpkgs.config.allowUnfree = true;
-      nixpkgs.overlays = [ (import overlays/default.nix) ];
+      nixpkgs.overlays = [ (import overlays/default.nix { inherit inputs; }) ];
     };
 }
