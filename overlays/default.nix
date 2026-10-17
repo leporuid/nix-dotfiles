@@ -44,7 +44,7 @@ final: prev: {
       owner = "nilaoda";
       repo = "N_m3u8DL-RE";
       rev = "main";
-      hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+      hash = "sha256-hbzcYAq6o6utmAOtSTZT8NeqbSaPUvSgT+Zr2GgykFw=";
     };
 
     nugetDeps = ./n-m3u8dl-re-deps.nix;
