@@ -146,6 +146,8 @@ final: prev: {
       '';
 
       postInstall = (old.postInstall or "") + prev.lib.optionalString prev.stdenv.hostPlatform.isDarwin ''
+        mkdir -p "$out/bin"
+
         cat << 'EOF' > "$out/bin/m3u8dl-handler"
 #!${prev.python3}/bin/python3
 import base64
