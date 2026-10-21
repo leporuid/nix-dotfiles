@@ -135,6 +135,15 @@ final: prev: {
       nugetDeps = ./n-m3u8dl-re-deps.nix;
       patches = [];
 
+      nativeBuildInputs = (old.nativeBuildInputs or []) ++ prev.lib.optionals prev.stdenv.hostPlatform.isDarwin [
+        prev.clang
+        prev.apple-sdk
+      ];
+
+      buildInputs = (old.buildInputs or []) ++ prev.lib.optionals prev.stdenv.hostPlatform.isDarwin [
+        prev.apple-sdk
+      ];
+
       postPatch = (old.postPatch or "") + ''
         find . -type f \( -name "*.csproj" -o -name "*.props" \) -exec sed -i 's/net10\.0/net9.0/g' {} +
         find . -type f \( -name "*.csproj" -o -name "*.props" \) -exec sed -i 's/<PublishTrimmed>true<\/PublishTrimmed>//g' {} +
@@ -435,7 +444,7 @@ EOF
         mkdir -p "$appDir/MacOS"
         cp "${infoPlist}" "$appDir/Info.plist"
 
-        $CC -O2 -Wall -Wno-unused-parameter "${objcSource}" \
+        clang -O2 -Wall -Wno-unused-parameter "${objcSource}" \
           -framework Cocoa \
           -DHANDLER_PATH="\"$out/bin/m3u8dl-handler\"" \
           -o "$appDir/MacOS/M3U8DLProtocol"
