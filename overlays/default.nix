@@ -146,27 +146,6 @@ final: prev: {
       '';
 
       postInstall = (old.postInstall or "") + prev.lib.optionalString prev.stdenv.hostPlatform.isDarwin ''
-        mv "$out/bin/N_m3u8DL-RE" "$out/bin/.N_m3u8DL-RE-unwrapped"
-
-        cat << 'WRAPPER_EOF' > "$out/bin/N_m3u8DL-RE"
-#!/bin/bash
-BIN_DIR="$(cd "$(dirname "$0")" && pwd)"
-APP_PATH="$(dirname "$BIN_DIR")/Applications/M3U8DLProtocol.app"
-STAMP_DIR="$HOME/.cache/n-m3u8dl-re"
-STAMP_FILE="$STAMP_DIR/registered_path"
-LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
-
-if [ -f "$LSREGISTER" ] && [ -d "$APP_PATH" ]; then
-  if [ ! -f "$STAMP_FILE" ] || [ "$(cat "$STAMP_FILE" 2>/dev/null)" != "$APP_PATH" ]; then
-    mkdir -p "$STAMP_DIR" 2>/dev/null
-    ("$LSREGISTER" -f "$APP_PATH" >/dev/null 2>&1 && echo "$APP_PATH" > "$STAMP_FILE" 2>/dev/null) &
-  fi
-fi
-
-exec "$BIN_DIR/.N_m3u8DL-RE-unwrapped" "$@"
-WRAPPER_EOF
-        chmod +x "$out/bin/N_m3u8DL-RE"
-
         cat << 'EOF' > "$out/bin/m3u8dl-handler"
 #!${prev.python3}/bin/python3
 import base64
@@ -458,6 +437,29 @@ EOF
           -framework Cocoa \
           -DHANDLER_PATH="\"$out/bin/m3u8dl-handler\"" \
           -o "$appDir/MacOS/M3U8DLProtocol"
+      '';
+
+      postFixup = (old.postFixup or "") + prev.lib.optionalString prev.stdenv.hostPlatform.isDarwin ''
+        tmpWrapper=$(mktemp)
+        cat << 'WRAPPER_HEADER' > "$tmpWrapper"
+STAMP="$HOME/.cache/n-m3u8dl-re/registered_path"
+APP="@APP_PATH@"
+LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+if [ -f "$LSREGISTER" ] && [ -d "$APP" ]; then
+  if [ ! -f "$STAMP" ] || [ "$(cat "$STAMP" 2>/dev/null)" != "$APP" ]; then
+    mkdir -p "$(dirname "$STAMP")" 2>/dev/null
+    ("$LSREGISTER" -f "$APP" >/dev/null 2>&1 && echo "$APP" > "$STAMP" 2>/dev/null) &
+  fi
+fi
+WRAPPER_HEADER
+        substituteInPlace "$tmpWrapper" --replace-fail "@APP_PATH@" "$out/Applications/M3U8DLProtocol.app"
+
+        mv "$out/bin/N_m3u8DL-RE" "$out/bin/.N_m3u8DL-RE-bin"
+        head -n 1 "$out/bin/.N_m3u8DL-RE-bin" > "$out/bin/N_m3u8DL-RE"
+        cat "$tmpWrapper" >> "$out/bin/N_m3u8DL-RE"
+        tail -n +2 "$out/bin/.N_m3u8DL-RE-bin" >> "$out/bin/N_m3u8DL-RE"
+        rm -f "$tmpWrapper" "$out/bin/.N_m3u8DL-RE-bin"
+        chmod +x "$out/bin/N_m3u8DL-RE"
       '';
     });
 
