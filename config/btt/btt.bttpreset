@@ -2703,6 +2703,32 @@
           "BTTGestureNotes" : "TipTap Mitte (2 Finger fest)"
         },
         {
+          "BTTLastUpdatedAt" : 1792389000.0,
+          "BTTTriggerType" : 643,
+          "BTTTriggerTypeDescriptionReadOnly" : "Named Trigger",
+          "BTTTriggerTypeDescription" : "Named Trigger: cat-catch-dl",
+          "BTTTriggerClass" : "BTTTriggerTypeOtherTriggers",
+          "BTTUUID" : "C47CA7C0-B3B8-4B77-9A11-000000000001",
+          "BTTTriggerName" : "cat-catch-dl",
+          "BTTEnabled" : 1,
+          "BTTEnabled2" : 1,
+          "BTTOrder" : 99,
+          "BTTActionsToExecute" : [
+            {
+              "BTTLastUpdatedAt" : 1792389000.0,
+              "BTTTriggerParentUUID" : "C47CA7C0-B3B8-4B77-9A11-000000000001",
+              "BTTIsPureAction" : true,
+              "BTTTriggerClass" : "BTTTriggerTypeOtherTriggers",
+              "BTTUUID" : "C47CA7C0-B3B8-4B77-9A11-000000000002",
+              "BTTPredefinedActionType" : 206,
+              "BTTPredefinedActionName" : "Execute Shell Script  or  Task",
+              "BTTShellTaskActionScript" : "export PATH=\"/etc/profiles/per-user/$USER/bin:$HOME/.nix-profile/bin:/run/current-system/sw/bin:$PATH\"\nm3u8dl-handler --from-btt",
+              "BTTShellTaskActionConfig" : "/bin/sh:::-c:::-:::",
+              "BTTOrder" : 1
+            }
+          ]
+        },
+        {
           "BTTLastUpdatedAt" : 1751505850.9255052,
           "BTTTriggerType" : 0,
           "BTTTriggerClass" : "BTTTriggerTypeKeyboardShortcut",

@@ -11,7 +11,7 @@ let
     "x86_64-linux" = {
       os = "linux";
       arch = "amd64";
-      hash = "sha256-YAq6mAbBwXIiYrywowPOT8XjuPIeVh02VjOyZIEqQoE="; # 一般 x86 Linux
+      hash = "sha256-YAq6mAbBwXIiYrywowPOT8XjuPIeVh02VjOyZIEqQoE="; # Standard x86_64 Linux
     };
     "aarch64-darwin" = {
       os = "darwin";
