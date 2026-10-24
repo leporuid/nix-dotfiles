@@ -10,22 +10,21 @@ in
   determinate.enable = true;
 
   nix.settings = {
-    inherit (nixCaches) extra-substituters extra-trusted-public-keys;
-
-    auto-optimise-store = true;
-    trusted-users = [
-      "root"
-      "@wheel"
-    ];
-
-    extra-experimental-features = [
+    experimental-features = [
       "nix-command"
       "flakes"
       "parallel-eval"
     ];
 
+    inherit (nixCaches) extra-substituters extra-trusted-public-keys;
+    auto-optimise-store = true;
     builders-use-substitutes = true;
     lazy-trees = true;
+
+    trusted-users = [
+      "root"
+      "@wheel"
+    ];
   };
 
   nix.optimise.automatic = true;

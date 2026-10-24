@@ -83,6 +83,8 @@ in
     pkgs.wget
     pkgs.zellij
     pkgs.zoxide
+    # Fonts
+    pkgs.nerd-fonts.roboto-mono
   ];
 
   fonts.fontconfig.enable = !pkgs.stdenv.hostPlatform.isDarwin;
@@ -139,6 +141,6 @@ in
     ZDOTDIR = "$HOME/.config/zsh";
     NIX_CONFIG_REV = flake.rev or flake.dirtyRev or "unknown";
     NIX_CONFIG_DIR = config.my.config.directory;
-    NIX_CONFIG_LAST_MODIFIED = flake.rev or flake.dirtyRev or "0";
+    NIX_CONFIG_LAST_MODIFIED = builtins.toString flake.lastModified;
   };
 }

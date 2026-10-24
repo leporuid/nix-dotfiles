@@ -1,4 +1,3 @@
-# Full macOS desktop and media configuration extending the shared cloud configuration.
 {
   pkgs,
   perSystem,
@@ -30,7 +29,6 @@
     pkgs.gallery-dl
     pkgs.mas
     pkgs.n-m3u8dl-re
-    pkgs.nerd-fonts.roboto-mono
     pkgs.qpdf
     pkgs.yt-dlp
     perSystem.ktoolbox.default

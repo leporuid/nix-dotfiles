@@ -73,7 +73,7 @@ in
     agenixPkg 
   ];
 
-  environment.etc."configuration-revision".text = toString (flake.shortRev or flake.dirtyShortRev or flake.lastModified or "unknown");
+  environment.etc."configuration-revision".text = flake.rev or flake.dirtyRev;
 
   environment.sessionVariables = {
     TERM = "linux";

@@ -23,8 +23,6 @@
       upgrade = false;
       cleanup = "none";
       extraFlags = [
-        "--zap"
-        "--force-cleanup"
         "--quiet"
       ];
     };
