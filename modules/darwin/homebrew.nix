@@ -67,7 +67,6 @@
           "font-sf-mono"
           "font-sf-pro"
           "font-sketchybar-app-font"
-          "orion"
           "arc"
           "aninsomniacy/rayburst/rayburst"
           "tailscale-app"
