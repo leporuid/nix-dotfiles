@@ -21,7 +21,6 @@ in
     extra-experimental-features = [
       "nix-command"
       "flakes"
-      "build-time-fetch-tree"
       "parallel-eval"
     ];
 
