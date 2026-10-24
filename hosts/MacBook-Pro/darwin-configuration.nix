@@ -18,6 +18,7 @@ in
   networking.hostName = "MacBook-Pro";
 
   system.primaryUser = "leporuid";
+  system.stateVersion = 1;
 
   users.users."${config.system.primaryUser}" = {
     description = "Yu-Min Peng";
@@ -46,6 +47,4 @@ in
     "nixpkgs=${inputs.nixpkgs}"
     "home-manager=${inputs.home-manager}"
   ];
-
-  system.stateVersion = 1;
 }

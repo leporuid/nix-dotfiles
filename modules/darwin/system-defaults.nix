@@ -62,7 +62,7 @@ in
       inherit (nixCaches) extra-substituters extra-trusted-public-keys;
 
       extra-trusted-users = [
-        "@admin"
+        "leporuid"
       ];
       extra-experimental-features = [
         "build-time-fetch-tree"
