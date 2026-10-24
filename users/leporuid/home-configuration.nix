@@ -1,38 +1,42 @@
-{ config, pkgs, lib, perSystem, inputs, flake, ... }@args:
+# Full macOS desktop and media configuration extending the shared cloud configuration.
+{
+  pkgs,
+  perSystem,
+  ...
+}:
 {
   imports = [
     ./cloud-configuration.nix
   ];
 
   home.sessionVariables = {
-    ATUIN_NOBIND = "true";
-    FZF_DEFAULT_OPTS = "--no-sort --reverse --margin=0,1 --exit-0 --select-1 --pointer ▸▹ --prompt • --color bg+:#414559,bg:#303446,spinner:#f2d5cf,hl:#e78284,fg:#c6d0f5,header:#e78284,info:#ca9ee6,pointer:#f2d5cf,marker:#babbf1,fg+:#c6d0f5,prompt:#ca9ee6,hl+:#e78284,selected-bg:#51576d,border:#414559,label:#c6d0f5";
+    IS_DARWIN = "";
   };
 
-  my.config.source =
-   let
-     platformConfig = if pkgs.stdenv.hostPlatform.isDarwin then "Library/Application Support" else ".config";
-   in
-   {
-    ".config/atuin" = "config/atuin";
-    ".config/raycast" = "config/raycast";
+  # Suppress the default macOS terminal login welcome message.
+  home.file.".hushlogin".source = pkgs.emptyFile;
+
+  my.config.source = {
+    ".config/ghostty/config" = "config/ghostty/config";
+    ".config/ghostty/os-config" = "config/ghostty/os-config-darwin";
     ".config/ghostty/themes" = "config/ghostty/themes";
+    ".config/kitty" = "config/kitty";
+    ".config/raycast" = "config/raycast";
     ".config/zed" = "config/zed";
   };
 
-  home.packages = with pkgs; [
-    atuin
-    ffmpeg
-    n-m3u8dl-re
-    yt-dlp
-    gallery-dl
-    qpdf
-    perSystem.self.kumono
-    perSystem.self.age-plugin-se
-    megabasterd
-    perSystem.self.unxip
+  home.packages = [
+    pkgs.ffmpeg
+    pkgs.gallery-dl
+    pkgs.mas
+    pkgs.n-m3u8dl-re
+    pkgs.nerd-fonts.roboto-mono
+    pkgs.qpdf
+    pkgs.yt-dlp
     perSystem.ktoolbox.default
-    mas
-   ];
-  
+    perSystem.self.age-plugin-se
+    perSystem.self.kumono
+    perSystem.self.megabasterd
+    perSystem.self.unxip
+  ];
 }

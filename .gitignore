@@ -1,6 +1,7 @@
 result
 result-*
 .direnv
+.DS_Store
 _*
 secrets
 config/age

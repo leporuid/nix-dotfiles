@@ -19,9 +19,9 @@
     enable = true;
     global.brewfile = true;
     onActivation = {
-      autoUpdate = true;
+      autoUpdate = false;
+      upgrade = false;
       cleanup = "none";
-      upgrade = true;
       extraFlags = [
         "--zap"
         "--force-cleanup"
@@ -84,14 +84,4 @@
       "aninsomniacy/homebrew-rayburst" = inputs.homebrew-rayburst;
     };
   };
-
-  system.activationScripts.preActivation.text = lib.mkAfter ''
-    if [ -x ${config.homebrew.prefix}/bin/brew ]; then
-       # shellcheck disable=SC2043
-       for tap in ${lib.escapeShellArgs (builtins.map (t: t.name) config.homebrew.taps)}; do
-         sudo --user=${lib.escapeShellArg config.system.primaryUser} --set-home \
-           ${config.homebrew.prefix}/bin/brew trust "$tap" >/dev/null 2>&1 || true
-       done
-     fi
-  '';
 }

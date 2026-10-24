@@ -1,5 +1,4 @@
 {
-  pkgs,
   config,
   lib,
   flake,
@@ -10,7 +9,11 @@ let
   cfg = config.my.config;
 
   mkConfigSymlink =
-    relativePath: config.lib.file.mkOutOfStoreSymlink "${cfg.directory}/${relativePath}";
+    relativePath:
+    if cfg.useOutOfStoreSymlinks then
+      config.lib.file.mkOutOfStoreSymlink "${cfg.directory}/${relativePath}"
+    else
+      "${flake}/${relativePath}";
 in
 {
   options.my.config = {
@@ -18,7 +21,15 @@ in
       default = flake;
       type = types.path;
       description = ''
-        Path to the directory that the configuration will be linked to.
+        Path to the directory that the configuration will be linked to when useOutOfStoreSymlinks is enabled.
+      '';
+    };
+
+    useOutOfStoreSymlinks = lib.mkOption {
+      default = false;
+      type = types.bool;
+      description = ''
+        Whether to link directly to the local checkout directory instead of the Nix store.
       '';
     };
 

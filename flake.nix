@@ -36,6 +36,11 @@
       flake = false;
     };
 
+    catppuccin-bat = {
+      url = "github:catppuccin/bat";
+      flake = false;
+    };
+
     n-m3u8dl-re = {
       url = "github:nilaoda/N_m3u8DL-RE/main";
       flake = false;
@@ -45,6 +50,7 @@
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";

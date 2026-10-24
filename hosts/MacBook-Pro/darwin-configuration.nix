@@ -1,4 +1,13 @@
-{ inputs, pkgs, config, lib, flake, self, perSystem, ... }:
+{
+  inputs,
+  pkgs,
+  config,
+  lib,
+  ...
+}:
+let
+  sshKeys = import ../../users/leporuid/ssh-keys.nix;
+in
 {
   imports = [
     inputs.self.darwinModules.system-defaults
@@ -9,44 +18,34 @@
   networking.hostName = "MacBook-Pro";
 
   system.primaryUser = "leporuid";
- 
+
   users.users."${config.system.primaryUser}" = {
     description = "Yu-Min Peng";
     home = "/Users/${config.system.primaryUser}";
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINaZLCaoAppOpXqJmBrB8AOCEc7zffCWU3G0P+9W4tnL"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDrcoI6oOTch+FI7XVlJ5eYJaGx4ZO2noO9GcXVFMhn9"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAyz8c5h0/9ejDcYYkUZ568FUw0OAQEPfRnIbbbd4xGe"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAAIJNFFaMxFGkxbzGvTtFfu+DPlxtqK0NoaExRVDvCt"
-      "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBN6rDDWpOzuVy7v8foYFJdjlcNJBZpmZcwZWWhoa3dbprqJGRClVKyg1NYNj1a3D43XvxeA+Vd1AgaAQDrSIbIE= #SSH ID - @leporuid"
-    ];
-    openssh.authorizedKeys.keyFiles = [
-      "${flake}/hosts/${config.networking.hostName}/users/leporuid/id_ed25519.pub"
-      "${flake}/hosts/${config.networking.hostName}/id_ed25519.pub"
-    ];
+    openssh.authorizedKeys = {
+      keys = sshKeys.authorizedKeys;
+      keyFiles = sshKeys.keyFiles;
+    };
   };
- 
+
   nixpkgs.hostPlatform = "aarch64-darwin";
-  
+
   services.openssh.enable = true;
 
   security.pam.services.sudo_local.touchIdAuth = true;
   security.pam.services.sudo_local.reattach = true;
- 
 
   environment.systemPackages = [
     pkgs.fish
-   ];
+  ];
 
-    
   nix.enable = !config.determinateNix.enable;
-  
   nix.channel.enable = false;
 
   nix.nixPath = lib.mkForce [
-      "nixpkgs=${inputs.nixpkgs}"
-      "home-manager=${inputs.home-manager}"
-    ];
+    "nixpkgs=${inputs.nixpkgs}"
+    "home-manager=${inputs.home-manager}"
+  ];
 
   system.stateVersion = 1;
 }

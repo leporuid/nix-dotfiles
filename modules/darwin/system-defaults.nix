@@ -1,6 +1,13 @@
-{ inputs, flake, config, pkgs, lib, ... }:
-
-with lib;
+{
+  inputs,
+  flake,
+  config,
+  pkgs,
+  ...
+}:
+let
+  nixCaches = import ../common/nix-caches.nix;
+in
 {
   imports = [
     inputs.determinate.darwinModules.default
@@ -19,7 +26,7 @@ with lib;
         "home-manager=${inputs.home-manager}"
       ];
     };
-    
+
     etc = {
       "resolver/ts.net".text = ''
         nameserver 100.100.100.100
@@ -51,24 +58,16 @@ with lib;
   determinateNix = {
     enable = true;
 
-    customSettings = {      
+    customSettings = {
+      inherit (nixCaches) extra-substituters extra-trusted-public-keys;
+
       extra-trusted-users = [
         "@admin"
       ];
-      extra-substituters = [
-        "https://cache.numtide.com"
-        "https://cache.nixos.org"
-        "https://nix-community.cachix.org"
+      extra-experimental-features = [
+        "build-time-fetch-tree"
+        "parallel-eval"
       ];
-      extra-trusted-public-keys = [
-        "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
-        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      ];
-     extra-experimental-features = [
-      "build-time-fetch-tree"
-      "parallel-eval"
-     ];
       lazy-trees = true;
       connect-timeout = 5;
       keep-derivations = true;
@@ -115,7 +114,7 @@ with lib;
         InitialKeyRepeat = 15;
         KeyRepeat = 2;
       };
-      
+
       CustomUserPreferences = {
         "com.apple.symbolichotkeys" = {
           AppleSymbolicHotKeys = {
