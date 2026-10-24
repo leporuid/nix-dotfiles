@@ -26,6 +26,16 @@
 
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
 
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     ktoolbox = {
       url = "github:leporuid/KToolBox/fix-test";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -44,16 +54,6 @@
     n-m3u8dl-re = {
       url = "github:nilaoda/N_m3u8DL-RE/main";
       flake = false;
-    };
-
-    agenix = {
-      url = "github:ryantm/agenix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    disko = {
-      url = "github:nix-community/disko";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
