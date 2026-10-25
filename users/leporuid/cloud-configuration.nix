@@ -46,7 +46,6 @@ in
     perSystem.self.comview
     neovimWithDependencies
 
-    perSystem.self.atuin
     pkgs.ast-grep
     pkgs.bat
     pkgs.bun
