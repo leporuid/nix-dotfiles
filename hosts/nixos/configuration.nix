@@ -20,7 +20,6 @@ let
 in
 {
   imports = [
-    inputs.self.modules.common.fish-environment
     ./hardware-configuration.nix
     ./disk-config.nix
     ./users/leporuid
