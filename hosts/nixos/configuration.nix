@@ -41,6 +41,9 @@ in
     inputs.self.nixosModules.tailscale
     inputs.self.nixosModules.tailzero
   ];
+  
+  fileSystems."/".device =
+    lib.mkForce "/dev/disk/by-partlabel/disk-main-root";
 
   boot = {
     loader = {
