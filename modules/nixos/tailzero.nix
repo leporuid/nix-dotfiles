@@ -26,7 +26,7 @@ in
     ];
     before = [ "tailzero.service" ];
     path = with pkgs; [
-      bash
+      bashInteractive
       coreutils
       nettools
     ];
@@ -84,7 +84,7 @@ in
       "agenix.service"
     ];
     path = with pkgs; [
-      bash
+      bashInteractive
       coreutils
     ];
     serviceConfig = {
@@ -92,7 +92,7 @@ in
       Restart = "on-failure";
       RestartSec = "10s";
       TimeoutStartSec = "60";
-      ExecStart = "${pkgs.bash}/bin/bash -lc 'set -euo pipefail; TOKEN=\"$(tr -d \"\\r\\n\" < /run/agenix/tailzero-token)\"; exec ${tailzeroPkg}/bin/tailzero start --border0-token \"$TOKEN\"'";
+      ExecStart = "${pkgs.bashInteractive}/bin/bash -lc 'set -euo pipefail; TOKEN=\"$(tr -d \"\\r\\n\" < /run/agenix/tailzero-token)\"; exec ${tailzeroPkg}/bin/tailzero start --border0-token \"$TOKEN\"'";
     };
   };
 }

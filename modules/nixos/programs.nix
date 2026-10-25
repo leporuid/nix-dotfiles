@@ -10,6 +10,7 @@
 {
   imports = [
     inputs.self.nixosModules.my-config
+    inputs.self.modules.common.fish-environment
   ];
 
   programs.bash = {
@@ -36,13 +37,12 @@
       }
 
       add_to_path "$HOME/.local/bin"
-      add_to_path "$HOME/.local/share/mise/shims"
       export PATH
 
       if [[ $(${pkgs.procps}/bin/ps --no-header --pid=$PPID --format=comm) != "fish" && -z ''${BASH_EXECUTION_STRING:-} ]] && tty -s; then
         if command -v fish >/dev/null 2>&1; then
           shopt -q login_shell && LOGIN_OPTION='--login' || LOGIN_OPTION=''
-          exec fish $LOGIN_OPTION
+          exec "${pkgs.fish}/bin/fish" $LOGIN_OPTION
         fi
       fi
     '';
@@ -56,7 +56,6 @@
   environment.systemPackages = with pkgs; [
     bashInteractive
     fish
-    mise
     starship
     direnv
     nix-direnv
@@ -74,6 +73,11 @@
     curl
     wget
     jq
+    yq-go
+    htop
+    btop
+    tmux
+    mosh
     jujutsu
     just
     gum

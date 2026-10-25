@@ -24,7 +24,7 @@
     {
       type = "basic";
       source = pkgs.writeShellScript "50-tailscale-ethtool" ''
-        #!${pkgs.bash}/bin/bash
+        #!${pkgs.bashInteractive}/bin/bash
         set -euo pipefail
         IFACE="''${1:-}"
         STATE="''${2:-}"
