@@ -11,8 +11,11 @@
     authKeyFile = config.age.secrets.tailscale-oracle.path;
     useRoutingFeatures = "both";
     extraUpFlags = [
+      "--accept-dns=false"
+      "--accept-routes"
       "--advertise-exit-node"
       "--advertise-routes=10.0.50.0/24"
+      "--operator=leporuid"
       "--advertise-tags=tag:all,tag:border0-managed"
     ];
   };
