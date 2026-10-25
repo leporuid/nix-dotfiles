@@ -77,7 +77,6 @@ in
    users.
   users = {
     mutableUsers = false;
-    defaultUserShell = pkgs.bashInteractive;
 
     users.${vars.username} = {
       isNormalUser = true;
