@@ -1,7 +1,7 @@
+{ flake, ... }:
 {
   config,
   lib,
-  flake,
   ...
 }:
 let
@@ -19,7 +19,7 @@ in
   options.my.config = {
     directory = lib.mkOption {
       default = flake;
-      type = types.path;
+      type = types.either types.path types.str;
       description = ''
         Path to the directory that the configuration will be linked to when useOutOfStoreSymlinks is enabled.
       '';

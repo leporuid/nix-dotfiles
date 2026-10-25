@@ -1,27 +1,27 @@
 { pkgs, ... }:
 with pkgs;
 let
-  version = "v0.2-101-g4f3c385";
+  version = "v0.2-115-gcd16a55";
   sources = {
     "aarch64-linux" = {
       os = "linux";
       arch = "arm64";
-      hash = "sha256-H2PcspfmvoWt/CU1Tc4J+5+gKCRV2HxIzFdtS5FvJJE="; # Oracle ARM
+      hash = "sha256-QE6n4HvfWVIaEyWaOfdWRLcKsNLQduiVasRKD0A4hXo="; # Oracle ARM
     };
     "x86_64-linux" = {
       os = "linux";
       arch = "amd64";
-      hash = "sha256-YAq6mAbBwXIiYrywowPOT8XjuPIeVh02VjOyZIEqQoE="; # Standard x86_64 Linux
+      hash = "sha256-9f/YFuHMdwo7mv5Zp6lcmrPEQrdsQFqEmfceZH0kwcI="; # Standard x86_64 Linux
     };
     "aarch64-darwin" = {
       os = "darwin";
       arch = "arm64";
-      hash = "sha256-pWeD40KRs5nPwoh8ukNHD9KcDTcEAy6F7wH1QKnCXtY="; # M1/M2/M3 Mac
+      hash = "sha256-cYn4I9a1KF6/9LRppXKmVvkhAfW1rg9qOAa9Bobc6ZE="; # M1/M2/M3 Mac
     };
     "x86_64-darwin" = {
       os = "darwin";
       arch = "amd64";
-      hash = "sha256-EdTHqqXTU0F3bYDWWMj5/3XpER9bfpEW6ynHFRjqp+Q="; # Intel Mac
+      hash = "sha256-gD/WsdJmJGr5e1y1auv8Gr7BJE05apvYZdsAt3Qrcho="; # Intel Mac
     };
   };
 

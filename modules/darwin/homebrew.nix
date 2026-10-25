@@ -1,10 +1,9 @@
+{ inputs, ... }:
 {
-  inputs,
   config,
   lib,
   ...
 }:
-
 {
   imports = [
     inputs.nix-homebrew.darwinModules.nix-homebrew

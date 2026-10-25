@@ -1,4 +1,5 @@
-{ pkgs, lib, ... }:
+{ ... }:
+{ pkgs, ... }:
 {
   services.resolved = {
     enable = true;

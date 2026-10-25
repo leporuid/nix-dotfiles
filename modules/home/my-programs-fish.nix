@@ -1,4 +1,5 @@
 # Declarative fish plugin and optional manpage completion installation.
+{ ... }:
 {
   pkgs,
   config,

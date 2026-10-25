@@ -1,8 +1,13 @@
+{ ... }:
 { pkgs, ... }:
 let
-  tailzeroPkg = pkgs.callPackage ../../packages/tailzero.nix {};
+  tailzeroPkg = pkgs.callPackage ../../packages/tailzero.nix { };
 in
 {
+  environment.systemPackages = [
+    tailzeroPkg
+  ];
+
   systemd.tmpfiles.rules = [
     "d /var/lib/tailzero 0750 root root -"
     "d /etc/border0 0750 root root -"
@@ -11,10 +16,20 @@ in
   systemd.services.tailzero-bootstrap = {
     description = "Bootstrap Tailzero connector registration";
     wantedBy = [ "multi-user.target" ];
-    after = [ "network-online.target" "agenix.service" ];
-    wants = [ "network-online.target" "agenix.service" ];
+    after = [
+      "network-online.target"
+      "agenix.service"
+    ];
+    wants = [
+      "network-online.target"
+      "agenix.service"
+    ];
     before = [ "tailzero.service" ];
-    path = with pkgs; [ bash coreutils nettools ];
+    path = with pkgs; [
+      bash
+      coreutils
+      nettools
+    ];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
@@ -26,9 +41,9 @@ in
       [ -s "$SECRET" ] || { echo "Missing or empty secret: $SECRET" >&2; exit 1; }
       INVITE="$(tr -d '\r\n' < "$SECRET")"
       [ -n "$INVITE" ] || { echo "Invite empty after trimming" >&2; exit 1; }
-      
+
       CONNECTOR_NAME="$(hostname | tr . -)"
-      
+
       set +e
 
       OUT="$(${tailzeroPkg}/bin/tailzero install \
@@ -37,7 +52,7 @@ in
         --service-user root 2>&1)"
       RC=$?
       set -e
-      
+
       if [ $RC -eq 0 ]; then
         echo "$OUT"
         exit 0
@@ -58,9 +73,20 @@ in
   systemd.services.tailzero = {
     description = "Border0 Tailzero Connector";
     wantedBy = [ "multi-user.target" ];
-    after = [ "network-online.target" "tailzero-bootstrap.service" "agenix.service" ];
-    wants = [ "network-online.target" "tailzero-bootstrap.service" "agenix.service" ];
-    path = with pkgs; [ bash coreutils ];
+    after = [
+      "network-online.target"
+      "tailzero-bootstrap.service"
+      "agenix.service"
+    ];
+    wants = [
+      "network-online.target"
+      "tailzero-bootstrap.service"
+      "agenix.service"
+    ];
+    path = with pkgs; [
+      bash
+      coreutils
+    ];
     serviceConfig = {
       Type = "simple";
       Restart = "on-failure";

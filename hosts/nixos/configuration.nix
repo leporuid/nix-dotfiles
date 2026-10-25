@@ -1,12 +1,20 @@
-{ config, lib, pkgs, inputs, flake, ... }:
+{
+  pkgs,
+  inputs,
+  flake,
+  ...
+}:
 let
   vars = import ./vars.nix;
-  agenixPkg = (inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
-     ageBin = "${pkgs.rage}/bin/rage";
-   }).overrideAttrs (old: {
-    doCheck = false;
-    doInstallCheck = false;
-  });
+  agenixPkg =
+    (inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
+      ageBin = "${pkgs.rage}/bin/rage";
+    }).overrideAttrs
+      (_: {
+        # agenix's upstream checks currently fail with the rage backend used here.
+        doCheck = false;
+        doInstallCheck = false;
+      });
 in
 {
   imports = [
@@ -14,18 +22,17 @@ in
     ./disk-config.nix
     inputs.agenix.nixosModules.default
     inputs.disko.nixosModules.disko
-    
 
-    ../../modules/nixos/age-secrets.nix
-    ../../modules/nixos/auto-upgrade.nix
-    ../../modules/nixos/base.nix
-    ../../modules/nixos/essentials.nix
-    ../../modules/nixos/fail2ban.nix
-    ../../modules/nixos/firewall-base.nix
-    ../../modules/nixos/observability.nix
-    ../../modules/nixos/ssh-hardening.nix
-    ../../modules/nixos/tailscale.nix
-    ../../modules/nixos/tailzero.nix
+    inputs.self.nixosModules.age-secrets
+    inputs.self.nixosModules.auto-upgrade
+    inputs.self.nixosModules.base
+    inputs.self.nixosModules.essentials
+    inputs.self.nixosModules.fail2ban
+    inputs.self.nixosModules.firewall-base
+    inputs.self.nixosModules.observability
+    inputs.self.nixosModules.ssh-hardening
+    inputs.self.nixosModules.tailscale
+    inputs.self.nixosModules.tailzero
   ];
 
   boot = {
@@ -50,7 +57,10 @@ in
   users.mutableUsers = false;
   users.users.${vars.username} = {
     isNormalUser = true;
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
     openssh.authorizedKeys.keys = vars.sshKeys;
     shell = pkgs.zsh;
   };
@@ -67,13 +77,13 @@ in
     }
   ];
 
-  environment.systemPackages = with pkgs; [ 
-    age 
+  environment.systemPackages = with pkgs; [
+    age
     rage
-    agenixPkg 
+    agenixPkg
   ];
 
-  environment.etc."configuration-revision".text = flake.rev or flake.dirtyRev;
+  environment.etc."configuration-revision".text = flake.rev or flake.dirtyRev or "unknown";
 
   environment.sessionVariables = {
     TERM = "linux";
@@ -81,7 +91,7 @@ in
 
   services.getty.autologinUser = null;
   documentation.enable = false;
-  
+
   nix.registry.nixpkgs.flake = inputs.nixpkgs;
   nix.registry.self.flake = flake;
   age.secrets.tailscale-oracle.file = ./tailscale-oracle.age;
