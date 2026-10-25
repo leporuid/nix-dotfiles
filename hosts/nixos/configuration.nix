@@ -25,7 +25,6 @@ in
     (modulesPath + "/virtualisation/oci-common.nix")
     ./hardware-configuration.nix
     ./disk-config.nix
-
     inputs.agenix.nixosModules.default
     inputs.disko.nixosModules.disko
 
@@ -74,9 +73,10 @@ in
 
   time.timeZone = vars.timezone;
   i18n.defaultLocale = vars.locale;
-   users.
+
   users = {
     mutableUsers = false;
+    defaultUserShell = pkgs.bashInteractive;
 
     users.${vars.username} = {
       isNormalUser = true;
