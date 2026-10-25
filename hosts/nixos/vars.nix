@@ -1,8 +1,10 @@
 
-{  hostname = "nixos";
+{  
+  hostname = "nixos";
   username = "leporuid";
   sshKeys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBf7Ls2SkpAo7DezrxlnPlvRqiJRJVtNiUJEy1RFmMn/"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL7u84aJ0ObCzO1tbh6VccXpqUMVU+Y5nUzf7/w9Vv8k"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDrcoI6oOTch+FI7XVlJ5eYJaGx4ZO2noO9GcXVFMhn9"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAyz8c5h0/9ejDcYYkUZ568FUw0OAQEPfRnIbbbd4xGe"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAAIJNFFaMxFGkxbzGvTtFfu+DPlxtqK0NoaExRVDvCt"
