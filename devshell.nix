@@ -8,18 +8,9 @@ let
   determinatePkgs =
     inputs.determinate.inputs.nixpkgs.legacyPackages.${system};
 
-  systemNix = pkgs.writeShellScriptBin "nix" ''
-    exec /nix/var/nix/profiles/default/bin/nix "$@"
-  '';
-
   nixos-rebuild = pkgs.writeShellScriptBin "nixos-rebuild" ''
-    exec ${determinatePkgs.nixos-rebuild-ng}/bin/nixos-rebuild "$@"
-  '';
-
-  nixos-anywhere = pkgs.writeShellScriptBin "nixos-anywhere" ''
-    exec ${determinatePkgs.nixos-anywhere.override {
-      nix = systemNix;
-    }}/bin/nixos-anywhere "$@"
+    exec env TMPDIR=/tmp \
+      ${determinatePkgs.nixos-rebuild-ng}/bin/nixos-rebuild "$@"
   '';
 in
 pkgs.mkShellNoCC {
@@ -32,7 +23,6 @@ pkgs.mkShellNoCC {
     pkgs.age
     pkgs.deno
     nixos-rebuild
-    nixos-anywhere
   ]
   ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
       perSystem.nix-darwin.default

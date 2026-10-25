@@ -133,8 +133,6 @@ function MacBook-Pro -a verb
         set maybe_sudo sudo
     end
 
-    set -lx PATH /nix/var/nix/profiles/default/bin $PATH
-
     _run $maybe_sudo darwin-rebuild $verb --flake .#MacBook-Pro $argv[2..]
 end
 
