@@ -11,7 +11,7 @@
   ];
 
   programs.bash = {
-    enableCompletion = true;
+    completion.enable =true;
 
     interactiveShellInit = ''
       export HISTFILE="$HOME/.local/share/bash/.bash_history"
