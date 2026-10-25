@@ -25,6 +25,7 @@
   };
 
   home.packages = [
+    pkgs.atuin
     pkgs.ffmpeg
     pkgs.gallery-dl
     pkgs.mas
