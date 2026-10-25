@@ -16,20 +16,20 @@
   networking.hostName = "MacBook-Pro";
 
   system.primaryUser = "leporuid";
-  system.stateVersion = 1;
+  system.stateVersion = 6;
 
   users.users."${config.system.primaryUser}" = {
     description = "Yu-Min Peng";
     home = "/Users/${config.system.primaryUser}";
     openssh.authorizedKeys = {
-      keys =  [
+    keys =  [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBf7Ls2SkpAo7DezrxlnPlvRqiJRJVtNiUJEy1RFmMn/"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDrcoI6oOTch+FI7XVlJ5eYJaGx4ZO2noO9GcXVFMhn9"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAyz8c5h0/9ejDcYYkUZ568FUw0OAQEPfRnIbbbd4xGe"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAAIJNFFaMxFGkxbzGvTtFfu+DPlxtqK0NoaExRVDvCt"
     "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBN6rDDWpOzuVy7v8foYFJdjlcNJBZpmZcwZWWhoa3dbprqJGRClVKyg1NYNj1a3D43XvxeA+Vd1AgaAQDrSIbIE= #SSH ID - @leporuid"
   ];
-     keyFiles = [
+   keyFiles = [
   "${flake}/hosts/MacBook-Pro/users/leporuid/id_ed25519.pub"
   "${flake}/hosts/MacBook-Pro/id_ed25519.pub"
   ];
