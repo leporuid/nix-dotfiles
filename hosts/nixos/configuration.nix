@@ -25,7 +25,6 @@ in
     (modulesPath + "/virtualisation/oci-common.nix")
     ./hardware-configuration.nix
     ./disk-config.nix
-    ./users/leporuid
 
     inputs.agenix.nixosModules.default
     inputs.disko.nixosModules.disko
