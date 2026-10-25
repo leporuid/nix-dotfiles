@@ -30,6 +30,7 @@ in
     inputs.agenix.nixosModules.default
     inputs.disko.nixosModules.disko
 
+    inputs.self.nixosModules.programs
     inputs.self.nixosModules.age-secrets
     inputs.self.nixosModules.auto-upgrade
     inputs.self.nixosModules.base
@@ -74,16 +75,22 @@ in
 
   time.timeZone = vars.timezone;
   i18n.defaultLocale = vars.locale;
-
+   users.
   users = {
     mutableUsers = false;
+    defaultUserShell = pkgs.bashInteractive;
 
     users.${vars.username} = {
       isNormalUser = true;
       extraGroups = [ "wheel" ];
       hashedPassword = "!";
       openssh.authorizedKeys.keys = vars.sshKeys;
-      openssh.authorizedKeys.keyFiles = vars.keyFiles;
+      shell = pkgs.bashInteractive;
+      openssh.authorizedKeys.keyFiles = [
+      "${flake}/hosts/MacBook-Pro/users/leporuid/id_ed25519.pub"
+       "${flake}/hosts/MacBook-Pro/id_ed25519.pub"
+       "${flake}/hosts/nixos/id_ed25519.pub"
+      ];
     };
   };
 
