@@ -35,6 +35,7 @@
 
     trusted-users = [
       "root"
+      "leporuid"
     ];
   };
 
