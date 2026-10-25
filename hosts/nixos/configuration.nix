@@ -37,7 +37,7 @@ in
     inputs.self.nixosModules.programs
     inputs.self.nixosModules.ssh-hardening
     inputs.self.nixosModules.tailscale
-    inputs.self.nixosModules.tailzero
+    # inputs.self.nixosModules.tailzero
   ];
 
   boot = {
