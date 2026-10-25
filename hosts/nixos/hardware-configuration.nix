@@ -9,9 +9,16 @@
     ];
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "virtio_pci" "virtio_scsi" "usbhid" ];
-  boot.initrd.kernelModules = [ ];
+  boot.kernelParams = [
+    "console=ttyS0"
+    "console=tty1"
+    "nvme.shutdown_timeout=10"
+    "libiscsi.debug_libiscsi_eh=1"
+  ];
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
 
+  networking.useDHCP = lib.mkDefault true;
+  # networking.interfaces.enp0s6.useDHCP = lib.mkDefault true;
   nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
 }

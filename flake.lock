@@ -224,6 +224,22 @@
         "type": "github"
       }
     },
+    "gallery-ai": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792905236,
+        "narHash": "sha256-1TiWbqluMwNh4glHV+1gOkdWr45uNkC+P4Sad+t6Rro=",
+        "owner": "CrimsonGlory",
+        "repo": "gallery-ai",
+        "rev": "4cec9d918b546f2e687dd0cb328f35478c246e68",
+        "type": "github"
+      },
+      "original": {
+        "owner": "CrimsonGlory",
+        "repo": "gallery-ai",
+        "type": "github"
+      }
+    },
     "git-hooks-nix": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -274,11 +290,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792818371,
-        "narHash": "sha256-yhEZAzZRNvzYpoAlyFY3wM75V9BmkIXJIueof8S5gOg=",
+        "lastModified": 1792896866,
+        "narHash": "sha256-/0tELNnhdSnP+bHSdWiEe6KpfSwi6WrTnT9cm/jNkjA=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "2cd3234928f60bbff695a7ee56115ef7799c47cd",
+        "rev": "c216bf5a1f173b0481bd5c8c489ebe5595ecc68c",
         "type": "github"
       },
       "original": {
@@ -291,11 +307,11 @@
     "homebrew-rayburst": {
       "flake": false,
       "locked": {
-        "lastModified": 1792514294,
-        "narHash": "sha256-PjlaV9pQS29swL13cfMFbEZiXT+I5UM7/EDn0lwW4OA=",
+        "lastModified": 1792893975,
+        "narHash": "sha256-DqqnUDtBiyYdR6n0QoWPaQ7gO5Bfu294EWmtmKaBkiw=",
         "owner": "AnInsomniacy",
         "repo": "homebrew-rayburst",
-        "rev": "5a0c48f504c46fb740beb85455b65f82e3d06c62",
+        "rev": "7082b5dd575974cb40a81bbc4188e5a327cfd740",
         "type": "github"
       },
       "original": {
@@ -455,11 +471,11 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1792782095,
-        "narHash": "sha256-KtL+p7f7jY34cO5Mt0/hUZNE3spnINk7hwpYxM2XLC4=",
+        "lastModified": 1792812153,
+        "narHash": "sha256-T2+XBfNbf9pecLUWS4+RtuVNZ3W8K5taG5QdV71mWlk=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "901c54c08bdc20e00c2b3c73716b97497b1b3c74",
+        "rev": "674a2028661e550a97400c1cc992b9cca9a668a1",
         "type": "github"
       },
       "original": {
@@ -556,6 +572,7 @@
         "catppuccin-bat": "catppuccin-bat",
         "determinate": "determinate",
         "disko": "disko",
+        "gallery-ai": "gallery-ai",
         "helix": "helix",
         "home-manager": "home-manager",
         "homebrew-rayburst": "homebrew-rayburst",
@@ -564,7 +581,8 @@
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
         "nixpkgs": "nixpkgs_3",
-        "nixpkgs-unstable": "nixpkgs-unstable"
+        "nixpkgs-unstable": "nixpkgs-unstable",
+        "yt-ai": "yt-ai"
       }
     },
     "rust-overlay": {
@@ -640,6 +658,22 @@
       "original": {
         "owner": "pyproject-nix",
         "repo": "uv2nix",
+        "type": "github"
+      }
+    },
+    "yt-ai": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792901181,
+        "narHash": "sha256-P0QbD4YqGPRxefzNErOqnXTN1ESqKo8p1ddXqzCPf9o=",
+        "owner": "CrimsonGlory",
+        "repo": "yt-ai",
+        "rev": "725fce7073b5fbfb6ecf6ab9974f31480762ba6c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "CrimsonGlory",
+        "repo": "yt-ai",
         "type": "github"
       }
     }

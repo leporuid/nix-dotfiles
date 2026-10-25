@@ -14,6 +14,7 @@ pkgs.mkShellNoCC {
       pkgs.deno
       pkgs.nixos-rebuild
       pkgs.nixos-anywhere
+      pkgs.cpio
     ]
     ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
       perSystem.nix-darwin.default

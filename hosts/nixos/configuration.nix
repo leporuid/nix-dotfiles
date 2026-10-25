@@ -59,18 +59,16 @@ in
   time.timeZone = vars.timezone;
   i18n.defaultLocale = vars.locale;
 
-  users.mutableUsers = false;
-
-  users.users.${vars.username} = {
-    isNormalUser = true;
-
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-    ];
-
-    openssh.authorizedKeys.keys = vars.sshKeys;
+  users = {
+    mutableUsers = false;
+    users.${vars.username} = {
+      isNormalUser = true;
+      extraGroups = ["networkmanager" "wheel"];
+      openssh.authorizedKeys.keys = vars.sshKeys;
+    };
   };
+
+
 
   security.sudo.extraRules = [
     {

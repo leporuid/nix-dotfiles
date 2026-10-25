@@ -1,3 +1,4 @@
+# Full macOS desktop and media configuration extending the shared cloud configuration.
 {
   pkgs,
   perSystem,
@@ -25,17 +26,17 @@
   };
 
   home.packages = [
-    pkgs.atuin
     pkgs.ffmpeg
-    pkgs.gallery-dl
     pkgs.mas
     pkgs.n-m3u8dl-re
+    pkgs.nerd-fonts.roboto-mono
     pkgs.qpdf
-    pkgs.yt-dlp
     perSystem.ktoolbox.default
     perSystem.self.age-plugin-se
+    perSystem.self.gallery-dl
     perSystem.self.kumono
     perSystem.self.megabasterd
     perSystem.self.unxip
+    perSystem.self.yt-dlp
   ];
 }

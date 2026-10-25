@@ -12,7 +12,6 @@
     useRoutingFeatures = "both";
     extraUpFlags = [
       "--advertise-exit-node"
-      "--exit-node-allow-lan-access"
       "--advertise-routes=10.0.50.0/24"
       "--advertise-tags=tag:all,tag:border0-managed"
     ];

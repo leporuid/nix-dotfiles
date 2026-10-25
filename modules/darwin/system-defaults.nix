@@ -25,6 +25,15 @@
         "nixpkgs=${inputs.nixpkgs}"
         "home-manager=${inputs.home-manager}"
       ];
+      NIX_CONFIG = let
+    builder = builtins.toJSON [
+      {
+        program = "/usr/local/bin/determinate-nixd";
+        args = ["builder" "--memory-size" "17179869184" "--cpu-count" "8"];
+        systems = ["aarch64-linux" "x86_64-linux"];
+      }
+    ];
+  in "external-builders = ${lib.replaceStrings ["\""] ["\\\""] builder}";
     };
 
     etc = {
@@ -76,6 +85,7 @@
       ];
 
       extra-trusted-users = [
+        "root"
         config.system.primaryUser
       ];
       extra-experimental-features = [
@@ -99,9 +109,16 @@
         fi
       '';
 
-      "postActivation".text = ''
-        sudo -u ${config.system.primaryUser} /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
-      '';
+      "postActivation".text = lib.mkAfter ''
+    if ! diff /etc/nix/nix.custom.conf /run/current-system/etc/nix/nix.custom.conf &> /dev/null; then
+      echo "reloading determinate nix-daemon (nix.custom.conf changed)..." >&2
+      launchctl kickstart -k system/systems.determinate.nix-daemon
+    fi
+     	 # activateSettings -u will reload the settings from the database and apply
+     	 # them to the current session, so we do not need to logout and login again
+    	 # to make the changes take effect, or kill ControlCenter
+      	sudo -u ${config.system.primaryUser} /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
+    '';
     };
 
     defaults = {
