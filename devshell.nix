@@ -14,10 +14,8 @@ let
   '';
   
   nixos-anywhere = pkgs.writeShellScriptBin "nixos-anywhere" ''
-     exec env TMPDIR=/tmp \
-      ${determinatePkgs.nixos-anywhere.override {
-      nix = systemNix;
-    }}/bin/nixos-anywhere "$@"
+    exec env TMPDIR=/tmp \
+      ${determinatePkgs.nixos-anywhere}/bin/nixos-anywhere "$@"
   '';
 in
 pkgs.mkShellNoCC {
