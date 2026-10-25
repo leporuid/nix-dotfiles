@@ -4,8 +4,10 @@
   flake,
   ...
 }:
+
 let
   vars = import ./vars.nix;
+
   agenixPkg =
     (inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
       ageBin = "${pkgs.rage}/bin/rage";
@@ -18,8 +20,11 @@ let
 in
 {
   imports = [
+    inputs.self.modules.common.fish-environment
     ./hardware-configuration.nix
     ./disk-config.nix
+    ./leporuid
+
     inputs.agenix.nixosModules.default
     inputs.disko.nixosModules.disko
 
@@ -37,6 +42,7 @@ in
   boot = {
     loader = {
       systemd-boot.enable = true;
+
       efi = {
         canTouchEfiVariables = true;
         efiSysMountPoint = "/boot";
@@ -45,27 +51,32 @@ in
   };
 
   fileSystems."/boot".options = [ "umask=0077" ];
+
   systemd.targets.multi-user.enable = true;
 
   networking.hostName = vars.hostname;
   networking.networkmanager.enable = true;
+
   time.timeZone = vars.timezone;
   i18n.defaultLocale = vars.locale;
 
   users.mutableUsers = false;
+
   users.users.${vars.username} = {
     isNormalUser = true;
+
     extraGroups = [
       "networkmanager"
       "wheel"
     ];
+
     openssh.authorizedKeys.keys = vars.sshKeys;
-    shell = pkgs.bashInteractive;
   };
 
   security.sudo.extraRules = [
     {
       users = [ vars.username ];
+
       commands = [
         {
           command = "ALL";
@@ -81,17 +92,21 @@ in
     agenixPkg
   ];
 
-  environment.etc."configuration-revision".text = flake.rev or flake.dirtyRev or "unknown";
+  environment.etc."configuration-revision".text =
+    flake.rev or flake.dirtyRev or "unknown";
 
   environment.sessionVariables = {
     TERM = "linux";
   };
 
   services.getty.autologinUser = null;
+
   documentation.enable = false;
 
   nix.registry.nixpkgs.flake = inputs.nixpkgs;
   nix.registry.self.flake = flake;
+
   age.secrets.tailscale-oracle.file = ./tailscale-oracle.age;
+
   system.stateVersion = "26.11";
 }

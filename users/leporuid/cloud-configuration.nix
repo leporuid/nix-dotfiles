@@ -1,4 +1,3 @@
-# Shared CLI configuration applied to both macOS (MacBook-Pro) and NixOS (Oracle).
 {
   pkgs,
   perSystem,
@@ -47,6 +46,7 @@ in
     perSystem.self.comview
     neovimWithDependencies
 
+    perSystem.self.atuin
     pkgs.ast-grep
     pkgs.bat
     pkgs.bun
@@ -123,30 +123,14 @@ in
     ".zshenv" = "config/zsh/home_zshenv";
     ".npmrc" = "config/npm/npmrc";
     "${platformConfig}/jj" = "config/jj";
-  }
-  // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
-    ".config/zsh" = "config/zsh";
-    ".zshenv" = "config/zsh/home_zshenv";
-  }
-  // lib.optionalAttrs (!pkgs.stdenv.hostPlatform.isDarwin) {
-    ".bashenv" = "config/bash/.bashenv";
-    ".bashrc" = "config/bash/.bashrc";
-    ".bash_profile" = "config/bash/.bash_profile";
   };
 
   # Ensure session variables are in a known path for both standalone HM and system modules.
- home.file = {
-    ".config/direnv/lib/nix-direnv.sh".source =
-      "${pkgs.nix-direnv}/share/direnv/direnvrc";
-  }
-  // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
-    ".local/share/zsh/hm-session-vars.sh".source =
-      "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
-  }
-  // lib.optionalAttrs (!pkgs.stdenv.hostPlatform.isDarwin) {
-    ".local/share/bash/hm-session-vars.sh".source =
-      "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
-  };
+  home.file.".local/share/zsh/hm-session-vars.sh".source =
+    "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
+
+  home.file.".config/direnv/lib/nix-direnv.sh".source =
+    "${pkgs.nix-direnv}/share/nix-direnv/direnvrc";
 
   home.sessionVariables = {
     ATUIN_NOBIND = "true";
@@ -156,12 +140,6 @@ in
     ZDOTDIR = "$HOME/.config/zsh";
     NIX_CONFIG_REV = flake.rev or flake.dirtyRev or "unknown";
     NIX_CONFIG_DIR = config.my.config.directory;
-    NIX_CONFIG_LAST_MODIFIED = builtins.toString flake.lastModified or "0";
-   }
-  // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
-    ZDOTDIR = "$HOME/.config/zsh";
-  }
-  // lib.optionalAttrs (!pkgs.stdenv.hostPlatform.isDarwin) {
-    BASH_ENV = "$HOME/.bashenv";
+    NIX_CONFIG_LAST_MODIFIED = builtins.toString flake.lastModified;
   };
 }
