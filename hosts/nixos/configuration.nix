@@ -62,7 +62,7 @@ in
       "wheel"
     ];
     openssh.authorizedKeys.keys = vars.sshKeys;
-    shell = pkgs.zsh;
+    shell = pkgs.bashInteractive;
   };
 
   security.sudo.extraRules = [
@@ -83,7 +83,7 @@ in
     agenixPkg
   ];
 
-  environment.etc."configuration-revision".text = flake.rev or flake.dirtyRev or "unknown";
+  environment.etc."configuration-revision".text = flake.rev or flake.dirtyRev;
 
   environment.sessionVariables = {
     TERM = "linux";
