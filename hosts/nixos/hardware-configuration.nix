@@ -4,21 +4,19 @@
 { config, lib, pkgs, modulesPath, ... }:
 
 {
-  imports =
-    [ (modulesPath + "/profiles/qemu-guest.nix")
-    ];
+  imports = [
+    (modulesPath + "/profiles/qemu-guest.nix")
+  ];
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "virtio_pci" "virtio_scsi" "usbhid" ];
-  boot.kernelParams = [
-    "console=ttyS0"
+  boot.kernelParams = [ 
+    "console=ttyS0,115200n8"
     "console=tty1"
-    "nvme.shutdown_timeout=10"
-    "libiscsi.debug_libiscsi_eh=1"
-  ];
+   ];
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
 
-  networking.useDHCP = lib.mkDefault true;
   # networking.interfaces.enp0s6.useDHCP = lib.mkDefault true;
+  oci.efi = true;
   nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
 }

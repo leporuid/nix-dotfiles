@@ -1,3 +1,4 @@
+{ ... }:
 {
   pkgs,
   config,
@@ -14,7 +15,8 @@ let
 in
 {
   config = lib.mkIf config.programs.fish.enable {
-    environment.etc."fish/conf.d/00-system-environment.fish".source =
-      fishEnvironment;
+    programs.fish.shellInit = ''
+      source ${fishEnvironment}
+    '';
   };
 }

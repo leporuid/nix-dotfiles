@@ -10,7 +10,6 @@
     experimental-features = [
       "nix-command"
       "flakes"
-      "parallel-eval"
     ];
 
     extra-substituters = [
@@ -34,7 +33,6 @@
     lazy-trees = true;
 
     trusted-users = [
-      "root"
       "leporuid"
     ];
   };

@@ -14,6 +14,7 @@
 	      format = "vfat";
  	      mountpoint = "/boot";
 	      mountOptions = [ "umask=0077" ];
+              extraArgs = [ "-n" "NIXOS_BOOT" ];
             };
           };
           root = {

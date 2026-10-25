@@ -1,7 +1,9 @@
 {
   pkgs,
+  lib,
   inputs,
   flake,
+  modulesPath,
   ...
 }:
 
@@ -20,6 +22,7 @@ let
 in
 {
   imports = [
+    (modulesPath + "/virtualisation/oci-common.nix")
     ./hardware-configuration.nix
     ./disk-config.nix
     ./users/leporuid
@@ -50,33 +53,40 @@ in
     };
   };
 
-  fileSystems."/boot".options = [ "umask=0077" ];
 
+  boot.kernelParams = lib.mkAfter [  "net.ifnames=0" ];
   systemd.targets.multi-user.enable = true;
+  
+  networking = {
+    hostName = vars.hostname;
+    useNetworkd = true;
+    networkmanager.enable = false;
+    useDHCP = true;
+  };
 
-  networking.hostName = vars.hostname;
-  networking.networkmanager.enable = true;
+  systemd.network.wait-online.anyInterface = true;
+  services.resolved.enable = true;
 
   time.timeZone = vars.timezone;
   i18n.defaultLocale = vars.locale;
 
   users = {
     mutableUsers = false;
+
     users.${vars.username} = {
       isNormalUser = true;
-      extraGroups = [
-        "networkmanager"
-        "wheel"
-      ];
+      extraGroups = [ "wheel" ];
+      hashedPassword = "!";
       openssh.authorizedKeys.keys = vars.sshKeys;
-      openssh.authorizedKeys.keyFiles  = vars.keyFiles;
+      openssh.authorizedKeys.keyFiles = vars.keyFiles;
     };
   };
+
+  security.sudo.wheelNeedsPassword = false;
 
   security.sudo.extraRules = [
     {
       users = [ vars.username ];
-
       commands = [
         {
           command = "ALL";
@@ -94,11 +104,7 @@ in
 
   environment.etc."configuration-revision".text = flake.rev or flake.dirtyRev or "unknown";
 
-  environment.sessionVariables = {
-    TERM = "linux";
-  };
-
-  services.getty.autologinUser = null;
+  services.getty.autologinUser = "root";
 
   documentation.enable = false;
 
