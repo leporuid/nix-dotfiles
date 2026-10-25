@@ -1,7 +1,13 @@
 {
   pkgs,
   perSystem,
+  inputs,
 }:
+let
+   nixos-rebuild = pkgs.writeShellScriptBin "nixos-rebuild" ''
+    exec ${inputs.determinate.inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system}.nixos-rebuild-ng}/bin/nixos-rebuild "$@"
+  '';
+in
 pkgs.mkShellNoCC {
   packages =
     [
@@ -12,6 +18,7 @@ pkgs.mkShellNoCC {
       pkgs.taplo
       pkgs.age
       pkgs.deno
+      nixos-rebuild
     ]
     ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
       perSystem.nix-darwin.default
