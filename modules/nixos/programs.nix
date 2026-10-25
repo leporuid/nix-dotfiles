@@ -1,17 +1,19 @@
 {
-  pkgs,
   flake,
   inputs,
   ...
 }:
-
+{
+  pkgs,
+  ...
+}:
 {
   imports = [
     inputs.self.nixosModules.my-config
   ];
 
   programs.bash = {
-    completion.enable =true;
+    completion.enable = true;
 
     interactiveShellInit = ''
       export HISTFILE="$HOME/.local/share/bash/.bash_history"
@@ -37,20 +39,18 @@
       add_to_path "$HOME/.local/share/mise/shims"
       export PATH
 
-      if command -v fish >/dev/null 2>&1; then
-        exec fish -l
+      if [[ $(${pkgs.procps}/bin/ps --no-header --pid=$PPID --format=comm) != "fish" && -z ''${BASH_EXECUTION_STRING:-} ]] && tty -s; then
+        if command -v fish >/dev/null 2>&1; then
+          shopt -q login_shell && LOGIN_OPTION='--login' || LOGIN_OPTION=''
+          exec fish $LOGIN_OPTION
+        fi
       fi
-
-      printf '\n'
-      printf '  WARNING: fish not found in PATH - falling back to bash\n'
-      printf '\n'
     '';
   };
 
   programs.fish = {
     enable = true;
-    interactiveShellInit =
-      builtins.readFile "${flake}/config/fish/config.fish";
+    interactiveShellInit = builtins.readFile "${flake}/config/fish/config.fish";
   };
 
   environment.systemPackages = with pkgs; [

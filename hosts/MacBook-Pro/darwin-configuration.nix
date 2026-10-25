@@ -23,7 +23,8 @@
     home = "/Users/${config.system.primaryUser}";
     openssh.authorizedKeys = {
     keys =  [
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBf7Ls2SkpAo7DezrxlnPlvRqiJRJVtNiUJEy1RFmMn/"
+    # My iPhone, blink terminal
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGr7upNdIAAtGkiQaUkCaj5g6QW843fL3bbsJyP/0tAB"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDrcoI6oOTch+FI7XVlJ5eYJaGx4ZO2noO9GcXVFMhn9"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAyz8c5h0/9ejDcYYkUZ568FUw0OAQEPfRnIbbbd4xGe"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAAIJNFFaMxFGkxbzGvTtFfu+DPlxtqK0NoaExRVDvCt"
@@ -32,6 +33,7 @@
    keyFiles = [
   "${flake}/hosts/MacBook-Pro/users/leporuid/id_ed25519.pub"
   "${flake}/hosts/MacBook-Pro/id_ed25519.pub"
+  "${flake}/hosts/nixos/id_ed25519.pub"
   ];
     };
   };

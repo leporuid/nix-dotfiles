@@ -36,6 +36,7 @@ in
     inputs.self.nixosModules.observability
     inputs.self.nixosModules.ssh-hardening
     inputs.self.nixosModules.tailscale
+    inputs.self.nixosModules.tailzero
   ];
 
   boot = {
@@ -63,12 +64,14 @@ in
     mutableUsers = false;
     users.${vars.username} = {
       isNormalUser = true;
-      extraGroups = ["networkmanager" "wheel"];
+      extraGroups = [
+        "networkmanager"
+        "wheel"
+      ];
       openssh.authorizedKeys.keys = vars.sshKeys;
+      openssh.authorizedKeys.keyFiles  = vars.keyFiles;
     };
   };
-
-
 
   security.sudo.extraRules = [
     {
@@ -89,8 +92,7 @@ in
     agenixPkg
   ];
 
-  environment.etc."configuration-revision".text =
-    flake.rev or flake.dirtyRev or "unknown";
+  environment.etc."configuration-revision".text = flake.rev or flake.dirtyRev or "unknown";
 
   environment.sessionVariables = {
     TERM = "linux";
