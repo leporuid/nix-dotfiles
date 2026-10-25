@@ -95,13 +95,6 @@ in
       hashedPassword = "!";
       openssh.authorizedKeys.keys = vars.sshKeys;
       openssh.authorizedKeys.keyFiles = [
-        users.${vars.username} = {
-      isNormalUser = true;
-      extraGroups = [ "wheel" ];
-      hashedPassword = "!";
-      openssh.authorizedKeys.keys = vars.sshKeys;
-      shell = pkgs.bashInteractive;
-      openssh.authorizedKeys.keyFiles = [
       "${flake}/hosts/MacBook-Pro/users/leporuid/id_ed25519.pub"
        "${flake}/hosts/MacBook-Pro/id_ed25519.pub"
        "${flake}/hosts/nixos/id_ed25519.pub"
