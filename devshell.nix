@@ -12,14 +12,6 @@ pkgs.mkShellNoCC {
       pkgs.taplo
       pkgs.age
       pkgs.deno
-      (pkgs.nixos-rebuild.override {
-        nix = pkgs.writeShellScriptBin "nix" ''
-        exec /nix/var/nix/profiles/default/bin/$command "$@"
-      '';})
-      (pkgs.nixos-anywhere.override {
-        nix = pkgs.writeShellScriptBin "nix" ''
-        exec /nix/var/nix/profiles/default/bin/$command "$@"
-      '';})
     ]
     ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
       perSystem.nix-darwin.default
