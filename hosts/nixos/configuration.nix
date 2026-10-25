@@ -101,10 +101,7 @@ in
       ];
     };
   };
-
-     ];
-    };
-  };
+}
 
   security.sudo.wheelNeedsPassword = false;
   security.sudo.extraRules = [
@@ -141,5 +138,5 @@ in
 
   age.secrets.tailscale-oracle.file = ./tailscale-oracle.age;
 
-  system.stateVersion = "26.11";
+  system.stateVersion = "24.11";
 }
