@@ -54,13 +54,9 @@ in
   };
 
 
-  boot.kernelParams = lib.mkAfter [  "net.ifnames=0" ];
-  systemd.targets.multi-user.enable = true;
-  
   networking = {
     hostName = vars.hostname;
     useNetworkd = true;
-    networkmanager.enable = false;
     useDHCP = true;
   };
 
@@ -104,7 +100,7 @@ in
 
   environment.etc."configuration-revision".text = flake.rev or flake.dirtyRev or "unknown";
 
-  services.getty.autologinUser = "root";
+  services.getty.autologinUser = null;
 
   documentation.enable = false;
 
@@ -112,6 +108,8 @@ in
   nix.registry.self.flake = flake;
 
   age.secrets.tailscale-oracle.file = ./tailscale-oracle.age;
-
-  system.stateVersion = "26.11";
+  # networking.interfaces.enp0s6.useDHCP = lib.mkDefault true;
+  oci.efi = true;
+  nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
+  system.stateVersion = "24.11";
 }
