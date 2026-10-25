@@ -1,3 +1,4 @@
+{ flake, ... }:
 {
   hostname = "nixos";
   username = "leporuid";
