@@ -40,6 +40,7 @@ in
     # inputs.self.nixosModules.tailzero
   ];
 
+  oci.efi = true;
   boot = {
     loader = {
       systemd-boot = {
