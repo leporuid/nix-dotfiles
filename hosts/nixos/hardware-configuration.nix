@@ -2,7 +2,6 @@
 # and may be overwritten by future invocations.  Please make changes
 # to /etc/nixos/configuration.nix instead.
 {
-  lib,
   modulesPath,
   ...
 }:
@@ -21,15 +20,11 @@
   boot.kernelParams = [
     "console=ttyS0,115200n8"
     "console=tty1"
-    "nvme.shutdown_timeout=10"
-    "libiscsi.debug_libiscsi_eh=1"
   ];
   boot.kernelModules = [
     "wireguard"
     "ip_vs"
   ];
   boot.extraModulePackages = [ ];
-
-  networking.useDHCP = lib.mkDefault true;
-  nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
+ 
 }

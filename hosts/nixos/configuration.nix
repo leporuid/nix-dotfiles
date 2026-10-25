@@ -62,7 +62,16 @@ in
     };
   };
 
-  fileSystems."/boot".options = [ "umask=0077" ];
+  fileSystems."/".device =
+    lib.mkForce "/dev/disk/by-partlabel/disk-main-root";
+
+  fileSystems."/boot".device =
+    lib.mkForce "/dev/disk/by-partlabel/disk-main-boot";
+
+  fileSystems."/boot".options = [
+    "umask=0077"
+  ];
+
   systemd.targets.multi-user.enable = true;
 
   networking = {
@@ -124,10 +133,6 @@ in
 
   environment.etc."configuration-revision".text = flake.rev or flake.dirtyRev or "unknown";
 
-  environment.sessionVariables = {
-    TERM = "linux";
-  };
-
   services.getty.autologinUser = null;
 
   documentation.enable = false;
@@ -136,6 +141,6 @@ in
   nix.registry.self.flake = flake;
 
   age.secrets.tailscale-oracle.file = ./tailscale-oracle.age;
-
+  nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
   system.stateVersion = "24.11";
 }
