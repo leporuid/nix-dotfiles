@@ -60,7 +60,6 @@
     starship
     direnv
     nix-direnv
-    atuin
     zoxide
     fzf
     tmux
