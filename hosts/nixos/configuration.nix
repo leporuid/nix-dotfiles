@@ -42,8 +42,15 @@ in
     inputs.self.nixosModules.tailzero
   ];
   
-  fileSystems."/".device =
+   fileSystems."/".device =
     lib.mkForce "/dev/disk/by-partlabel/disk-main-root";
+
+  fileSystems."/boot".device =
+    lib.mkForce "/dev/disk/by-partlabel/disk-main-boot";
+
+  fileSystems."/boot".options = [
+    "umask=0077"
+  ];
 
   boot = {
     loader = {
