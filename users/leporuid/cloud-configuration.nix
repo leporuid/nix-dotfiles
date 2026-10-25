@@ -156,7 +156,7 @@ in
     ZDOTDIR = "$HOME/.config/zsh";
     NIX_CONFIG_REV = flake.rev or flake.dirtyRev or "unknown";
     NIX_CONFIG_DIR = config.my.config.directory;
-    NIX_CONFIG_LAST_MODIFIED = builtins.toString flake.lastModified;
+    NIX_CONFIG_LAST_MODIFIED = builtins.toString flake.lastModified or "0";
    }
   // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
     ZDOTDIR = "$HOME/.config/zsh";

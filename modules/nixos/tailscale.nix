@@ -1,10 +1,22 @@
 { ... }:
-{ pkgs, ... }:
 {
-  # Disable the native Tailscale daemon so Tailzero (Border0) manages the connection exclusively.
-  services.tailscale.enable = false;
-
-  # Retain UDP GRO forwarding and firewall optimizations for Tailzero's underlying WireGuard tunnel.
+  config,
+  pkgs,
+  ...
+}:
+{
+  services.tailscale = {
+    enable = true;
+    interfaceName = "userspace-networking";
+    authKeyFile = config.age.secrets.tailscale-oracle.path;
+    useRoutingFeatures = "both";
+    extraUpFlags = [
+      "--advertise-exit-node"
+      "--exit-node-allow-lan-access"
+      "--advertise-routes=10.0.50.0/24"
+      "--advertise-tags=tag:all,tag:border0-managed"
+    ];
+  };
   services.networkd-dispatcher.enable = false;
   networking.networkmanager.dispatcherScripts = [
     {
@@ -23,11 +35,9 @@
       '';
     }
   ];
-
   environment.systemPackages = with pkgs; [
     ethtool
   ];
-
   networking.firewall = {
     checkReversePath = "loose";
     allowedUDPPorts = [ 41641 ];

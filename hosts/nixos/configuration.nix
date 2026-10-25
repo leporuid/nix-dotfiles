@@ -32,7 +32,6 @@ in
     inputs.self.nixosModules.observability
     inputs.self.nixosModules.ssh-hardening
     inputs.self.nixosModules.tailscale
-    inputs.self.nixosModules.tailzero
   ];
 
   boot = {
@@ -43,7 +42,6 @@ in
         efiSysMountPoint = "/boot";
       };
     };
-    #initrd.systemd.enable = true;
   };
 
   fileSystems."/boot".options = [ "umask=0077" ];
@@ -83,7 +81,7 @@ in
     agenixPkg
   ];
 
-  environment.etc."configuration-revision".text = flake.rev or flake.dirtyRev;
+  environment.etc."configuration-revision".text = flake.rev or flake.dirtyRev or "unknown";
 
   environment.sessionVariables = {
     TERM = "linux";
