@@ -2,7 +2,7 @@
 {
   system.autoUpgrade = {
     enable = true;
-    flake = "/etc/nixos";
+    flake = "~/Developer/nix-dotfiles";
     dates = "04:20";
     randomizedDelaySec = "45min";
     allowReboot = true;
