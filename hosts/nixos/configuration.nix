@@ -1,9 +1,8 @@
 {
-  pkgs,
   lib,
+  pkgs,
   inputs,
   flake,
-  modulesPath,
   ...
 }:
 
@@ -22,13 +21,13 @@ let
 in
 {
   imports = [
-    (modulesPath + "/virtualisation/oci-common.nix")
     ./hardware-configuration.nix
     ./disk-config.nix
+    ./users/leporuid
+
     inputs.agenix.nixosModules.default
     inputs.disko.nixosModules.disko
 
-    inputs.self.nixosModules.programs
     inputs.self.nixosModules.age-secrets
     inputs.self.nixosModules.auto-upgrade
     inputs.self.nixosModules.base
@@ -40,63 +39,68 @@ in
     inputs.self.nixosModules.tailscale
     inputs.self.nixosModules.tailzero
   ];
-  
-   fileSystems."/".device =
-    lib.mkForce "/dev/disk/by-partlabel/disk-main-root";
-
-  fileSystems."/boot".device =
-    lib.mkForce "/dev/disk/by-partlabel/disk-main-boot";
-
-  fileSystems."/boot".options = [
-    "umask=0077"
-  ];
 
   boot = {
     loader = {
-      systemd-boot.enable = true;
+      systemd-boot = {
+        enable = true;
+        configurationLimit = 10;
+        editor = false;
+      };
 
-      efi = lib.mkDefault {
+      efi = {
         canTouchEfiVariables = true;
         efiSysMountPoint = "/boot";
       };
     };
+
+    kernel.sysctl = {
+      "net.core.devconf_inherit_init_net" = 1;
+      "net.ipv4.conf.all.forwarding" = true;
+      "net.ipv4.conf.all.route_localnet" = lib.mkDefault 1;
+      "net.ipv6.conf.all.forwarding" = lib.mkDefault 1;
+    };
   };
+
+  fileSystems."/boot".options = [ "umask=0077" ];
+  systemd.targets.multi-user.enable = true;
 
   networking = {
     hostName = vars.hostname;
     useNetworkd = true;
     useDHCP = true;
+    iproute2.enable = true;
+    nftables.enable = true;
   };
 
-  systemd.network.wait-online.anyInterface = true;
-  services.resolved.enable = true;
+  systemd.network = {
+    enable = true;
+    wait-online.anyInterface = true;
+  };
+
+  services.vnstat.enable = true;
 
   time.timeZone = vars.timezone;
   i18n.defaultLocale = vars.locale;
 
   users = {
     mutableUsers = false;
-    defaultUserShell = pkgs.bashInteractive;
-
     users.${vars.username} = {
       isNormalUser = true;
-      extraGroups = [ "wheel" ];
+      extraGroups = [
+        "wheel"
+      ];
       hashedPassword = "!";
       openssh.authorizedKeys.keys = vars.sshKeys;
-      shell = pkgs.bashInteractive;
-      openssh.authorizedKeys.keyFiles = [
-      "${flake}/hosts/MacBook-Pro/users/leporuid/id_ed25519.pub"
-       "${flake}/hosts/MacBook-Pro/id_ed25519.pub"
-       "${flake}/hosts/nixos/id_ed25519.pub"
-      ];
+      openssh.authorizedKeys.keyFiles = vars.keyFiles;
     };
   };
 
   security.sudo.wheelNeedsPassword = false;
-
   security.sudo.extraRules = [
     {
       users = [ vars.username ];
+
       commands = [
         {
           command = "ALL";
@@ -114,6 +118,10 @@ in
 
   environment.etc."configuration-revision".text = flake.rev or flake.dirtyRev or "unknown";
 
+  environment.sessionVariables = {
+    TERM = "linux";
+  };
+
   services.getty.autologinUser = null;
 
   documentation.enable = false;
@@ -122,8 +130,6 @@ in
   nix.registry.self.flake = flake;
 
   age.secrets.tailscale-oracle.file = ./tailscale-oracle.age;
-  # networking.interfaces.enp0s6.useDHCP = lib.mkDefault true;
-  oci.efi = true;
-  nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
-  system.stateVersion = "24.11";
+
+  system.stateVersion = "26.11";
 }
