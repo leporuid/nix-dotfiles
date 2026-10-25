@@ -18,7 +18,7 @@ pkgs.stdenv.mkDerivation {
   meta = with pkgs.lib; {
     description = "A tool to check ancestor relationships";
     license = licenses.mit;
-    maintainers = [];
+    maintainers = [ ];
     platforms = platforms.unix;
   };
 }

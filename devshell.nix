@@ -5,14 +5,13 @@
 }:
 let
   system = pkgs.stdenv.hostPlatform.system;
-  determinatePkgs =
-    inputs.determinate.inputs.nixpkgs.legacyPackages.${system};
+  determinatePkgs = inputs.determinate.inputs.nixpkgs.legacyPackages.${system};
 
   nixos-rebuild = pkgs.writeShellScriptBin "nixos-rebuild" ''
     exec env TMPDIR=/tmp \
       ${determinatePkgs.nixos-rebuild-ng}/bin/nixos-rebuild "$@"
   '';
-  
+
   nixos-anywhere = pkgs.writeShellScriptBin "nixos-anywhere" ''
     exec env TMPDIR=/tmp \
       ${determinatePkgs.nixos-anywhere}/bin/nixos-anywhere "$@"
@@ -31,8 +30,8 @@ pkgs.mkShellNoCC {
     nixos-anywhere
   ]
   ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
-      perSystem.nix-darwin.default
-    ];
+    perSystem.nix-darwin.default
+  ];
 
   shellHook = ''
     export IN_NIX_CONFIG_DEVSHELL=1

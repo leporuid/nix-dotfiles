@@ -21,20 +21,18 @@ final: prev: {
 
         src = inputs.n-m3u8dl-re;
 
-        nugetDeps = ./n-m3u8dl-re-deps.nix;
+        nugetDeps = ./n-m3u8dl-re-deps.json;
         patches = [ ];
 
-        postPatch =
-          (old.postPatch or "")
-          + ''
-            find . -type f \( -name "*.csproj" -o -name "*.props" \) -exec sed -i 's/net10\.0/net9.0/g' {} +
-            find . -type f \( -name "*.csproj" -o -name "*.props" \) -exec sed -i 's/<PublishTrimmed>true<\/PublishTrimmed>//g' {} +
-            find . -type f \( -name "*.csproj" -o -name "*.props" \) -exec sed -i 's/<PublishAot>true<\/PublishAot>//g' {} +
-            find . -type f \( -name "*.csproj" -o -name "*.props" \) -exec sed -i 's/<PublishSingleFile>true<\/PublishSingleFile>//g' {} +
+        postPatch = (old.postPatch or "") + ''
+          find . -type f \( -name "*.csproj" -o -name "*.props" \) -exec sed -i 's/net10\.0/net9.0/g' {} +
+          find . -type f \( -name "*.csproj" -o -name "*.props" \) -exec sed -i 's/<PublishTrimmed>true<\/PublishTrimmed>//g' {} +
+          find . -type f \( -name "*.csproj" -o -name "*.props" \) -exec sed -i 's/<PublishAot>true<\/PublishAot>//g' {} +
+          find . -type f \( -name "*.csproj" -o -name "*.props" \) -exec sed -i 's/<PublishSingleFile>true<\/PublishSingleFile>//g' {} +
 
-            rm -f src/N_m3u8DL-RE.sln
-            rm -rf src/N_m3u8DL-RE.Tests
-          '';
+          rm -f src/N_m3u8DL-RE.sln
+          rm -rf src/N_m3u8DL-RE.Tests
+        '';
 
         postFixup = (old.postFixup or "") + (final.callPackage ../packages/m3u8dl-protocol { }).injectHook;
       });

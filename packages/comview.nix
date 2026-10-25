@@ -1,11 +1,11 @@
 { pname, pkgs, ... }:
 pkgs.buildGoModule {
   inherit pname;
-  version = "0-unstable-2026-06-02";
+  version = "0-unstable-2026-09-16";
   src = pkgs.fetchFromGitHub {
     owner = "rockorager";
     repo = "comview";
-    rev = "08a35f43a467783015ff12557ac02c0e30004e2f";
+    rev = "main";
     hash = "sha256-4zu6PKXRcf1j0Bavql/i/apyJt4ArhnMgW2jqAoBazs=";
   };
   vendorHash = "sha256-f7Q4+Bd22xnxkOWjgv4TzPmgZTNHhYvMtoVyl9anGzc=";

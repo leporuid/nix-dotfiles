@@ -3,7 +3,7 @@ with pkgs;
 rustPlatform.buildRustPackage {
   inherit pname;
   version = "0.5.1";
-  
+
   src = fetchFromGitHub {
     owner = "rutrum";
     repo = pname;

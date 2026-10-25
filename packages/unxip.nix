@@ -4,9 +4,9 @@ stdenvNoCC.mkDerivation {
   pname = "unxip";
   version = "v3.3";
   src = fetchurl {
-      url = "https://github.com/saagarjha/unxip/releases/download/v3.3/unxip";
-      sha256 = "sha256-R12///1w4GcV+Wa4eI+N02dy8zCzNg/272/x/M0vFP4=";
-    };
+    url = "https://github.com/saagarjha/unxip/releases/download/v3.3/unxip";
+    sha256 = "sha256-R12///1w4GcV+Wa4eI+N02dy8zCzNg/272/x/M0vFP4=";
+  };
 
   dontUnpack = true;
   dontFixup = true;
@@ -25,9 +25,9 @@ stdenvNoCC.mkDerivation {
     description = "A fast Xcode unarchiver";
     homepage = "https://github.com/saagarjha/unxip";
     license = lib.licenses.lgpl3Only;
-    maintainers = with lib.maintainers; [DivitMittal];
+    maintainers = with lib.maintainers; [ DivitMittal ];
     platforms = lib.platforms.darwin;
-    sourceProvenance = with lib.sourceTypes; [binaryNativeCode];
+    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     mainProgram = "unxip";
   };
 }

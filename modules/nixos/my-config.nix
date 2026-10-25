@@ -6,7 +6,13 @@
 }:
 
 let
-  inherit (lib.types) attrsOf either nullOr path str;
+  inherit (lib.types)
+    attrsOf
+    either
+    nullOr
+    path
+    str
+    ;
 
   cfg = config.my.system.config;
 

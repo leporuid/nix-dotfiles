@@ -124,9 +124,9 @@ in
       '';
     };
 
-    programs.man.generateCaches = lib.mkIf (enableGeneratedCompletions && config.programs.man.package != null) (
-      lib.mkDefault true
-    );
+    programs.man.generateCaches = lib.mkIf (
+      enableGeneratedCompletions && config.programs.man.package != null
+    ) (lib.mkDefault true);
 
     xdg.dataFile."fish/generated_completions" = lib.mkIf enableGeneratedCompletions {
       source =
@@ -143,14 +143,16 @@ in
 
     manual.manpages.enable = false;
 
-    xdg.dataFile."fish/vendor_conf.d/99_generated_completions.fish" = lib.mkIf enableGeneratedCompletions {
-      source = fishIndent "99_generated_completions.fish" ''
-        set -l genpath ${config.xdg.dataHome}/fish/generated_completions
+    xdg.dataFile."fish/vendor_conf.d/99_generated_completions.fish" =
+      lib.mkIf enableGeneratedCompletions
+        {
+          source = fishIndent "99_generated_completions.fish" ''
+            set -l genpath ${config.xdg.dataHome}/fish/generated_completions
 
-        if test -d $genpath; and not contains -- $genpath $fish_complete_path
-          set --append fish_complete_path $genpath
-        end
-      '';
-    };
+            if test -d $genpath; and not contains -- $genpath $fish_complete_path
+              set --append fish_complete_path $genpath
+            end
+          '';
+        };
   };
 }

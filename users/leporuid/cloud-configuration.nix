@@ -25,10 +25,7 @@ let
   };
 
   platformConfig =
-    if pkgs.stdenv.hostPlatform.isDarwin then
-      "Library/Application Support"
-    else
-      ".config";
+    if pkgs.stdenv.hostPlatform.isDarwin then "Library/Application Support" else ".config";
 in
 {
   imports = [

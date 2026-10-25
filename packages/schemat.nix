@@ -8,14 +8,14 @@ rustPlatform.buildRustPackage {
     owner = "raviqqe";
     repo = pname;
     rev = "main";
-    hash = "sha256-JXlaOMlBn3rZtNHLbzXNp4a6w/BaFdzWjgY2MdbWJtA=";
+    hash = "sha256-e+fUDVvNg6fHBv7QLWM1xtPon2Ry+XRGUD3EaOipDVY=";
   };
 
   # FIXME: This should really be removed in favor of using a proper nightly
   # toolchain, but it works for now. Might need to use rust-overlay?
   env.RUSTC_BOOTSTRAP = true;
 
-  cargoHash = "sha256-lIy71FOYg3VJvl7F/6MtPI8ejHHadJloJdPBEnm0aBM=";
+  cargoHash = "sha256-7OwBx7aA5SUW3tzMUv2g7XrSj//5SWaWexwAcij4o/o=";
 
   meta = {
     description = "Code formatter for Scheme, Lisp, and any S-expressions";

@@ -53,7 +53,6 @@ in
     };
   };
 
-
   networking = {
     hostName = vars.hostname;
     useNetworkd = true;
