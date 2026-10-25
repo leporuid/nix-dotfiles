@@ -1,0 +1,11 @@
+# Home Manager Bash profile initialization.
+
+session_vars="$HOME/.local/share/bash/hm-session-vars.sh"
+
+if [[ -r "$session_vars" ]]; then
+    source "$session_vars"
+fi
+
+if [[ -r "$HOME/.bashenv" ]]; then
+    source "$HOME/.bashenv"
+fi

@@ -1,0 +1,13 @@
+# Bash environment initialization.
+#
+# This file should contain environment variables that should be available
+# to both interactive and non-interactive Bash shells.
+
+session_vars="$HOME/.local/share/bash/hm-session-vars.sh"
+
+if [[ -r "$session_vars" ]]; then
+    source "$session_vars"
+fi
+
+# uv
+export PATH="$HOME/.local/bin:$PATH"
