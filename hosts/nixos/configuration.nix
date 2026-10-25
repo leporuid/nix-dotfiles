@@ -37,13 +37,13 @@ in
 
   boot = {
     loader = {
-      #systemd-boot.enable = true;
+      systemd-boot.enable = true;
       efi = {
         canTouchEfiVariables = true;
         efiSysMountPoint = "/boot";
       };
     };
-    initrd.systemd.enable = true;
+    #initrd.systemd.enable = true;
   };
 
   fileSystems."/boot".options = [ "umask=0077" ];
