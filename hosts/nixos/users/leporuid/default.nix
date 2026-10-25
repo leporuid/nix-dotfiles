@@ -1,14 +1,15 @@
 {
   pkgs,
+  flake.
   ...
 }:
 
 let
-  vars = import ../vars.nix;
+  vars = import ../../vars.nix;
 in
 {
   imports = [
-    ../../../modules/nixos/programs.nix
+    inputs.self.nixosModules.programs
   ];
 
   users.defaultUserShell = pkgs.bashInteractive;
