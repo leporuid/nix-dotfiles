@@ -6,7 +6,7 @@ pkgs.buildGoModule {
     owner = "rockorager";
     repo = "comview";
     rev = "main";
-    hash = "sha256-4zu6PKXRcf1j0Bavql/i/apyJt4ArhnMgW2jqAoBazs=";
+    hash = "sha256-9mkRE8zycbXkeWRV5QJErhNSX850ywcpZBjpaSTLuJo=";
   };
   vendorHash = "sha256-f7Q4+Bd22xnxkOWjgv4TzPmgZTNHhYvMtoVyl9anGzc=";
 
