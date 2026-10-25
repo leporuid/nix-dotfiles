@@ -1,3 +1,4 @@
+# Shared CLI configuration applied to both macOS (MacBook-Pro) and NixOS (Oracle).
 {
   pkgs,
   perSystem,
@@ -24,47 +25,11 @@ let
     '';
   };
 
-  isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
-
   platformConfig =
-    if isDarwin then
+    if pkgs.stdenv.hostPlatform.isDarwin then
       "Library/Application Support"
     else
       ".config";
-
-  shellConfig =
-    if isDarwin then
-      {
-        # macOS: Zsh remains the login shell and launches Fish interactively.
-        my.config.source = {
-          ".config/zsh" = "config/zsh";
-          ".zshenv" = "config/zsh/home_zshenv";
-        };
-
-        home.file.".local/share/zsh/hm-session-vars.sh".source =
-          "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
-
-        home.sessionVariables = {
-          ZDOTDIR = "$HOME/.config/zsh";
-        };
-      }
-    else
-      {
-        # NixOS: use Bash.
-        my.config.source = {
-          ".bashenv" = "config/bash/.bashenv";
-          ".bashrc" = "config/bash/.bashrc";
-          ".bash_profile" = "config/bash/.bash_profile";
-        };
-
-        home.file.".local/share/bash/hm-session-vars.sh".source =
-          "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
-
-        home.sessionVariables = {
-          # Used by non-interactive Bash scripts.
-          BASH_ENV = "$HOME/.bashenv";
-        };
-      };
 in
 {
   imports = [
@@ -76,7 +41,7 @@ in
   ];
 
   home.packages = [
-    (if isDarwin then perSystem.helix.helix else pkgs.helix)
+    (if pkgs.stdenv.hostPlatform.isDarwin then perSystem.helix.helix else pkgs.helix)
     perSystem.self.has-ancestor
     perSystem.self.ccase
     perSystem.self.comview
@@ -118,28 +83,23 @@ in
     pkgs.wget
     pkgs.zellij
     pkgs.zoxide
-
     # Fonts
     pkgs.nerd-fonts.roboto-mono
   ];
 
-  fonts.fontconfig.enable = !isDarwin;
+  fonts.fontconfig.enable = !pkgs.stdenv.hostPlatform.isDarwin;
 
-  programs.starship.settings =
-    builtins.fromTOML (builtins.readFile "${flake}/config/starship.toml");
+  programs.starship.settings = builtins.fromTOML (builtins.readFile "${flake}/config/starship.toml");
 
   programs.bat = {
     config.theme = "Catppuccin Mocha";
-
     extraPackages = with pkgs.bat-extras; [
       batdiff
       batman
       batgrep
       batwatch
     ];
-
     syntaxes = { };
-
     themes."Catppuccin Mocha" = {
       src = inputs.catppuccin-bat;
       file = "themes/Catppuccin Mocha.tmTheme";
@@ -160,21 +120,49 @@ in
     ".config/starship.toml" = "config/starship.toml";
     ".config/tmux" = "config/tmux";
     ".config/zellij" = "config/zellij";
+    ".config/zsh" = "config/zsh";
+    ".zshenv" = "config/zsh/home_zshenv";
     ".npmrc" = "config/npm/npmrc";
     "${platformConfig}/jj" = "config/jj";
+  }
+  // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
+    ".config/zsh" = "config/zsh";
+    ".zshenv" = "config/zsh/home_zshenv";
+  }
+  // lib.optionalAttrs (!pkgs.stdenv.hostPlatform.isDarwin) {
+    ".bashenv" = "config/bash/.bashenv";
+    ".bashrc" = "config/bash/.bashrc";
+    ".bash_profile" = "config/bash/.bash_profile";
   };
 
-  home.file.".config/direnv/lib/nix-direnv.sh".source =
-    "${pkgs.nix-direnv}/share/nix-direnv/direnvrc";
+  # Ensure session variables are in a known path for both standalone HM and system modules.
+ home.file = {
+    ".config/direnv/lib/nix-direnv.sh".source =
+      "${pkgs.nix-direnv}/share/direnv/direnvrc";
+  }
+  // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
+    ".local/share/zsh/hm-session-vars.sh".source =
+      "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
+  }
+  // lib.optionalAttrs (!pkgs.stdenv.hostPlatform.isDarwin) {
+    ".local/share/bash/hm-session-vars.sh".source =
+      "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
+  };
 
   home.sessionVariables = {
     ATUIN_NOBIND = "true";
     BAT_THEME = "Catppuccin Mocha";
     FZF_DEFAULT_OPTS = "--no-sort --reverse --margin=0,1 --exit-0 --select-1 --pointer ▸▹ --prompt • --color bg+:#414559,bg:#303446,spinner:#f2d5cf,hl:#e78284,fg:#c6d0f5,header:#e78284,info:#ca9ee6,pointer:#f2d5cf,marker:#babbf1,fg+:#c6d0f5,prompt:#ca9ee6,hl+:#e78284,selected-bg:#51576d,border:#414559,label:#c6d0f5";
     JJ_CONFIG = "${config.home.homeDirectory}/.config/jj/config.toml";
+    ZDOTDIR = "$HOME/.config/zsh";
     NIX_CONFIG_REV = flake.rev or flake.dirtyRev or "unknown";
     NIX_CONFIG_DIR = config.my.config.directory;
     NIX_CONFIG_LAST_MODIFIED = builtins.toString flake.lastModified;
+   }
+  // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
+    ZDOTDIR = "$HOME/.config/zsh";
+  }
+  // lib.optionalAttrs (!pkgs.stdenv.hostPlatform.isDarwin) {
+    BASH_ENV = "$HOME/.bashenv";
   };
 }
-// shellConfig
