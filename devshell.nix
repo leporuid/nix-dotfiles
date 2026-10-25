@@ -1,7 +1,11 @@
 {
   pkgs,
   perSystem,
+  inputs,
 }:
+let
+   determinateNix = inputs.determinate.inputs.nix.packages.${pkgs.stdenv.hostPlatform.system}.default;
+in
 pkgs.mkShellNoCC {
   packages =
     [
@@ -12,9 +16,12 @@ pkgs.mkShellNoCC {
       pkgs.taplo
       pkgs.age
       pkgs.deno
-      pkgs.nixos-rebuild
-      pkgs.nixos-anywhere
-      pkgs.cpio
+      (pkgs.nixos-rebuild.override {
+        nix = determinateNix;
+      })
+      (pkgs.nixos-anywhere.override {
+        nix = determinateNix;
+      })
     ]
     ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
       perSystem.nix-darwin.default
