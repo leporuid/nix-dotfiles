@@ -12,6 +12,13 @@ let
     exec env TMPDIR=/tmp \
       ${determinatePkgs.nixos-rebuild-ng}/bin/nixos-rebuild "$@"
   '';
+  
+  nixos-anywhere = pkgs.writeShellScriptBin "nixos-anywhere" ''
+     exec env TMPDIR=/tmp \
+      ${determinatePkgs.nixos-anywhere.override {
+      nix = systemNix;
+    }}/bin/nixos-anywhere "$@"
+  '';
 in
 pkgs.mkShellNoCC {
   packages = [
@@ -23,6 +30,7 @@ pkgs.mkShellNoCC {
     pkgs.age
     pkgs.deno
     nixos-rebuild
+    nixos-anywhere
   ]
   ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
       perSystem.nix-darwin.default
