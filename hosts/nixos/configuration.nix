@@ -23,7 +23,7 @@ in
     inputs.self.modules.common.fish-environment
     ./hardware-configuration.nix
     ./disk-config.nix
-    ./leporuid
+    ./users/leporuid
 
     inputs.agenix.nixosModules.default
     inputs.disko.nixosModules.disko
