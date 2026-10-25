@@ -23,7 +23,6 @@ in
   imports = [
     ./hardware-configuration.nix
     ./disk-config.nix
-    ./users/leporuid
 
     inputs.agenix.nixosModules.default
     inputs.disko.nixosModules.disko
@@ -35,6 +34,7 @@ in
     inputs.self.nixosModules.fail2ban
     inputs.self.nixosModules.firewall-base
     inputs.self.nixosModules.observability
+    inputs.self.nixosModules.programs
     inputs.self.nixosModules.ssh-hardening
     inputs.self.nixosModules.tailscale
     inputs.self.nixosModules.tailzero
@@ -85,8 +85,10 @@ in
 
   users = {
     mutableUsers = false;
+    defaultUserShell = pkgs.bashInteractive;
     users.${vars.username} = {
       isNormalUser = true;
+      shell = pkgs.bashInteractive;
       extraGroups = [
         "wheel"
       ];
