@@ -101,7 +101,6 @@ in
       ];
     };
   };
-}
 
   security.sudo.wheelNeedsPassword = false;
   security.sudo.extraRules = [
