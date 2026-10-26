@@ -166,13 +166,15 @@ in
         NSNavPanelExpandedStateForSaveMode = true;
         NSWindowResizeTime = 0.001;
         NSWindowShouldDragOnGesture = true;
-        QLPanelAnimationDuration = 0.0;
         InitialKeyRepeat = 15;
         KeyRepeat = 2;
         "com.apple.sound.beep.feedback" = 0;
       };
 
       CustomUserPreferences = {
+         "NSGlobalDomain" = {
+         QLPanelAnimationDuration = 0.0;
+       };
         "com.apple.symbolichotkeys" = {
           AppleSymbolicHotKeys = {
             "64".enabled = false;
