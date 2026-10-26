@@ -2,6 +2,7 @@
 {
   pkgs,
   perSystem,
+  config,
   ...
 }:
 {
@@ -16,10 +17,10 @@
   # Suppress the default macOS terminal login welcome message.
   home.file.".hushlogin".source = pkgs.emptyFile;
   home.sessionPath = [
-   "${config.home.homeDirectory}/.local/bin"
-   "${config.home.homeDirectory}/.bun/bin"
-   "${config.home.homeDirectory}/.swiftly/bin"
-   ];
+    "${config.home.homeDirectory}/.local/bin"
+    "${config.home.homeDirectory}/.bun/bin"
+    "${config.home.homeDirectory}/.swiftly/bin"
+  ];
   my.config.source = {
     ".config/ghostty/config" = "config/ghostty/config";
     ".config/ghostty/os-config" = "config/ghostty/os-config-darwin";
@@ -33,7 +34,6 @@
     pkgs.ffmpeg
     pkgs.mas
     pkgs.n-m3u8dl-re
-    pkgs.nerd-fonts.roboto-mono
     pkgs.qpdf
     perSystem.ktoolbox.default
     perSystem.self.age-plugin-se

@@ -4,6 +4,24 @@
   lib,
   ...
 }:
+let
+  tapName = t: if builtins.isString t then t else t.name;
+
+  qualifiedTap =
+    s:
+    let
+      parts = lib.splitString "/" s;
+    in
+    lib.optional (builtins.length parts >= 3) (
+      lib.toLower "${builtins.elemAt parts 0}/${builtins.elemAt parts 1}"
+    );
+
+  trustedTaps = lib.unique (
+    (map (t: lib.toLower (tapName t)) config.homebrew.taps)
+    ++ lib.concatMap (b: qualifiedTap (tapName b)) config.homebrew.brews
+    ++ lib.concatMap (c: qualifiedTap (tapName c)) config.homebrew.casks
+  );
+in
 {
   imports = [
     inputs.nix-homebrew.darwinModules.nix-homebrew
@@ -21,6 +39,11 @@
       autoUpdate = false;
       upgrade = false;
       cleanup = "none";
+      extraEnv = {
+        HOMEBREW_NO_UPDATE_REPORT_NEW = "1";
+        HOMEBREW_NO_ENV_HINTS = "1";
+        HOMEBREW_NO_REQUIRE_TAP_TRUST = "1";
+      };
       extraFlags = [
         "--quiet"
       ];
@@ -80,4 +103,14 @@
       "aninsomniacy/homebrew-rayburst" = inputs.homebrew-rayburst;
     };
   };
+
+  # Automatically trust declared third-party taps before brew bundle runs.
+  system.activationScripts.preActivation.text = lib.mkAfter ''
+    if [ -x ${config.homebrew.prefix}/bin/brew ]; then
+      for tap in ${lib.escapeShellArgs trustedTaps}; do
+        sudo --user=${lib.escapeShellArg config.system.primaryUser} --set-home \
+          ${config.homebrew.prefix}/bin/brew trust "$tap" >/dev/null 2>&1 || true
+      done
+    fi
+  '';
 }

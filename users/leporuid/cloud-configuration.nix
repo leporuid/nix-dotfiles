@@ -41,6 +41,7 @@ in
     perSystem.self.has-ancestor
     perSystem.self.ccase
     perSystem.self.comview
+    perSystem.self.atuin
     neovimWithDependencies
 
     pkgs.ast-grep
@@ -83,8 +84,6 @@ in
   ];
 
   fonts.fontconfig.enable = !pkgs.stdenv.hostPlatform.isDarwin;
-
-  programs.starship.settings = builtins.fromTOML (builtins.readFile "${flake}/config/starship.toml");
 
   programs.bat = {
     config.theme = "Catppuccin Mocha";

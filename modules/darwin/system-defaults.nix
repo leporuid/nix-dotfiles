@@ -1,10 +1,13 @@
+{ inputs, ... }:
 {
-  inputs,
   pkgs,
   config,
   lib,
   ...
 }:
+let
+  tailscaleBin = "/Applications/Tailscale.app/Contents/MacOS/Tailscale";
+in
 {
   # =========================================================================
   # 1. Imports and System Modules
@@ -30,15 +33,16 @@
   environment.systemPackages = with pkgs; [
     fish
     pkg-config
-    mas
-    starship
     ghostty-bin.terminfo
 
     (writeShellScriptBin "tailscale" ''
       export TAILSCALE_BE_CLI=1
-      exec /Applications/Tailscale.app/Contents/MacOS/Tailscale "$@"
+      exec ${tailscaleBin} "$@"
     '')
   ];
+
+  environment.enableAllTerminfo = true;
+  time.timeZone = "Asia/Taipei";
 
   environment.pathsToLink = [
     "/share/fish/vendor_completions.d"
@@ -59,17 +63,34 @@
   determinateNix = {
     enable = true;
 
+    determinateNixd = {
+      garbageCollector.strategy = "automatic";
+      builder.state = "enabled";
+    };
+
     customSettings = {
       # Performance and storage optimization for macOS APFS
       auto-optimise-store = false;
+      builders-use-substitutes = true;
+       accept-flake-config = true;
+      connect-timeout = 5;
+      eval-cores = 0;
+      keep-going = true;
+      warn-dirty = false;
+      fallback = true;
+      log-lines = 25;
+      min-free = 1073741824;
+      lazy-trees = true;
+      keep-derivations = true;
+      keep-outputs = true;
 
       extra-substituters = [
-        "https://numtide.com"
-        "https://cachix.org"
-        "https://cachix.org"
+        "https://cache.numtide.com"
+        "https://nix-community.cachix.org"
+        "https://crane.cachix.org"
       ];
       extra-trusted-public-keys = [
-        #niks3.numtide.com
+        # niks3.numtide.com
         "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
         # nix-community.cachix.org
         "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
@@ -82,14 +103,8 @@
         config.system.primaryUser
       ];
       extra-experimental-features = [
-        "lazy-trees"
         "parallel-eval"
-        "nix-command"
-        "flakes"
       ];
-      lazy-trees = true;
-      keep-derivations = true;
-      keep-outputs = true;
     };
   };
 
@@ -102,8 +117,8 @@
 
     activationScripts = {
       tailscaleDns.text = ''
-        if ${pkgs.tailscale}/bin/tailscale status >/dev/null 2>&1; then
-          ${pkgs.tailscale}/bin/tailscale set --accept-dns=false || true
+        if [ -x "${tailscaleBin}" ] && TAILSCALE_BE_CLI=1 "${tailscaleBin}" status >/dev/null 2>&1; then
+          TAILSCALE_BE_CLI=1 "${tailscaleBin}" set --accept-dns=false || true
         fi
       '';
 
@@ -120,11 +135,28 @@
         AppleShowAllFiles = true;
         AppleShowAllExtensions = true;
         ShowPathbar = true;
+        ShowStatusBar = true;
         FXDefaultSearchScope = "SCcf";
         FXPreferredViewStyle = "clmv";
+        FXEnableExtensionChangeWarning = false;
+        QuitMenuItem = true;
+        _FXShowPosixPathInTitle = true;
+        _FXSortFoldersFirst = true;
       };
 
-      dock.autohide = true;
+      dock = {
+        autohide = true;
+        autohide-delay = 0.0;
+        autohide-time-modifier = 0.15;
+        show-recents = false;
+        mru-spaces = false;
+        launchanim = false;
+      };
+
+      trackpad = {
+        Clicking = true;
+        TrackpadThreeFingerDrag = true;
+      };
 
       NSGlobalDomain = {
         ApplePressAndHoldEnabled = true;
@@ -135,6 +167,7 @@
         NSWindowShouldDragOnGesture = true;
         InitialKeyRepeat = 15;
         KeyRepeat = 2;
+        "com.apple.sound.beep.feedback" = 0;
       };
 
       CustomUserPreferences = {
@@ -143,6 +176,10 @@
             "64".enabled = false;
             "65".enabled = false;
           };
+        };
+        "com.apple.desktopservices" = {
+          DSDontWriteNetworkStores = true;
+          DSDontWriteUSBStores = true;
         };
       };
     };

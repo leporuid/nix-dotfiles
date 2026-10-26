@@ -19,7 +19,6 @@
   system.primaryUser = "leporuid";
   system.stateVersion = 6;
 
-
   users.users."${config.system.primaryUser}" = {
     description = "Yu-Min Peng";
     home = "/Users/${config.system.primaryUser}";
@@ -46,9 +45,4 @@
 
   nix.enable = !config.determinateNix.enable;
   nix.channel.enable = false;
-
-  nix.nixPath = lib.mkForce [
-    "nixpkgs=${inputs.nixpkgs}"
-    "home-manager=${inputs.home-manager}"
-  ];
 }
