@@ -34,13 +34,13 @@
     pkgs.atuin
     pkgs.ffmpeg
     pkgs.mas
-    pkgs.n-m3u8dl-re
     pkgs.qpdf
     perSystem.ktoolbox.default
     perSystem.self.age-plugin-se
     perSystem.self.gallery-dl
     perSystem.self.kumono
     perSystem.self.megabasterd
+    perSystem.self.n-m3u8dl-re
     perSystem.self.unxip
     perSystem.self.yt-dlp
   ];

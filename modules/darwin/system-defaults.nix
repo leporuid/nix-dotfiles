@@ -3,10 +3,10 @@
   pkgs,
   config,
   lib,
+  nixCaches,
   ...
 }:
 let
-  nixCaches = import ../../users/leporuid/nix-caches.nix;
   tailscaleBin = "/Applications/Tailscale.app/Contents/MacOS/Tailscale";
 in
 {
@@ -15,6 +15,7 @@ in
   # =========================================================================
   imports = [
     inputs.determinate.darwinModules.default
+    inputs.self.modules.common.nix-caches
   ];
 
   # =========================================================================

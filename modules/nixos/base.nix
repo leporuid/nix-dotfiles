@@ -1,11 +1,9 @@
 { inputs, ... }:
-{ ... }:
-let
-  nixCaches = import ../../users/leporuid/nix-caches.nix;
-in
+{ nixCaches, ... }:
 {
   imports = [
     inputs.determinate.nixosModules.default
+    inputs.self.modules.common.nix-caches
   ];
 
   determinate.enable = true;

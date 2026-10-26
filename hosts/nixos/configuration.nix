@@ -3,12 +3,11 @@
   pkgs,
   inputs,
   flake,
+  vars,
   ...
 }:
 
 let
-  vars = import ./vars.nix;
-
   agenixPkg =
     (inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
       ageBin = "${pkgs.rage}/bin/rage";
@@ -27,6 +26,7 @@ in
     inputs.agenix.nixosModules.default
     inputs.disko.nixosModules.disko
 
+    inputs.self.modules.common.vars
     inputs.self.nixosModules.age-secrets
     inputs.self.nixosModules.auto-upgrade
     inputs.self.nixosModules.base
@@ -103,12 +103,10 @@ in
         "wheel"
       ];
       hashedPassword = "!";
-      openssh.authorizedKeys.keys = vars.sshKeys;
-      openssh.authorizedKeys.keyFiles = [
-      "${flake}/hosts/MacBook-Pro/users/leporuid/id_ed25519.pub"
-       "${flake}/hosts/MacBook-Pro/id_ed25519.pub"
-       "${flake}/hosts/nixos/id_ed25519.pub"
-      ];
+      openssh.authorizedKeys = {
+        keys = vars.sshKeys;
+        keyFiles = vars.sshKeyFiles;
+      };
     };
   };
 
