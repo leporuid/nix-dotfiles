@@ -31,6 +31,7 @@
   };
 
   home.packages = [
+    pkgs.atuin
     pkgs.ffmpeg
     pkgs.mas
     pkgs.n-m3u8dl-re

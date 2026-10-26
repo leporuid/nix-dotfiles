@@ -41,7 +41,6 @@ in
     perSystem.self.has-ancestor
     perSystem.self.ccase
     perSystem.self.comview
-    perSystem.self.atuin
     neovimWithDependencies
 
     pkgs.ast-grep

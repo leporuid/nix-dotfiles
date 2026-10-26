@@ -55,9 +55,6 @@ in
   # 3. Nix Core and Determinate Installer Integration
   # =========================================================================
 
-  # Bind standard flake registry profiles locally
-  nixpkgs.flake.setNixPath = true;
-  nixpkgs.flake.setFlakeRegistry = true;
   documentation.doc.enable = false;
   home-manager.backupFileExtension = "hm-backup";
 
