@@ -1,11 +1,5 @@
-
-{
-  inputs,
-  config,
-  lib,
-  ...
-}:
-
+{ inputs, flake, ... }:
+{ config, pkgs, lib, ... }:
 let
   extraTaps = [
     "aninsomniacy/homebrew-rayburst"
@@ -40,8 +34,8 @@ let
 in
 {
   imports = [
-    inputs.nix-homebrew.darwinModules.nix-homebrew
-  ];
+  inputs.nix-homebrew.darwinModules.nix-homebrew
+];
 
   environment.variables = {
     HOMEBREW_NO_AUTO_UPDATE = "1";
