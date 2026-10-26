@@ -19,7 +19,7 @@
 
     src = inputs.n-m3u8dl-re;
 
-    nugetDeps = ../overlays/n-m3u8dl-re-deps.json;
+    nugetDeps = ./n-m3u8dl-re-deps.json;
     patches = [ ];
 
     postPatch = (old.postPatch or "") + ''

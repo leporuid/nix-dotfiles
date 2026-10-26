@@ -10,7 +10,6 @@
 {
   imports = [
     inputs.self.nixosModules.my-config
-    inputs.self.modules.common.fish-environment
   ];
 
   programs.bash = {

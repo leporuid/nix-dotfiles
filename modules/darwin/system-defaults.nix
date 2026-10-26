@@ -155,10 +155,13 @@ in
       };
 
       NSGlobalDomain = {
+        AppleKeyboardUIMode = 3;
         ApplePressAndHoldEnabled = true;
         AppleShowAllExtensions = true;
         NSAutomaticCapitalizationEnabled = false;
+        NSAutomaticDashSubstitutionEnabled = false;
         NSAutomaticPeriodSubstitutionEnabled = false;
+        NSAutomaticQuoteSubstitutionEnabled = false;
         NSAutomaticSpellingCorrectionEnabled = false;
         NSAutomaticWindowAnimationsEnabled = false;
         NSNavPanelExpandedStateForSaveMode = true;
