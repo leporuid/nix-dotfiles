@@ -32,6 +32,7 @@ in
     inputs.self.homeModules.my-config
     inputs.self.homeModules.my-programs-fish
     inputs.self.homeModules.my-programs-neovim
+    inputs.self.modules.common.nixpkgs-unstable
     ../../config/nvim/plugins.nix
   ];
 
