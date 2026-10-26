@@ -65,6 +65,7 @@
     zellij
     git
     gh
+    ghostty.terminfo
     lazygit
     bat
     eza
