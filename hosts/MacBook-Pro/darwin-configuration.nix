@@ -14,9 +14,11 @@
   ];
 
   networking.hostName = "MacBook-Pro";
+  nixpkgs.hostPlatform = "aarch64-darwin";
 
   system.primaryUser = "leporuid";
   system.stateVersion = 6;
+
 
   users.users."${config.system.primaryUser}" = {
     description = "Yu-Min Peng";
@@ -38,16 +40,9 @@
     };
   };
 
-  nixpkgs.hostPlatform = "aarch64-darwin";
-
   services.openssh.enable = true;
-
   security.pam.services.sudo_local.touchIdAuth = true;
   security.pam.services.sudo_local.reattach = true;
-
-  environment.systemPackages = [
-    pkgs.fish
-  ];
 
   nix.enable = !config.determinateNix.enable;
   nix.channel.enable = false;

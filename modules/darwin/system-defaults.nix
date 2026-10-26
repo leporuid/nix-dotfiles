@@ -1,79 +1,91 @@
-{ inputs, flake }:
-{ config, lib, pkgs, ... }:
 {
+  inputs,
+  pkgs,
+  config,
+  lib,
+  ...
+}:
+{
+  # =========================================================================
+  # 1. Imports and System Modules
+  # =========================================================================
   imports = [
     inputs.determinate.darwinModules.default
   ];
 
-  documentation.doc.enable = false;
-
-  ids.gids.nixbld = 350;
-
-  home-manager.backupFileExtension = "hm-backup";
-
-   environment = {
-    variables = {
-      NIX_PATH = [
-        "nixpkgs=${inputs.nixpkgs}"
-        "home-manager=${inputs.home-manager}"
-      ];
-    };
-
-    etc = {
-      "resolver/ts.net".text = ''
-        nameserver 100.100.100.100
-      '';
-
-      "nix/nix.custom.conf".knownSha256Hashes = [
-        "3bd68ef979a42070a44f8d82c205cfd8e8cca425d91253ec2c10a88179bb34aa"
-      ];
-    };
-
-    systemPackages = with pkgs; [
-      pkg-config
-      mas
-      starship
-      ghostty-bin.terminfo
-
-      (writeShellScriptBin "tailscale" ''
-        export TAILSCALE_BE_CLI=1
-        exec /Applications/Tailscale.app/Contents/MacOS/Tailscale "$@"
-      '')
-    ];
-
-    pathsToLink = [
-      "/share/fish/vendor_completions.d"
-      "/share/fish/vendor_functions.d"
-      "/Applications"
-    ];
+  # =========================================================================
+  # 2. Environment, System Packages, and Local DNS Settings
+  # =========================================================================
+  environment.etc = {
+    "resolver/ts.net".text = ''
+      nameserver 100.100.100.100
+    '';
   };
+
+  # Safe injection of custom NIX_PATH that works seamlessly alongside determinateNix
+  environment.extraInit = lib.mkForce ''
+    export NIX_PATH="nixpkgs=${inputs.nixpkgs}:home-manager=${inputs.home-manager}:$NIX_PATH"
+  '';
+
+  environment.systemPackages = with pkgs; [
+    fish
+    pkg-config
+    mas
+    starship
+    ghostty-bin.terminfo
+
+    (writeShellScriptBin "tailscale" ''
+      export TAILSCALE_BE_CLI=1
+      exec /Applications/Tailscale.app/Contents/MacOS/Tailscale "$@"
+    '')
+  ];
+
+  environment.pathsToLink = [
+    "/share/fish/vendor_completions.d"
+    "/share/fish/vendor_functions.d"
+    "/Applications"
+  ];
+
+  # =========================================================================
+  # 3. Nix Core and Determinate Installer Integration
+  # =========================================================================
+
+  # Bind standard flake registry profiles locally
+  nixpkgs.flake.setNixPath = true;
+  nixpkgs.flake.setFlakeRegistry = true;
+  documentation.doc.enable = false;
+  home-manager.backupFileExtension = "hm-backup";
 
   determinateNix = {
     enable = true;
 
     customSettings = {
+      # Performance and storage optimization for macOS APFS
+      auto-optimise-store = false;
+
       extra-substituters = [
-        "https://cache.numtide.com"
-        "https://nix-community.cachix.org"
-        "https://crane.cachix.org"
+        "https://numtide.com"
+        "https://cachix.org"
+        "https://cachix.org"
       ];
       extra-trusted-public-keys = [
-    	# cache.numtide.com
-    	"niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
-
-    	# nix-community.cachix.org
-    	"nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-
-    	# crane.cachix.org
-    	"crane.cachix.org-1:8Scfpmn9w+hGdXH/Q9tTLiYAE/2dnJYRJP7kl80GuRk="
+        #niks3.numtide.com
+        "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
+        # nix-community.cachix.org
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+        # crane.cachix.org
+        "crane.cachix.org-1:8Scfpmn9w+hGdXH/Q9tTLiYAE/2dnJYRJP7kl80GuRk="
       ];
 
       extra-trusted-users = [
-        "root"
+        "@admin"
         config.system.primaryUser
       ];
       extra-experimental-features = [
+        "lazy-trees"
         "parallel-eval"
+        "nix-command"
+        "flakes"
       ];
       lazy-trees = true;
       keep-derivations = true;
@@ -81,9 +93,12 @@
     };
   };
 
-   system = {
+  # =========================================================================
+  # 4. macOS System Architecture and Native Configurations
+  # =========================================================================
+  system = {
     tools.darwin-uninstaller.enable = false;
-    configurationRevision = flake.rev or flake.dirtyRev or null;
+    configurationRevision = inputs.self.rev or inputs.self.dirtyRev or null;
 
     activationScripts = {
       tailscaleDns.text = ''
