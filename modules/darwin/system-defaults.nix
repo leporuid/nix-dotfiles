@@ -28,7 +28,7 @@ in
 
   # Safe injection of custom NIX_PATH that works seamlessly alongside determinateNix
   environment.extraInit = lib.mkForce ''
-    export NIX_PATH="nixpkgs=${inputs.nixpkgs}:home-manager=${inputs.home-manager}:$NIX_PATH"
+    export NIX_PATH="nixpkgs=${inputs.nixpkgs.outPath}:home-manager=${inputs.home-manager.outPath}:$NIX_PATH"
   '';
 
   environment.systemPackages = with pkgs; [
@@ -97,6 +97,7 @@ in
       ];
       extra-experimental-features = [
         "parallel-eval"
+        "provenance"
       ];
     };
   };
