@@ -1,4 +1,8 @@
 { inputs, ... }:
+{ ... }:
+let
+  nixCaches = import ../../users/leporuid/nix-caches.nix;
+in
 {
   imports = [
     inputs.determinate.nixosModules.default
@@ -7,30 +11,29 @@
   determinate.enable = true;
 
   nix.settings = {
+    inherit (nixCaches) extra-substituters extra-trusted-public-keys;
+
     experimental-features = [
       "nix-command"
       "flakes"
+      "parallel-eval"
     ];
 
-    extra-substituters = [
-      "https://cache.numtide.com"
-      "https://nix-community.cachix.org"
-      "https://crane.cachix.org"
-    ];
-    extra-trusted-public-keys = [
-      # cache.numtide.com
-      "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
-
-      # nix-community.cachix.org
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-
-      # crane.cachix.org
-      "crane.cachix.org-1:8Scfpmn9w+hGdXH/Q9tTLiYAE/2dnJYRJP7kl80GuRk="
-    ];
-
+    accept-flake-config = true;
     auto-optimise-store = true;
     builders-use-substitutes = true;
+    connect-timeout = 5;
+    eval-cores = 0;
+    fallback = true;
+    http-connections = 50;
+    keep-going = true;
     lazy-trees = true;
+    log-lines = 25;
+    max-free = 3221225472;
+    max-jobs = "auto";
+    min-free = 1073741824;
+    stalled-download-timeout = 20;
+    warn-dirty = false;
 
     trusted-users = [
       "leporuid"

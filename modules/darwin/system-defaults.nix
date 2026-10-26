@@ -6,6 +6,7 @@
   ...
 }:
 let
+  nixCaches = import ../../users/leporuid/nix-caches.nix;
   tailscaleBin = "/Applications/Tailscale.app/Contents/MacOS/Tailscale";
 in
 {
@@ -69,34 +70,26 @@ in
     };
 
     customSettings = {
+      inherit (nixCaches) extra-substituters extra-trusted-public-keys;
+
       # Performance and storage optimization for macOS APFS
+      accept-flake-config = true;
       auto-optimise-store = false;
       builders-use-substitutes = true;
-       accept-flake-config = true;
       connect-timeout = 5;
       eval-cores = 0;
-      keep-going = true;
-      warn-dirty = false;
       fallback = true;
-      log-lines = 25;
-      min-free = 1073741824;
-      lazy-trees = true;
+      http-connections = 50;
       keep-derivations = true;
+      keep-going = true;
       keep-outputs = true;
-
-      extra-substituters = [
-        "https://cache.numtide.com"
-        "https://nix-community.cachix.org"
-        "https://crane.cachix.org"
-      ];
-      extra-trusted-public-keys = [
-        # niks3.numtide.com
-        "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
-        # nix-community.cachix.org
-        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-        # crane.cachix.org
-        "crane.cachix.org-1:8Scfpmn9w+hGdXH/Q9tTLiYAE/2dnJYRJP7kl80GuRk="
-      ];
+      lazy-trees = true;
+      log-lines = 25;
+      max-free = 3221225472;
+      max-jobs = "auto";
+      min-free = 1073741824;
+      stalled-download-timeout = 20;
+      warn-dirty = false;
 
       extra-trusted-users = [
         "@admin"
@@ -106,6 +99,11 @@ in
         "parallel-eval"
       ];
     };
+  };
+
+  launchd.daemons.determinate-nix-daemon.serviceConfig = {
+    SoftResourceLimits.NumberOfFiles = 1048576;
+    HardResourceLimits.NumberOfFiles = 1048576;
   };
 
   # =========================================================================
@@ -164,7 +162,11 @@ in
         NSAutomaticCapitalizationEnabled = false;
         NSAutomaticPeriodSubstitutionEnabled = false;
         NSAutomaticSpellingCorrectionEnabled = false;
+        NSAutomaticWindowAnimationsEnabled = false;
+        NSNavPanelExpandedStateForSaveMode = true;
+        NSWindowResizeTime = 0.001;
         NSWindowShouldDragOnGesture = true;
+        QLPanelAnimationDuration = 0.0;
         InitialKeyRepeat = 15;
         KeyRepeat = 2;
         "com.apple.sound.beep.feedback" = 0;
