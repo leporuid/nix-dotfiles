@@ -137,7 +137,6 @@ in
         FXPreferredViewStyle = "clmv";
         FXEnableExtensionChangeWarning = false;
         QuitMenuItem = true;
-        _FXShowPosixPathInTitle = true;
         _FXSortFoldersFirst = true;
       };
 
