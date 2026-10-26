@@ -1,3 +1,4 @@
+
 {
   inputs,
   config,
@@ -5,6 +6,38 @@
   ...
 }:
 
+let
+  extraTaps = [
+    "aninsomniacy/homebrew-rayburst"
+  ];
+
+  tapName = t: if builtins.isString t then t else t.name;
+
+  qualifiedTap =
+    s:
+    let
+      parts = lib.splitString "/" s;
+    in
+    lib.optional (builtins.length parts >= 3) (
+      lib.toLower "${builtins.elemAt parts 0}/${builtins.elemAt parts 1}"
+    );
+
+  inferredTaps = lib.concatMap
+    (item: qualifiedTap (tapName item))
+    (
+      config.homebrew.brews
+      ++ config.homebrew.casks
+    );
+
+  allTaps = lib.unique (
+    map lib.toLower (
+      extraTaps
+      ++ builtins.attrNames config.nix-homebrew.taps
+      ++ inferredTaps
+    )
+  );
+
+in
 {
   imports = [
     inputs.nix-homebrew.darwinModules.nix-homebrew
@@ -18,6 +51,7 @@
   homebrew = {
     enable = true;
     global.brewfile = true;
+
     onActivation = {
       autoUpdate = false;
       upgrade = false;
@@ -27,36 +61,10 @@
       ];
     };
 
-    taps =
-  let
-    tapName = t: if builtins.isString t then t else t.name;
-
-    qualifiedTap =
-      s:
-      let
-        parts = lib.splitString "/" s;
-      in
-      lib.optional (builtins.length parts >= 3) (
-        lib.toLower "${builtins.elemAt parts 0}/${builtins.elemAt parts 1}"
-      );
-
-    trustedTaps = lib.unique (
-      (map (t: lib.toLower (tapName t)) config.homebrew.taps)
-      ++ lib.concatMap (b: qualifiedTap (tapName b)) config.homebrew.brews
-      ++ lib.concatMap (c: qualifiedTap (tapName c)) config.homebrew.casks
-    );
-
-    allTaps = lib.unique (
-  map lib.toLower (
-    (builtins.attrNames config.nix-homebrew.taps)
-    ++ trustedTaps
-  )
-);
-  in
-  map (name: {
-    inherit name;
-    trusted = true;
-  }) allTaps;
+    taps = map (name: {
+      inherit name;
+      trusted = true;
+    }) allTaps;
 
     brews = [ ];
 
@@ -103,6 +111,7 @@
     enable = true;
     user = config.system.primaryUser;
     autoMigrate = true;
+
     taps = {
       "aninsomniacy/homebrew-rayburst" = inputs.homebrew-rayburst;
     };
