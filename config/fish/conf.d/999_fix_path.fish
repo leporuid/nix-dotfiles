@@ -11,7 +11,9 @@
 # by both the user environment and dev shell.
 if set -q IS_DARWIN; and not set -q __NIX_PROFILES_HAVE_BEEN_MOVED
     for path in (string split ' ' $NIX_PROFILES)
-        set -g PATH $path/bin $PATH
+        if test "$path" != "$HOME/.nix-profile"; and test -d "$path/bin"
+            set -g PATH $path/bin $PATH
+        end
     end
     set -gx __NIX_PROFILES_HAVE_BEEN_MOVED
 end

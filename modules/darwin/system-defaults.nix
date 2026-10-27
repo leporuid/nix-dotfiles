@@ -15,7 +15,7 @@ in
   # =========================================================================
   imports = [
     inputs.determinate.darwinModules.default
-    inputs.self.modules.common.nix-caches
+    inputs.self.modules.common.vars
   ];
 
   # =========================================================================
@@ -45,6 +45,12 @@ in
 
   environment.enableAllTerminfo = true;
   time.timeZone = "Asia/Taipei";
+
+  # Exclude ~/.nix-profile from PATH and keep strictly per-user and system profiles
+  environment.profiles = lib.mkForce [
+    "/etc/profiles/per-user/${config.system.primaryUser}"
+    "/run/current-system/sw"
+  ];
 
   environment.pathsToLink = [
     "/share/fish/vendor_completions.d"
@@ -113,12 +119,6 @@ in
     configurationRevision = inputs.self.rev or inputs.self.dirtyRev or null;
 
     activationScripts = {
-      tailscaleDns.text = ''
-        if [ -x "${tailscaleBin}" ] && TAILSCALE_BE_CLI=1 "${tailscaleBin}" status >/dev/null 2>&1; then
-          TAILSCALE_BE_CLI=1 "${tailscaleBin}" set --accept-dns=false || true
-        fi
-      '';
-
       postActivation.text = ''
         sudo -u ${config.system.primaryUser} \
           /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
