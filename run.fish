@@ -94,6 +94,33 @@ function edit-age -d "Edit the encrypted files stored in this repository"
     agenix -e $file $argv
 end
 
+function build-oci-image -d "Build the OCI Ampere A1 qcow2 custom image for nixos"
+    _run nix build .#nixosConfigurations.nixos.config.system.build.OCIImage -L $argv
+end
+
+function import-oci-image -d "Upload and import the built OCI qcow2 custom image into Oracle Cloud"
+    _require oci-import-image
+    set img (realpath result/nixos-image-oci-*.qcow2 2>/dev/null | head -n1)
+    if not test -n "$img"
+        echo "No built qcow2 found in result/. Run 'run build-oci-image' first or pass the qcow2 path directly."
+        return 1
+    end
+    _run oci-import-image $img $argv
+end
+
+function install-oci -d "Install NixOS on an OCI instance via nixos-anywhere + nixos-images kexec"
+    if not set -q argv[1]
+        echo "Usage: run install-oci <user@oracle-ip> [extra-args...]"
+        return 1
+    end
+    set target $argv[1]
+    _run nixos-anywhere \
+        --kexec "https://github.com/nix-community/nixos-images/releases/download/nixos-unstable/nixos-kexec-installer-noninteractive-aarch64-linux.tar.gz" \
+        --build-on-remote \
+        --flake .#nixos \
+        $target $argv[2..]
+end
+
 #
 # --- Functions for building/switching hosts
 #

@@ -34,14 +34,14 @@ in
     inputs.self.nixosModules.fail2ban
     inputs.self.nixosModules.firewall-base
     inputs.self.nixosModules.observability
+    inputs.self.nixosModules.oci
     inputs.self.nixosModules.programs
     inputs.self.nixosModules.ssh-hardening
     inputs.self.nixosModules.tailscale
     # inputs.self.nixosModules.tailzero
   ];
 
-  oci.efi = true;
-  boot = {
+  boot = lib.mkDefault {
     loader = {
       systemd-boot = {
         enable = true;
@@ -64,10 +64,10 @@ in
   };
 
   fileSystems."/".device =
-    lib.mkForce "/dev/disk/by-partlabel/disk-main-root";
+    lib.mkForce "/dev/disk/by-label/nixos";
 
   fileSystems."/boot".device =
-    lib.mkForce "/dev/disk/by-partlabel/disk-main-boot";
+    lib.mkForce "/dev/disk/by-label/ESP";
 
   fileSystems."/boot".options = [
     "umask=0077"

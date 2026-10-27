@@ -1,13 +1,14 @@
-# Full macOS desktop and media configuration extending the shared cloud configuration.
 {
   pkgs,
   perSystem,
   config,
+  inputs,
   ...
 }:
 {
   imports = [
     ./cloud-configuration.nix
+    inputs.self.homeModules.nixcord
   ];
 
   home.sessionVariables = {

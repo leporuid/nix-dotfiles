@@ -16,7 +16,7 @@
               mountOptions = [ "umask=0077" ];
               extraArgs = [
                 "-n"
-                "NIXOS_BOOT"
+                "ESP"
               ];
             };
           };
@@ -26,6 +26,10 @@
               type = "filesystem";
               format = "ext4";
               mountpoint = "/";
+              extraArgs = [
+                "-L"
+                "nixos"
+              ];
             };
           };
         };

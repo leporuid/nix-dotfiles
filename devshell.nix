@@ -22,6 +22,7 @@ pkgs.mkShellNoCC {
     perSystem.home-manager.default
     perSystem.agenix.default
     perSystem.self.run
+    perSystem.self.oci-import-image
     pkgs.nixd
     pkgs.taplo
     pkgs.age

@@ -72,7 +72,6 @@ in
           "adguard-vpn"
           "archaeology"
           "appcleaner"
-          "discord"
           "bettertouchtool"
           "prettyclean"
           "raycast"
