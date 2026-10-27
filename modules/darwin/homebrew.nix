@@ -42,6 +42,7 @@ in
       "appcleaner"
       "bettertouchtool"
       "prettyclean"
+      "discord"
       "raycast"
       "ghostty"
       "syntax-highlight"
