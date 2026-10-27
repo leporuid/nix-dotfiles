@@ -116,7 +116,7 @@ function install-oci -d "Install NixOS on an OCI instance via nixos-anywhere + n
     set target $argv[1]
     _run nixos-anywhere \
         --kexec "https://github.com/nix-community/nixos-images/releases/download/nixos-unstable/nixos-kexec-installer-noninteractive-aarch64-linux.tar.gz" \
-        --build-on-remote \
+        --build-on remote \
         --flake .#nixos \
         $target $argv[2..]
 end

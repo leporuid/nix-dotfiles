@@ -35,14 +35,16 @@
 - **Language**: Think in English, write all code comments (`#`, `/* */`) and terminal strings in English, and reply to user prompts in concise Traditional Chinese (Taiwan usage).
 
 ## 4. Active Task Status & Handover Context (Oracle OCI Deployment)
-- **Completed Components**:
-  - `modules/nixos/oci.nix`: Created two-stage Blueprint module importing `virtualisation/oci-image.nix`, configuring `system.build.OCIImage` (`qcow2`), Oracle Metadata NTP (`169.254.169.254`), and `systemd-networkd` (`10-eth`).
-  - `hosts/nixos/disk-config.nix` & `hosts/nixos/configuration.nix`: Aligned filesystem labels (`ESP` for `/boot` and `nixos` for `/`) so `disko` and `oci-image.nix` share the same configuration cleanly without mount collisions.
-  - `packages/oci-import-image.nix` & `packages/oci-import-image.py`: Packaged OCI custom image uploader (`UEFI_64`, `PARAVIRTUALIZED`, `VM.Standard.A1.Flex` compatibility) and wired it into `devshell.nix`.
-  - `run.fish`: Added `run build-oci-image`, `run import-oci-image`, and `run install-oci`.
-- **Known Blocker & Investigation**:
-  - **Issue**: `run build-oci-image` on macOS fails during `nixos-install` inside `make-disk-image.nix` with hash mismatch on `/nix/store/...-linux-headers-static-7.2`.
-  - **Root Cause**: macOS default APFS is case-insensitive. Linux kernel headers contain colliding case filenames (e.g., `ipt_ECN.h` vs `ipt_ecn.h`), causing in-store file overwrites and invalid NAR hashes when imported into the `.qcow2` virtual store.
-  - **Resolution Paths**:
-    1. **Primary Recommendation**: Boot a vanilla Ubuntu 24.04 ARM instance on OCI and run `run install-oci ubuntu@<IP>` from Mac. This delegates disk partitioning (`disko`) and system build directly to the remote Linux filesystem, completely bypassing macOS APFS case-insensitivity.
-    2. **Secondary Alternative**: Build `.qcow2` on a Linux remote builder or inside a case-sensitive disk image.
+- **Current State**:
+  - Target instance `146.235.221.190` has already kexec'd into the NixOS RAM disk installer, and `/dev/sda` has been partitioned via `disko` (`ESP` on `/boot`, `nixos` on `/`).
+  - Fixed flake evaluation blocker: Removed non-existent `hosts/nixos/id_ed25519.pub` from `modules/common/vars.nix`.
+  - Updated `run.fish`: Switched `--build-on-remote` to `--build-on remote`.
+- **Next Command to Execute**:
+  - Target machine is currently running the NixOS installer RAM disk with SSH as `root`:
+    ```fish
+    run install-oci "root@146.235.221.190" -i ~/.ssh/id_ed25519
+    ```
+- **Post-Install Verification**:
+  - Once installation completes and instance reboots:
+    `ssh -i ~/.ssh/id_ed25519 leporuid@146.235.221.190`
+  - Verify Tailscale / network connectivity and sudo permissions.

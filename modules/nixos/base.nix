@@ -19,6 +19,7 @@
 
     accept-flake-config = true;
     auto-optimise-store = true;
+    auto-allocate-uids = true;
     builders-use-substitutes = true;
     connect-timeout = 5;
     eval-cores = 0;
