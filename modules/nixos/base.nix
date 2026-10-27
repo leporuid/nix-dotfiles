@@ -14,19 +14,15 @@
     experimental-features = [
       "nix-command"
       "flakes"
-      "parallel-eval"
     ];
 
     accept-flake-config = true;
     auto-optimise-store = true;
-    auto-allocate-uids = true;
     builders-use-substitutes = true;
     connect-timeout = 5;
-    eval-cores = 0;
     fallback = true;
     http-connections = 50;
     keep-going = true;
-    lazy-trees = true;
     log-lines = 25;
     max-free = 3221225472;
     max-jobs = "auto";
@@ -35,6 +31,7 @@
     warn-dirty = false;
 
     trusted-users = [
+      "root"
       "leporuid"
     ];
   };

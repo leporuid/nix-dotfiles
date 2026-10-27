@@ -36,15 +36,14 @@
 
 ## 4. Active Task Status & Handover Context (Oracle OCI Deployment)
 - **Current State**:
-  - Target instance `146.235.221.190` has already kexec'd into the NixOS RAM disk installer, and `/dev/sda` has been partitioned via `disko` (`ESP` on `/boot`, `nixos` on `/`).
-  - Fixed flake evaluation blocker: Removed non-existent `hosts/nixos/id_ed25519.pub` from `modules/common/vars.nix`.
-  - Updated `run.fish`: Switched `--build-on-remote` to `--build-on remote`.
+  - NixOS has been installed on Oracle Cloud instance (`nixos`) and is reachable via SSH (`leporuid@nixos`).
+  - Remote rebuild (`run switch-nixos --impure`) failed during `nix.conf.drv` validation due to `auto-allocate-uids = true` without the experimental feature enabled.
+  - Fixed `modules/nixos/base.nix`: Removed `auto-allocate-uids = true`, pruned unsupported settings (`eval-cores`, `lazy-trees`, `parallel-eval`), and ensured `trusted-users = [ "root" "leporuid" ]`.
 - **Next Command to Execute**:
-  - Target machine is currently running the NixOS installer RAM disk with SSH as `root`:
+  - Run remote rebuild:
     ```fish
-    run install-oci "root@146.235.221.190" -i ~/.ssh/id_ed25519
+    run switch-nixos --impure
     ```
-- **Post-Install Verification**:
-  - Once installation completes and instance reboots:
-    `ssh -i ~/.ssh/id_ed25519 leporuid@146.235.221.190`
-  - Verify Tailscale / network connectivity and sudo permissions.
+- **Post-Switch Verification**:
+  - Verify services: `ssh leporuid@nixos "systemctl status fail2ban systemd-networkd"`
+  - Verify Tailscale / Tailzero status.
