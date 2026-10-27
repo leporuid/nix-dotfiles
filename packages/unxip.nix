@@ -1,33 +1,10 @@
 { pkgs, ... }:
 with pkgs;
-stdenvNoCC.mkDerivation {
-  pname = "unxip";
-  version = "v3.3";
-  src = fetchurl {
-    url = "https://github.com/saagarjha/unxip/releases/download/v3.3/unxip";
-    sha256 = "sha256-R12///1w4GcV+Wa4eI+N02dy8zCzNg/272/x/M0vFP4=";
+unxip.overrideAttrs (oldAttrs: {
+  src = pkgs.fetchFromGitHub {
+    owner = "ranvel";
+    repo = "unxip";
+    rev = "libunxip-patches";
+    hash = "sha256-jFChmKUA7+obHkZnd7ZpqeejZfeA+gTUELo1iYeFMFo";
   };
-
-  dontUnpack = true;
-  dontFixup = true;
-
-  installPhase = ''
-    runHook preInstall
-
-    mkdir -p $out/bin
-    cp $src $out/bin/unxip
-    chmod +x $out/bin/unxip
-
-    runHook postInstall
-  '';
-
-  meta = {
-    description = "A fast Xcode unarchiver";
-    homepage = "https://github.com/saagarjha/unxip";
-    license = lib.licenses.lgpl3Only;
-    maintainers = with lib.maintainers; [ DivitMittal ];
-    platforms = lib.platforms.darwin;
-    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
-    mainProgram = "unxip";
-  };
-}
+})
