@@ -20,7 +20,7 @@ in
     global.brewfile = true;
 
     caskArgs = {
-      no_quarantine = true; # 免除首次開啟 Gatekeeper 警示
+      no_quarantine = true;
     };
 
     onActivation = {
@@ -42,7 +42,6 @@ in
       "appcleaner"
       "bettertouchtool"
       "prettyclean"
-      "discord"
       "raycast"
       "ghostty"
       "syntax-highlight"

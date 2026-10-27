@@ -128,6 +128,23 @@ in
       postActivation.text = ''
         sudo -u ${config.system.primaryUser} \
           /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
+
+        # Automatically link Home Manager Applications to /Applications
+        hmApps="/Users/${config.system.primaryUser}/Applications/Home Manager Apps"
+        if [ -d "$hmApps" ]; then
+          echo "Linking Home Manager Applications to /Applications..."
+          for app in "$hmApps"/*.app; do
+            if [ -e "$app" ]; then
+              appName="$(basename "$app")"
+              target="/Applications/$appName"
+              if [ -d "$target" ] && [ ! -L "$target" ]; then
+                echo "Notice: Removing stale directory $target to link from Home Manager..."
+                rm -rf "$target"
+              fi
+              ln -sfn "$app" "$target"
+            fi
+          done
+        fi
       '';
     };
 
