@@ -1,5 +1,6 @@
 {
   pkgs,
+  pkgs',
   perSystem,
   inputs,
   config,
@@ -35,6 +36,9 @@ in
     inputs.self.modules.common.nixpkgs-unstable
     ../../config/nvim/plugins.nix
   ];
+
+  # Use Determinate Nixpkgs-pinned Nix package for Home Manager activation without touching /usr/local/bin
+  nix.package = pkgs'.nix;
 
   home.packages = [
     (if pkgs.stdenv.hostPlatform.isDarwin then perSystem.helix.helix else pkgs.helix)

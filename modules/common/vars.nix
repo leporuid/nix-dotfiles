@@ -1,6 +1,6 @@
 # Shared host, user variables, and binary caches across macOS (nix-darwin) and Oracle (NixOS).
 { flake, ... }:
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 let
   isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
   username = "leporuid";
@@ -21,8 +21,8 @@ let
 in
 {
   _module.args = {
-    nixCaches = caches;
-    vars = {
+    nixCaches = lib.mkDefault caches;
+    vars = lib.mkDefault {
       inherit username;
       description = "Yu-Min Peng";
       hostname = if isDarwin then "MacBook-Pro" else "nixos";

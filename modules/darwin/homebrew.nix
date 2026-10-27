@@ -72,7 +72,7 @@ in
     enable = true;
     user = config.system.primaryUser;
     autoMigrate = true;
-    mutableTaps = false;
+    mutableTaps = true;
     taps = {
       "aninsomniacy/homebrew-rayburst" = inputs.homebrew-rayburst;
     };

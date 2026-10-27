@@ -20,7 +20,7 @@
       ];
       plugins = {
         callTimer.enable = true;
-        copyUserURLs.enable = true;
+        copyUserUrls.enable = true;
         fakeNitro.enable = true;
         messageLogger.enable = true;
         openInApp.enable = true;

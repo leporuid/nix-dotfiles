@@ -6,7 +6,6 @@
 }:
 {
   imports = [
-    inputs.self.modules.common.vars
     inputs.self.darwinModules.system-defaults
     inputs.self.darwinModules.fish-environment
     inputs.self.darwinModules.homebrew
@@ -26,6 +25,8 @@
       keyFiles = vars.sshKeyFiles;
     };
   };
+
+  programs.zsh.enable = true;
 
   services.openssh.enable = true;
   security.pam.services.sudo_local.touchIdAuth = true;

@@ -28,8 +28,13 @@ in
   };
 
   # Safe injection of custom NIX_PATH that works seamlessly alongside determinateNix
+  # and ensures SSH sessions automatically source the Nix daemon environment.
   environment.extraInit = lib.mkForce ''
     export NIX_PATH="nixpkgs=${inputs.nixpkgs.outPath}:home-manager=${inputs.home-manager.outPath}:$NIX_PATH"
+
+    if [ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ] && [ -n "''${SSH_CONNECTION:-}" ] && [ "''${SHLVL:-0}" -eq 1 ]; then
+      . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+    fi
   '';
 
   environment.systemPackages = with pkgs; [
@@ -50,6 +55,7 @@ in
   environment.profiles = lib.mkForce [
     "/etc/profiles/per-user/${config.system.primaryUser}"
     "/run/current-system/sw"
+    "/nix/var/nix/profiles/default"
   ];
 
   environment.pathsToLink = [
@@ -128,6 +134,8 @@ in
     defaults = {
       loginwindow.GuestEnabled = false;
 
+      LaunchServices.LSQuarantine = false;
+
       finder = {
         AppleShowAllFiles = true;
         AppleShowAllExtensions = true;
@@ -145,6 +153,7 @@ in
         autohide-delay = 0.0;
         autohide-time-modifier = 0.15;
         show-recents = false;
+        showhidden = true;
         mru-spaces = false;
         launchanim = false;
       };
@@ -158,9 +167,7 @@ in
         AppleKeyboardUIMode = 3;
         ApplePressAndHoldEnabled = true;
         AppleShowAllExtensions = true;
-        NSAutomaticCapitalizationEnabled = false;
         NSAutomaticDashSubstitutionEnabled = false;
-        NSAutomaticPeriodSubstitutionEnabled = false;
         NSAutomaticQuoteSubstitutionEnabled = false;
         NSAutomaticSpellingCorrectionEnabled = false;
         NSAutomaticWindowAnimationsEnabled = false;
@@ -173,9 +180,9 @@ in
       };
 
       CustomUserPreferences = {
-         "NSGlobalDomain" = {
-         QLPanelAnimationDuration = 0.0;
-       };
+        "NSGlobalDomain" = {
+          QLPanelAnimationDuration = 0.0;
+        };
         "com.apple.symbolichotkeys" = {
           AppleSymbolicHotKeys = {
             "64".enabled = false;
