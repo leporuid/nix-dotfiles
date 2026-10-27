@@ -134,7 +134,11 @@ in
 
   services.getty.autologinUser = null;
 
-  documentation.enable = false;
+  documentation = {
+    enable = false;
+    man.enable = false;
+    nixos.enable = false;
+  };
 
   nix.registry.nixpkgs.flake = inputs.nixpkgs;
   nix.registry.self.flake = flake;

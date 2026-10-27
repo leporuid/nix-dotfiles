@@ -25,6 +25,7 @@
         baseName = config.image.baseName or "nixos-image-oci";
         configFile = "${flake}/hosts/nixos/configuration.nix";
         format = "qcow2";
+        copyChannel = false;
         partitionTableType = if config.oci.efi then "efi" else "legacy";
       };
     in
