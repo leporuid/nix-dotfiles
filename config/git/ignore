@@ -1,0 +1,17 @@
+*~
+*.swp
+result
+result-*
+.DS_Store
+.direnv
+/.helix
+.flake
+.pkgs
+.jj
+/.envrc
+.vscode
+.projectlocal
+.env*
+
+**/.claude/settings.local.json
+.worktrees

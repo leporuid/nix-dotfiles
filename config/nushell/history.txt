@@ -1,0 +1,979 @@
+which nu
+gum
+brew
+atuin
+atuin import
+atuin import auto 
+atuin import nu
+atuin import zsh
+zoxide init nu
+zoxide init nushell
+to 
+starship init nushell
+j
+z
+zi
+source 
+env
+/run/current-system/sw/bin/nu
+/run/current-system/sw/bin/nushell
+/run/current-system/sw/bin/nu
+cd
+sudo
+ghostty +show-config --docs --default | $EDITOR
+which nu
+which fish
+which nu
+starship init nushell
+starship init nu
+overlay use starship.nu
+source ~/.cache/starship
+which nu
+cd
+j
+z
+zoxide init nushell
+/Users/leporuid/.cache/starship/init.nu
+source /Users/leporuid/.cache/starship/init.nu
+source /Users/leporuid/.cache/atuin/init.nu
+source /Users/leporuid/.cache/zoxide/init.nu
+hx ~/.config/nu/init.nu
+nushell
+config nu
+ln /Users/leporuid/nix-dotfiles/config/nushell/config.nu /Users/leporuid/Library/Application\ Support/nushell/config.nu
+ln ~/nix-dotfiles/config/nushell/config.nu ~/Library/Application\ Support/nushell/config.nu
+ln ~/Library/Application\ Support/nushell/config.nu ~/nix-dotfiles/config/config.nu
+ln ~/nix-dotfiles/config/nushell/config.nu ~/Library/Application\ Support/nushell/config.nu
+config nu
+env
+config env
+which nu
+starship init nu
+use starship.nu
+which nu
+nushell
+echo TERM
+echo $env.TERM
+which nu
+which fish
+whoami
+source /Users/leporuid/.cache/atuin/init.nu
+source ~/.cache/atuin/init.nu
+starship init nu
+source ~/.cache/starship/starship.nu
+config nu
+source ~/.cache/starship/starship.nu
+config nu
+direnv
+direnv hook nu
+direnv hook
+mise
+ks 
+ktoolbox
+j
+z
+zoxide init nushell
+source ~/.cache/zoxide/zoxide.nu
+z
+which z
+which zi
+config nu
+source ~/.cache/zoxide/zoxide.nu
+zoxide
+zoxide init
+zoxide init nu
+zoxide init nushell
+config nu
+zoxide init nushell
+zoxide init nushell > ~/.cache/zoxide/zoxide.nu
+zoxide init nushell | save -f ~/.zoxide.nu
+zoxide init nushell | save -f ~/.cache/zoxide/.zoxide.nu
+z
+source ~/.cache/zoxide/.zoxide.nu
+zoxide init nushell | save -f ~/.cache/zoxide/.zoxide.nu
+z
+config nu
+which nu
+bat
+which bat
+whoami
+fish
+which bat
+bat
+which alias
+alias
+alia
+alias
+alias -h
+reload
+config nu
+starship init nu
+starship preset
+starship preset --help
+config nu
+which bat
+zoxide 
+def _ZO_FZF_OPTS
+env
+which nu
+sudo nano /etc/shells
+which nu
+sudo nano
+hx /etc/shells
+sudo hx /etc/shells
+XDG_DATA_DIRS
+eza
+sk
+which nu
+ghostty +show-config --docs --default | $EDITOR
+ghostty +show-config --docs --default | hx
+atuin
+eza
+ghostty +show-config
+ghostty +show-config --docs | hx
+ghostty +show-config --docs --default
+ghostty +show-config --docs | save -f ~/.cache
+ghostty +show-config --docs | save -f ~/.cache/config
+which nu
+config nu
+$env.config.buffer_editor = <path_to_your_preferred_editor>
+$env.config.buffer_editor = "hx"
+config nu
+config nu --doc | nu-highlight | bat
+config nu --doc | nu-highlight | bat -R
+config nu --doc | nu-highlight | bat -p
+config nu | hx
+config nu --doc | nu-highlight | bat -p
+$nu.default-config-dir
+$env.config
+$env.config | table -e | bat -p
+$env.config.show_banner = false
+config nu
+atuin
+atuin import 
+atuin import nu
+atuin import nu-hist-db
+echo $env.ZO_FZF_OPTS
+echo $env._ZO_FZF_OPTS
+env
+__ZO_FZF_OPTS
+zoxide
+_ZO_FZF_OPTS
+bat
+config nu
+reload
+config nu
+which $env.SHELL
+bat cache --build 
+cd /Users/leporuid/.config/bat
+eza
+z themes
+bat cache --build
+config nu
+if [ -n "${GHOSTTY_RESOURCES_DIR}" ]; then<\n>    builtin source "${GHOSTTY_RESOURCES_DIR}/shell-integration/bash/ghostty.bash"<\n>fi
+jump_to_prompt
+ks
+config nu
+ks 
+uv
+mise
+mise shell
+mise direnv
+mise direnv activate
+mise trust -a
+uv tool upgrade --all
+which ktoolbox
+uv tool reinstall --all
+which python
+uv shell
+uv tool upgrade-shell
+uv tool update-shell
+uv tool upgrade-shell
+uv tool upgrade --
+uv tool upgrade --all
+ks
+env
+zi
+reload
+zi
+echo $env.SKIM_DEFAULT_OPTS
+~/.local/bin/fzf
+hx ~/.local/bin/fzf
+zi
+z
+zoxide cmd
+zoxide 
+_ZO_FZF_OPTS
+$env._ZO_FZF_OPTS
+ehco $env._ZO_FZF_OPTS
+env
+hx ~/.local/bin/fzf
+which fzf
+reload
+nushell
+config nu
+hx ~/.local/bin/fzf
+hx /etc/shells
+sudo hx /etc/shells
+config
+config env
+config nu
+echo $nu.data-dir
+config env
+echo $nu.data-dir
+$nu.data-dir = /Users/leporuid/nix-dotfiles/config/nushell
+carapace _carapace nushell | save --force ~/nix-dotfiles/config/nushell/vendor/autoload/carapace/carapace.nu
+configenv
+config env
+hx ~/nix-dotfiles/config/nushell/config.nu
+$ev.DATADIR
+$ENV.DATAdir
+atuin update
+atuin
+atuin daemon
+mut $nu.data-dir = "~/nix-dotfiles/config/nushell"
+let $nu.data-dir = "~/nix-dotfiles/config/nushell"
+atuin import
+atuin help
+atuin doctor
+atuin sync
+atuin status
+atuin login
+env
+export
+sk
+function
+$nu.config-path
+brew
+brew install --cask glance-chamburr
+$env.PATH = ($env.PATH | split row (char esep) | append "some/other/path")
+$env.APPDATA
+vim $nu.env-path
+$env.APPDATA
+xh $env.APPDATA
+hx $env.APPDATA
+hx $nu.env-path
+$nu.config-path
+config nu
+overlay use starship.nu
+atuin history list --cmd-only | sk
+sk -q
+sk -qatuin search --cmd-only | sk --query=(commandline)
+atuin-setup
+atuin search -i
+brew list
+which $SHE
+zi
+env
+echo $env.FZF_DEFAULT_OPTS
+sk
+which fzff
+which fzf
+config nu
+zi
+sk query 
+sk query --help
+function __zoxide_zi() {<\n>    \builtin local result<\n>    result="$( \<\n>        zoxide query -ls -- "$@" \<\n>        | sk \<\n>            --delimiter='[^\t\n ][\t\n ]+' \<\n>            -n2.. \<\n>            --no-sort \<\n>            --keep-right \<\n>            --height='40%' \<\n>            --layout='reverse' \<\n>            --exit-0 \<\n>            --select-1 \<\n>            --bind='ctrl-z:ignore' \<\n>            --preview='\command -p ls -F --color=always {2..}' \<\n>        ;<\n>    )" \<\n>        && __zoxide_cd "${result:7}"<\n>}
+zle
+atuin 
+hx ~/nix-dotfiles/config/fish/functions/__zoxide_zi.fish
+zi
+hx ~/nix-dotfiles/config/fish/functions/__zoxide_zi.fish
+zi
+config nu
+echo $FZF_DEFAULT_OPTS
+zi
+z
+env
+brew update
+function __zoxide_zi() {<\n>    \builtin local result<\n>    result="$( \<\n>        zoxide query -ls -- "$@" \<\n>        | sk \<\n>            --delimiter='[^\t\n ][\t\n ]+' \<\n>            -n2.. \<\n>            --no-sort \<\n>            --keep-right \<\n>            --height='40%' \<\n>            --layout='reverse' \<\n>            --exit-0 \<\n>            --select-1 \<\n>            --bind='ctrl-z:ignore' \<\n>            --preview='\command -p ls -F --color=always {2..}' \<\n>        ;<\n>    )" \<\n>        && __zoxide_cd "${result:7}"<\n>}
+config nu
+config env
+z
+zi
+fzf --
+fzf --nu
+fzf --nushell
+fzf --
+sk
+skim
+fzf --
+fzf 
+env
+fzf --bash
+fzf -- | source
+fzf init
+fzf
+env
+fzf
+fzf -- | source
+fzf --
+fzf --help
+fzf --bash
+fzf --zsh
+zi
+set
+export
+config env
+fzf
+fzf --query
+_ZO_FZF_OPTS
+env._ZO_FZF_OPTS
+$env._ZO_FZF_OPTS
+_atuin_fzf_search
+env._atuin_fzf_search
+fzf
+function _atuin_fzf_search<\n>  set -f commands_selected (<\n>    atuin search --cmd-only |<\n>      _fzf_wrapper --print0 \<\n>        --query=(commandline) \<\n>  )
+fzf
+atuin search --cmd-olu | _fzf_wrapper --print0 \<\n>        --query=(commandline) \
+$env.FZF_DEFUALT.OPTS
+$env._ZO_FZF_OPTS
+set $env._ZO_FZF_OPTS
+zi
+PWD
+echo $nu.data-dir
+fzf
+fzf --help
+zi
+env
+which env
+zi
+env
+unset FZF_DEFAULT_OPTS
+unset-env FZF_DEFAULT_OPTS
+zi
+env
+config env
+zi
+unset-env FZF_DEFAULT_OPTS
+zi
+config env
+zi
+atuin search --cmd-only
+_atuin_search_cmd
+with-env _atuin_search_cmd
+zi
+env
+use ~/.config/zsh/home_var
+export-env ~/.config/zsh/home_var
+atuin h l --cmd-only | fzf
+atuin search --cmd-only --limit 1 --search-mode prefix
+atuin search --cmd-olu | _fzf_wrapper --print0 \<\n>        --query=(commandline) \
+atuin search --cmd-only | _fzf_wrapper --print0 \<\n>        --query=(commandline)
+atuin search --cmd-only | fzf --scheme
+atuin search --cmd-only | fzf --scheme history
+atuin init nu --cmd-only | fzf --scheme history
+atuin_cmd
+_atuin_search_cmd
+config env
+config nu
+with-env _atuin_search_cmd
+with-env ATUIN_QUERY
+with-env --help
+ls
+ls -a
+~/dotfiles
+ls -a
+config
+z dotfiles/config/nushell
+z ~/dotfiles/config/nushell
+ls -la
+atuin import auto
+atuin import zsh
+atuin import nu
+gum filter < $HISTFILE --height 20
+gum filter < $env.HISTFILE --height 20
+echo $env.PATH
+env
+echo $env.XDG_DATA_HOME
+echo XDG_DATA_HOME
+env
+echo XDG_DATA_HOME
+echo env.XDG_DATA_HOME
+echo $env.XDG_DATA_HOME
+config nu
+env.confiigdir
+env.configdir
+$env.configdir
+$env.config-dair
+$nu.config-dair
+$nu.config-path
+$env.config-path
+nu.config-path
+config-path
+config
+NU_PATH
+$env.NU_PATH
+$env.NU_DIRS
+$env.NU_LIB_DIRS
+$env.PATH
+nu.data-dir
+NU_DATA-DAIR
+ENV
+direnv hook
+direnv
+direnv hook nushell
+direnv hook nu
+direnv hook --help
+nix-direnv
+config env
+source~/.config/direnv/lib/nix-direnv.sh
+direnv
+direnv allow
+direnv hook
+direnv hook --help
+config nu
+hx /Users/leporuid/dotfiles/config/nushell/vendor/autoload/direnv.nu
+which direnv
+config nu
+direnv
+config env
+direnv export
+direnv
+open .env.yaml
+env
+direnv
+direnv hook
+direnv hook nu
+direnv export
+direnv export json
+direnv export json | from json | default {} | load-env
+hx /Users/leporuid/dotfiles/config/nushell/vendor/autoload/direnv.nu
+direnv
+direnv status
+direnv hook
+$nu.data-dir
+brew update
+brew upgrade
+env
+$env.GHOSTTY_RESOURCES_DIR}
+$env.GHOSTTY_RESOURCES_DIR
+sudo nano
+echo TERM
+echo $env.TERM
+prettier $(git diff --cached --name-only --diff-filter=ACMR | sed 's| |\\ |g') --write --ignore-unknown<\n>git update-index --again
+:q
+z
+zi
+=zsh
+exec 
+whicg $envSHELL
+relaod
+atuin search --cmd-only | fzf --scheme history
+_atuin_fzf_search
+relaod
+reload
+watch
+atuin search --cmd-only | fzf --scheme history
+atuin init --cmd-only | fzf --scheme history
+atuin init -- --cmd-only |fzf --scheme history
+atuin init nu -- --cmd-only |fzf --scheme history
+atuin init nu --cmd-only |fzf --scheme history
+atuin search --cmd-only --help
+atuin search --cmd-only -h
+config env.nu
+config env
+$nu.data-dir
+hs /Users/leporuid/Library/Application Support/nushell/config.nu
+fzf
+ln ~/dotfiles/config/nushell/vendor /Users/leporuid/Library/Application Support/nushell/vendor
+ln ~/dotfiles/config/nushell/vendor /Users/leporuid/Library/Application Support/nushell
+hx /Users/leporuid/dotfiles/config/nushell/vendor/autoload/atuin.nu
+hx -g fetch && hx -g build
+.config/helix
+ls
+hx -g fetch && hx -g build
+which $env.SHELL
+env
+echo nu.data-dir
+echo $env.nu.data-dir
+echo $nu.default-config-dir 
+$nu.data-dir 
+echo $nu.default-data-dir
+which nu
+which starship
+env
+ks
+env
+atuin_search_cmd
+_atuin_search_cmd
+cx
+which $env.SHELL
+env
+fzf_opts
+reload
+_atuin_search_cmd
+atuin h l --cmd-only | fzf
+atuin search --cmd-only | fzf --scheme history
+atuin search $env.cmd
+atuin search
+atuin search --cmd-only | fzf --scheme history
+atuin search
+atuin search --cmd-only
+atuin
+atuin key
+atuin import nu
+atuin import auto
+atuin import zsh
+_atuin_search_widget
+echo _atuin_search_widget
+echo _atuin_search_cmd
+_atuin_search_cmd
+sudo nano
+echo $env.TERM
+sudo nano
+env
+sudo nano
+env
+sudo nano
+env
+zi
+atuin
+atuin search --cmd-only
+atuin init nu
+atuin search --cmd-only
+atuin search --cmd-only | fzf --scheme history
+atuin init nu --disable-up-arrow
+echo $env.ATUIN_NOBIND
+atuin init nu | save -f ~/dotfiles/config/nushell/vendor/autoload/atuin.nu
+open ~/dotfiles/config/nushell/vendor/autoload/atuin.nu
+zed ~/dotfiles/config/nushell/vendor/autoload/atuin.nu
+atuin init nu | save -f ~/dotfiles/config/nushell/vendor/autoload/atuin.nu
+atuin search --cmd-only | fzf --scheme history
+atuin search --cmd-only | fzf --scheme default
+_atuin_search_cmd | fzf --scheme default
+atuin_search_cmd | fzf --scheme default
+atuin_search_cmd
+_atuin_search_cmd
+atuin init nu | save -f ~/dotfiles/config/nushell/vendor/autoload/atuin.nu
+_atuin_search_cmd
+env
+fzf --query(atuin search --cmd-oly)
+atuin search --cmd-only | fzf
+atuin history list --cmd-only | fzf
+atuin init nu | save -f ~/dotfiles/config/nushell/vendor/autoload/atuin.nu
+function _atuin_fzf_search<\n>  set -f commands_selected (<\n>    atuin search --cmd-only |<\n>      _fzf_wrapper --print0 \<\n>        --query=(commandline) \<\n>  )
+mise up
+env
+atuin search --cmd-only | fzf
+atuin search --cmd-only
+nu
+gum
+gum filter
+zi
+z
+which $env.SHELL
+env
+sudo nano
+env
+TERM
+env
+TERM
+echo $env.TERM
+$env.TERM
+/Applications/Ghostty.app/Contents/Resources/terminfo/78/xterm-ghostty
+sudo nano
+sudo vi
+hx
+sudo hx
+sudo nano
+which xterm-ghostty
+env
+echo $env.TERM
+sudo nano
+which sudo
+which nano
+sudo hx
+nv
+ne
+sudo nano
+nano
+sudo vi
+zzsh
+zsh
+/etc/profiles/per-user/leporuid/bin/nu
+/bin/zsh
+sudo nano
+env
+sudo nano
+env
+whoami
+source
+term
+env.term
+echo $env.term
+mkdir -p ~/.terminfo/x/<\n>cp /usr/share/terminfo/x/xterm-ghostty ~/.terminfo/x/
+which nu
+sudo nano
+whoami
+eza
+ls -lAhH --icons
+eza -lAhH --icons
+env
+nushell
+which nu
+nu --version
+source ~/.local/share/icons-in-terminal/
+ls ~/.local/share/icons-in-terminal/icons.fish
+ls ~/.local/share/icons-in-terminal/
+fontforge
+which fontforge
+brew install fontconfig
+fc-cache
+cd
+~/.config/
+ll
+ls
+cd ./icons-in-terminal
+ls
+eza -lAhH --icons
+eza -lAhH --icons --tree
+tree
+ls
+alias
+env.alias
+alia
+ls
+chmod u+x *
+ls
+chmod u+x ~/.config/icons-in-terminal/*
+ls
+ls --lAhH
+ls -lAhH
+eza -lAhH
+eza --lAhH
+ls
+eza
+eza --help
+eza -A
+eza -G
+eza --git
+eza --h
+eza -h
+eza --total-size
+eza -S
+eza -S --icons
+eza -@S --icons
+eza --total-size
+eza -@S --icons --total-size
+eza -?
+eza -@S --icons --total-size --smart-group
+eza -@SR --icons --total-size --smart-group
+eza -@lSR --icons --total-size --smart-group
+eza -@lahH --icons --total-size --smart-group
+eza -@lahH --icons --total-size
+eza -@lahH --icons
+eza -lahH --icons
+eza -lahH --icons --total-size
+eza -lAahH --icons --total-size
+eza -lahH--total-size
+eza -lahH --total-size
+eza -lahH --total-size --icons=always
+eza ->
+eza -?
+sudo nano
+env
+which nix
+config env
+config nu
+eza --tree --level=2 --long --icons --git
+ls --all -l
+cd
+which fish
+fish
+which nu
+na
+ni
+which ni
+which nu
+which bun
+ls
+nix flake update
+ni 
+bun upgrade -g --all
+cd
+nix flake lock
+ew
+ls
+nix flake lock
+which mise
+mise activate nushell
+mise activate nu 
+which nu
+which bun
+bun --version
+mise uninstall bun
+mise prune
+mise uninstall bun
+hx ~/.config/mise/config.tomll
+hx ~/.config/mise/config.toml
+which uv
+mise use -g nix@legacyPackages.aarch64-darwin.bun nix@legacyPackages.aarch64-darwin.uv -f
+mise uninstall 
+mise 
+which bun
+mise --version
+mise sync
+mise sync python
+mise sync python --uv
+which uv
+hx ~/.config/mise/config.toml
+mise prune
+nix search nixpkgs ni
+mise use -g nix@deno nix@legacyPackages.aarch64-darwin.bun nix@legacyPackages.aarch64-darwin.uv -f
+mise use -g 
+hx ~/.config/mise/config.toml
+nix search nixpkgs aqua
+nix search nixpkgs hydrus
+cd ~/Develop/nix-dotfiles
+cd ~/Developer/nix-dotfiles
+direnv allow
+nix flake update
+nix flake lock
+ls
+ll ./users/leporuid/
+ls./users/leporuid/
+ll  users/leporuid/
+ls
+ls users
+ls users/leporuid
+nano users/leporuid/home-configuration.nix
+which nix
+ls
+nano flake.nix
+terminfo
+env
+which bash
+/run/current-system/sw/bin/ghostty
+which nushell
+nu --version
+nix flake add
+nix flake --help
+nix flake update mise github:jdx/mise
+nix flake update init github:jdx/mise
+ls ~/Developer/
+which uv
+uv --version
+mise install nix@uv
+which uv
+mise install nix@python3.13-uv
+mise install nix@legacyPackages.aarch64-darwin.python3.13-uv
+mise install nix@packages.aarch64-darwin.legacyPackages.aarch64-darwin.python3.13-uv
+mise install nix@python3.13-uv
+which uv
+mise install -g nix@deno nix@bun nix@uv
+mise install -- -g nix@deno nix@bun nix@uv
+mise install nix@deno nix@bun nix@uv
+which deno
+which bun
+which uv
+mise install nix@deno nix@bun nix@uv
+which uv
+hx ~/.config/mise/config.toml
+which swiftly
+swiftly
+swiftly update
+nano flake.nix
+which nix
+nix flake lock
+which nu
+shell 
+nix shell nixpkg#fclones-gui
+nix shell nixpkg fclones-gui
+which nix
+nix flake
+nix flake update
+which nix
+nushell
+nix shell nixpkg fclones-gui
+nix develop
+nix developer
+cd ~/Developer/nix-dotfiles
+nix developer
+nix flake update
+bun init
+bun run build
+bun dev
+bun start
+z
+bun init
+bun run build
+bun dev
+bun install
+bun init
+bun index.ts
+bun dev
+bun start
+bun updatae
+bun updatae --all
+bun install -g shadowcjls
+bun install -g shadowcljs
+npm fund
+bun run-g 
+bun run -g 
+bun run -g dev
+bun run lint
+bun run ./index.tsx
+bun
+bun init
+bun init -f
+bun install
+bun install -g
+bun add
+bun add 
+bun add shadowcljs
+npm fund
+ni
+ni shadowcljs
+bun --yarn
+bun --yarn install
+bun --yarn init
+bun run index.ts
+bun dev
+bun install
+bun init
+bun init -g
+bun init -f
+bun init
+bun 
+bun  publish
+bun 
+bun  upgrade
+bun init
+bun dev
+bun init
+bun install package.json
+bun use package.json
+bun run package.json
+nano /Users/leporuid/build.ts
+bun 
+bun patch
+bun upgrade
+bun repl
+bun
+bun exec
+bun install package.json
+bun install bun.lock
+bun lock
+bun sync
+bun start
+bun update
+bun build
+bun build nuxt
+bun create
+bun
+bun init
+bun publish
+bun builf
+bun build
+bun create shadow-cljs
+npm fund
+bun
+bun init
+bun run
+bun run start
+bun run dev
+bun use -g webkit
+bun add figlet
+bun add -d @types/figlet
+bun add -d @types/deno
+bun use -g @floating-ui/core
+bun run use
+bun
+bun patch
+bun repl
+bun build
+bun build webkit
+ruby
+ruby use -g
+ruby install gem
+brew install gem
+xcrun --toolchain swift swift --version
+~/.swiftly/bin/swiftly init
+which swift
+xcrun --toolchain swift swift --version
+~/.swiftly/bin/swiftly init --help
+~/.swiftly/bin/swiftly init --platform python3.11
+swiftly install --use 6.2
+swiftly install --use 6.2-dev
+swiftly install --use 6.1
+swiftly --version
+swift --version
+mise use -g swiftly
+mise use -g swiftly https://download.swift.org/swiftly/darwin/swiftly-{{ site.data.builds.swiftly_release.version }}.pkg
+mise use -g  https://download.swift.org/swiftly/darwin/swiftly-{{ site.data.builds.swiftly_release.version }}.pkg
+mise use -g safari-wiftly https://download.swift.org/swiftly/darwin/swiftly-{{ site.data.builds.swiftly_release.version }}.pkg
+npm fund
+deno
+mise 
+mise  reshim
+mise registry
+nix:master/
+mu
+whoami
+atuin
+which atuin
+env
+whoami
+mise up
+env
+whoami
+zsh
+env
+zsh
+exit
+ks
+uv tool upgrade --all
+carapace _carapace nushell | save --force ~/Developer/nix-dotfiles/config/nushell/vendor/autoload/carapace/carapace.nu
+which carapace
+carapace _carapace nushell | save --force ~/Developer/nix-dotfiles/config/nushell/vendor/autoload/carapace/carapace.nu
+cd
+cd ~/Developer/nix-dotfiles
+clean-store
+which carapace
+scutil --get ComputerName
+scutil --get LocalHostName
+cd ~/.config/nix-dotfiles
+direnv allow
+ls
+whoami
+nushell
+starship completions nu
+starship completions nushell
+starship completions *
+uv
+uv tool upgrade --all
+which nu
+env
+fish
+exit
+starship init nu 
+info
+whoami
+sudo
+exit
+PS1
+echo $PS1
+alias
+alia
+alias
+echo alias
+env.alias
+env.SHELL
+$env.SHELL
+fish
+exit
+which nu
+carapace _carapace nushell | save --force ~/.config/nix-dotfiles/config/nushell/vendor/autoload/carapace/carapace.nu
+open ~/.config/nix-dotfiles/config/nushell
+fzf --nushell
+fzf --help
+fzf --bash
+mise
+which mise
+uv tool upgrade --all
+ks
+tailscale
+tailscale status
+tailscale status
+exit

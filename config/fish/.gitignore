@@ -1,0 +1,5 @@
+# Ignore everything except for directories and .fish files
+*
+!*/
+!*.fish
+!.gitignore

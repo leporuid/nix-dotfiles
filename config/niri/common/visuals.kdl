@@ -1,0 +1,106 @@
+window-rule {
+    match is-floating=false
+    geometry-corner-radius 4
+    clip-to-geometry true
+    tiled-state true
+//     draw-border-with-background false
+}
+
+window-rule {
+    match is-floating=true
+
+    clip-to-geometry false
+    tiled-state false
+    focus-ring {
+        off
+    }
+
+    // shadow {
+    //     on
+        // off
+        // spread -6
+        // softness 48
+        // offset x=0 y=8
+        // color "#000000a0"
+        // inactive-color "#00000040"
+    // }
+}
+
+window-rule {
+    match is-floating=true is-active=true
+
+    shadow {
+        spread -8
+        softness 32
+    }
+}
+
+layout {
+    gaps 6
+
+    empty-workspace-above-first
+
+    always-center-single-column
+
+    default-column-display "tabbed"
+    tab-indicator {
+        hide-when-single-tab
+        // place-within-column
+        length total-proportion=0.5
+        gap -5
+        width 2
+        corner-radius 8
+        active-color "#ffffff80"
+        inactive-color "#ffffff50"
+        gaps-between-tabs 6
+    }
+
+    default-column-width {
+        proportion 0.5
+    }
+    preset-column-widths {
+        proportion 0.4
+        proportion 0.6
+    }
+
+    focus-ring {
+        width 1
+        active-color "#ffffff50"
+        inactive-color "#77777b30"
+    }
+    border {
+        // on
+        width 1
+    }
+    shadow {
+        // on
+        softness 0
+        spread 1
+        offset x=0 y=0
+        color "000000ff"
+        inactive-color "000000f0"
+    }
+
+    background-color "#000000"
+}
+
+overview {
+    backdrop-color "#000000"
+
+    // since the background is black, no point rendering the shadow
+    workspace-shadow {
+        off
+    }
+}
+
+prefer-no-csd
+
+animations {
+    slowdown 0.3
+}
+
+recent-windows {
+    highlight {
+        corner-radius 6
+    }
+}

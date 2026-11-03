@@ -1,0 +1,206 @@
+# @fish-lsp-disable 2002 4004
+
+# If the devshell isn't active, the functions defined in this file cannot be
+# used, so ensure that the dev environment is always active.
+if not set -q IN_NIX_CONFIG_DEVSHELL
+    alias devshell "nix develop"
+    return 1
+end
+
+#
+# --- Private utility functions
+#
+
+function _pretty_print
+    set colored_command (string escape -- $argv | string join ' ' | fish_indent --ansi)
+    echo "$(set_color brgreen --bold)~~>$(set_color normal) $colored_command"
+end
+
+function _run
+    _pretty_print $argv
+    $argv
+end
+
+function _require
+    for program in $argv
+        if not command -vq $program
+            echo "Required program '$program' is missing. Ensure it is in your environment, then try again."
+        end
+    end
+end
+
+#
+# --- Commands
+#
+
+set -g this_host (hostname -s)
+
+function dry -d "Dry-run a function (replaces _run with _pretty_print)"
+    functions --erase _run
+    functions --copy _pretty_print _run
+
+    # Mistakenly ran this function without any arguments, print functions.
+    if not set -q argv[1]
+        run
+        return
+    end
+
+    $argv
+end
+
+function mc-rcon -d "Connect to nixos and begin an interactive RCON session"
+    echo (set_color --italics)"connecting to nixos and executing rcon-cli..."(set_color normal)
+    _run ssh leporuid@nixos "sudo podman exec -i minecraft-family rcon-cli"
+end
+
+function mc-stop
+    echo (set_color --italics)"connecting to nixos and stopping server..."(set_color normal)
+    _run ssh leporuid@nixos "sudo systemctl stop podman-minecraft-family.service"
+end
+
+function mc-start
+    echo (set_color --italics)"connecting to nixos and stopping server..."(set_color normal)
+    _run ssh leporuid@nixos "sudo systemctl start podman-minecraft-family.service"
+end
+
+function mc-logs
+    echo (set_color --italics)"connecting to nixos and stopping server..."(set_color normal)
+    _run ssh leporuid@nixos "journalctl -xefu podman-minecraft-family.service"
+end
+
+function check-applied -d "Check if the currently applied configuration needs to be updated"
+    set last_commit_timestamp (git log -1 --format=%at)
+    set current_commit_pretty (set_color --dim --italics)$NIX_CONFIG_REV(set_color normal)
+    if test $NIX_CONFIG_LAST_MODIFIED -lt $last_commit_timestamp
+        echo "Configuration is out of date."
+        echo $current_commit_pretty
+        # TODO: Prompt to apply configuration if out of date?
+        return 1
+    else
+        set commit_hash (git log -1 --format=%H)
+        if test $NIX_CONFIG_REV = $commit_hash
+            echo "Configuration is the most recent commit."
+            echo $current_commit_pretty
+        else
+            echo "Current configuration is dirty (new)."
+            echo $current_commit_pretty
+        end
+    end
+end
+
+function edit-age -d "Edit the encrypted files stored in this repository"
+    set file (fd --type file --glob '*.age' | fzf --height=40% --layout=reverse)
+    or return
+    agenix -e $file $argv
+end
+
+function build-oci-image -d "Build the OCI Ampere A1 qcow2 custom image for nixos"
+    _run nix build .#nixosConfigurations.nixos.config.system.build.OCIImage -L $argv
+end
+
+function import-oci-image -d "Upload and import the built OCI qcow2 custom image into Oracle Cloud"
+    _require oci-import-image
+    set img (realpath result/nixos-image-oci-*.qcow2 2>/dev/null | head -n1)
+    if not test -n "$img"
+        echo "No built qcow2 found in result/. Run 'run build-oci-image' first or pass the qcow2 path directly."
+        return 1
+    end
+    _run oci-import-image $img $argv
+end
+
+function install-oci -d "Install NixOS on an OCI instance via nixos-anywhere + nixos-images kexec"
+    if not set -q argv[1]
+        echo "Usage: run install-oci <user@oracle-ip> [extra-args...]"
+        return 1
+    end
+    set target $argv[1]
+    _run nixos-anywhere \
+        --kexec "https://github.com/nix-community/nixos-images/releases/download/nixos-unstable/nixos-kexec-installer-noninteractive-aarch64-linux.tar.gz" \
+        --build-on remote \
+        --flake .#nixos \
+        $target $argv[2..]
+end
+
+#
+# --- Functions for building/switching hosts
+#
+
+function nixos -a verb
+    set rebuild_args
+    set maybe_sudo
+
+    if test $this_host != nixos
+        # If not building on nixos, set nixos to be the target.
+        # Otherwise, it is definitely a mistake to switch on the local system.
+        set --append rebuild_args --elevate=sudo --target-host leporuid@nixos
+        echo (set_color --dim --italics)"not on nixos, targeting remote host..."(set_color normal)
+
+        # If the current system isn't x86-64 Linux, then nixos needs to build
+        # its own configuration. --no-reexec (--no-build-nix) is also required because
+        # the local system will attempt to execute a version of `nix` that it can't
+        # run.
+        if test (nix eval --impure --raw --expr 'builtins.currentSystem') != aarch64-linux
+            set --append rebuild_args --build-host leporuid@nixos --no-reexec
+            echo (set_color --dim --italics)"not on aarch64-linux, performing remote build..."(set_color normal)
+        end
+
+    else
+        # If, for whatever reason, we *are* on nixos, then we need to use sudo.
+        set maybe_sudo sudo
+        echo (set_color --dim --italics)"on nixos, using sudo..."(set_color normal)
+    end
+
+    _run $maybe_sudo nixos-rebuild $verb --flake .#nixos $rebuild_args $argv[2..]
+end
+
+
+function MacBook-Pro -a verb
+    set maybe_sudo
+    if test $verb = switch
+        set maybe_sudo sudo
+    end
+
+    _run $maybe_sudo darwin-rebuild $verb --flake .#MacBook-Pro $argv[2..]
+end
+
+function macbook-pro -a verb
+    _require pmset timeout home-manager
+
+    set jobs 8
+
+    if test $this_host = MacBook-Pro; and pmset -g batt | grep -q "Battery Power"
+        echo (set_color --dim --italics)"on battery power, testing connection to macmini..."(set_color normal)
+        if timeout 3 nix store info --store ssh-ng://leporuid@MacBook-Pro &>/dev/null
+            echo (set_color --dim --italics)"delegating to macmini..."(set_color normal)
+            set jobs 0
+        else
+            echo (set_color --dim --italics)"running on this machine..."(set_color normal)
+        end
+    end
+
+    _run home-manager $verb --flake ".#$USER@macbook-pro" --max-jobs $jobs $argv[2..]
+end
+
+
+# The logic below defines the commands used to build/switch configurations for
+# the hosts above. This requires some amount of metaprogramming, which Fish has
+# decent support for.
+
+set hosts (ls hosts)
+set verbs build switch
+
+for host in $hosts
+    functions -q $host; or continue
+    functions --copy $host _$host
+    functions --erase $host
+
+    for verb in $verbs
+        echo "function $verb-$host -d '$verb the configuration for $host'; _$host $verb \$argv; end" | source
+        # This line is visually confusing. Essentially, if there is a config
+        # for the current $hostname, we create an alias for it so I can refer
+        # to it as "host" rather than the actual hostname. It's easier to type
+        # and remember, since most of the time I'll want to build the config
+        # for the system I'm using at the time, regardless of what it is.
+        test $this_host = $host; and alias $verb-host $verb-$host
+    end
+end

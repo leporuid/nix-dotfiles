@@ -1,0 +1,40 @@
+{
+  "project_panel": {
+    "dock": "left"
+  },
+  "outline_panel": {
+    "dock": "left"
+  },
+  "collaboration_panel": {
+    "dock": "left"
+  },
+  "agent": {
+    "dock": "right",
+    "favorite_models": [],
+    "model_parameters": []
+  },
+  "git_panel": {
+    "dock": "left"
+  },
+  "helix_mode": true,
+  "status_bar": {
+    "active_encoding_button": "enabled"
+  },
+  "redact_private_values": true,
+  "session": {
+    "trust_all_worktrees": true
+  },
+  "edit_predictions": {
+    "provider": "zed"
+  },
+  "ui_font_size": 14.0,
+  "buffer_font_size": 14.0,
+  "buffer_font_weight": 400.0,
+  "ui_font_weight": 390.0,
+  "icon_theme": "Catppuccin Mocha",
+  "theme": "Catppuccin Mocha",
+  "vim_mode": false,
+  "buffer_font_family": "Maple Mono NF CN",
+  "ui_font_family": "Maple Mono NF CN",
+  "format_on_save": "off"
+}

@@ -1,0 +1,15 @@
+result
+result-*
+.direnv
+.DS_Store
+_*
+secrets
+config/age
+config/rclone
+
+# GitHub Copilot sensitive credentials, tokens, SQLite databases, and conversation history
+config/github-copilot/apps.json
+config/github-copilot/auth.db*
+config/github-copilot/*.db*
+config/github-copilot/**/conversations/
+config/github-copilot/**/appstate.json
