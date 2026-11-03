@@ -8,17 +8,6 @@
   config,
   ...
 }:
-
-let
-  agenixPkg =
-    (inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
-      ageBin = "${pkgs.rage}/bin/rage";
-    }).overrideAttrs
-      (_: {
-        doCheck = false;
-        doInstallCheck = false;
-      });
-in
 {
   # =========================================================================
   # 1. Imports
@@ -320,7 +309,12 @@ in
   environment.systemPackages = with pkgs; [
     age
     rage
-    agenixPkg
+    ((inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
+      ageBin = "${pkgs.rage}/bin/rage";
+    }).overrideAttrs (_: {
+      doCheck = false;
+      doInstallCheck = false;
+    }))
     ethtool
 
     # Observability & diagnostic tools
@@ -379,7 +373,7 @@ in
 
   system.autoUpgrade = {
     enable = true;
-    flake = "~/nix-dotfiles";
+    flake = "github:leporuid/nix-dotfiles";
     dates = "04:20";
     randomizedDelaySec = "45min";
     allowReboot = true;

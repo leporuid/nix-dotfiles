@@ -12,6 +12,9 @@
 
   home.sessionVariables = {
     IS_DARWIN = "";
+    SWIFTLY_HOME_DIR = "${config.home.homeDirectory}/.swiftly";
+    SWIFTLY_BIN_DIR = "${config.home.homeDirectory}/.swiftly/bin";
+    SWIFTLY_TOOLCHAINS_DIR = "${config.home.homeDirectory}/Library/Developer/Toolchains";
   };
 
   # Suppress the default macOS terminal login welcome message.
