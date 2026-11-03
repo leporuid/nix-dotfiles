@@ -1,7 +1,7 @@
 let
   system = builtins.readFile hosts/MacBook-Pro/id_ed25519.pub;
   leporuid-MacBook-Pro = builtins.readFile hosts/MacBook-Pro/users/leporuid/id_ed25519.pub;
-  nixos = builtins.readFile hosts/nixos/ssh_host_ed25519_key.pub;
+  nixos = builtins.readFile hosts/nixos/id_ed25519.pub;
 
   leporuid = [
     leporuid-MacBook-Pro
