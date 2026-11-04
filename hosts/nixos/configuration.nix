@@ -53,6 +53,10 @@
       "net.ipv4.conf.all.forwarding" = true;
       "net.ipv4.conf.all.route_localnet" = lib.mkDefault 1;
       "net.ipv6.conf.all.forwarding" = lib.mkDefault 1;
+
+      # Network buffer tuning for throughput bursts (from ThomasRitaine)
+      "net.core.rmem_default" = 2097152;
+      "net.core.rmem_max" = 16777216;
     };
 
     # APFS case-hack collision workaround for ncurses terminfo in initrd
@@ -124,17 +128,36 @@
     useRoutingFeatures = "both";
     authKeyFile = config.age.secrets."tailscale-oracle".path;
     authKeyParameters.preauthorized = true;
+
+    # Used at first login
     extraUpFlags = [
-      "--ssh"
-    ];
-    extraSetFlags = [
-      "--accept-dns=false"
-      "--accept-routes"
+      "--reset"
       "--advertise-exit-node"
+      "--accept-routes"
+      "--accept-dns=false"
+      "--ssh"
       "--advertise-routes=10.0.50.0/24"
       "--advertise-tags=tag:all,tag:border0-managed"
-      "--ssh"
     ];
+
+    # Reapplied on every activation via `tailscale set`
+    extraSetFlags = [
+      "--advertise-exit-node"
+      "--accept-routes"
+      "--accept-dns=false"
+      "--ssh"
+      "--advertise-routes=10.0.50.0/24"
+      "--advertise-tags=tag:all,tag:border0-managed"
+    ];
+  };
+
+  # Restart even after a clean exit (code 0), and never give up (from ThomasRitaine)
+  systemd.services.tailscaled = {
+    serviceConfig = {
+      Restart = lib.mkForce "always";
+      RestartSec = "5s";
+    };
+    startLimitIntervalSec = 0;
   };
 
   systemd.services.tailscale-ethtool = {
