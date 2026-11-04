@@ -14,7 +14,9 @@ pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
   };
 
   postPatch = ''
-    # Rewrite Package.swift for macOS offline build without Linux/Windows dependencies
+    # Remove Package.resolved and rewrite Package.swift for 100% offline macOS build
+    rm -f Package.resolved
+
     cat << 'EOF' > Package.swift
 // swift-tools-version: 6.2
 import PackageDescription
@@ -46,12 +48,9 @@ EOF
       fi
     fi
     export DEVELOPER_DIR="$_XCODE_DEV"
-    export SDKROOT="$($_XCODE_DEV/usr/bin/xcrun --sdk macosx --show-sdk-path)"
+    export SDKROOT="$(/usr/bin/xcrun --sdk macosx --show-sdk-path)"
 
-    /usr/bin/xcrun swift build \
-      -c release \
-      --disable-sandbox \
-      --only-use-versions-from-resolved-file
+    /usr/bin/xcrun swift build -c release --disable-sandbox
 
     runHook postBuild
   '';
