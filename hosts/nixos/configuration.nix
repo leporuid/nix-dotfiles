@@ -206,8 +206,8 @@
       "/etc/nixos/secrets/keys.txt"
     ];
     secrets = {
-      tailscale-oracle.file = ./tailscale-oracle.age;
-      tailzero-invite.file = ./tailzero-invite.age;
+      tailscale-oracle.file = "${inputs.nix-secrets}/hosts/nixos/tailscale-oracle.age";
+      tailzero-invite.file = "${inputs.nix-secrets}/hosts/nixos/tailzero-invite.age";
     };
   };
 
