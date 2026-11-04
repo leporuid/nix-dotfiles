@@ -47,7 +47,6 @@
   ];
 
   environment.enableAllTerminfo = true;
-  time.timeZone = "Asia/Taipei";
 
   # Exclude ~/.nix-profile from PATH and keep strictly per-user and system profiles
   environment.profiles = lib.mkForce [
