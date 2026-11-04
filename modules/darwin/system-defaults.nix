@@ -30,7 +30,7 @@ in
   # Safe injection of custom NIX_PATH that works seamlessly alongside determinateNix
   # and ensures SSH sessions automatically source the Nix daemon environment.
   environment.extraInit = lib.mkForce ''
-    export NIX_PATH="nixpkgs=${inputs.nixpkgs.outPath}:home-manager=${inputs.home-manager.outPath}:$NIX_PATH"
+    export NIX_PATH="nixpkgs=${inputs.nixpkgs.outPath}:home-manager=${inputs.home-manager.outPath}''${NIX_PATH:+:$NIX_PATH}"
 
     if [ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ] && [ -n "''${SSH_CONNECTION:-}" ] && [ "''${SHLVL:-0}" -eq 1 ]; then
       . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
@@ -82,6 +82,11 @@ in
 
     customSettings = {
       inherit (vars.caches) extra-substituters extra-trusted-public-keys;
+
+      nix-path = [
+        "nixpkgs=${inputs.nixpkgs}"
+        "home-manager=${inputs.home-manager}"
+      ];
 
       # Performance and storage optimization for macOS APFS
       accept-flake-config = true;
