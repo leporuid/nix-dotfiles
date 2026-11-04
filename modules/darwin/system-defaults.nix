@@ -200,7 +200,9 @@ in
 
       trackpad = {
         Clicking = true;
-        TrackpadThreeFingerDrag = true;
+        Dragging = true;
+        DragLock = true;
+        TrackpadThreeFingerDrag = false;
       };
 
       NSGlobalDomain = {
