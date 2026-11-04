@@ -448,5 +448,5 @@
   };
 
   nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
-  system.stateVersion = "24.11";
+  system.stateVersion = "26.11";
 }

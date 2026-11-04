@@ -6,9 +6,6 @@
   vars,
   ...
 }:
-let
-  tailscaleBin = "/Applications/Tailscale.app/Contents/MacOS/Tailscale";
-in
 {
   # =========================================================================
   # 1. Imports and System Modules
@@ -45,7 +42,7 @@ in
 
     (writeShellScriptBin "tailscale" ''
       export TAILSCALE_BE_CLI=1
-      exec ${tailscaleBin} "$@"
+      exec /Applications/Tailscale.app/Contents/MacOS/Tailscale "$@"
     '')
   ];
 
@@ -108,7 +105,6 @@ in
       warn-dirty = false;
 
       extra-trusted-users = [
-        "@admin"
         config.system.primaryUser
       ];
       extra-experimental-features = [

@@ -31,7 +31,7 @@ in
     onActivation = {
       autoUpdate = false;
       upgrade = false;
-      cleanup = "zap";
+      cleanup = "none";
       extraFlags = [
         "--quiet"
       ];
