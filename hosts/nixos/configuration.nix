@@ -427,6 +427,8 @@
     options = "--delete-older-than 14d";
   };
 
+  nix.channel.enable = false;
+  nix.nixPath = [ "nixpkgs=${inputs.nixpkgs}" ];
   nix.registry.nixpkgs.flake = inputs.nixpkgs;
   nix.registry.self.flake = flake;
 
