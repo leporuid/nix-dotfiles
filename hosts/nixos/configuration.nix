@@ -286,8 +286,8 @@
 
   # Symlink raw application configs from config/ to /etc/
   environment.etc = {
-    # Expose the deployed system flake at /etc/nixos
-    "nixos".source = flake;
+    # Expose the deployed system flake at /etc/nixos/current
+    "nixos/current".source = flake;
 
     "direnv/direnv.toml".source = "${flake}/config/direnv/direnv.toml";
     "fish/completions".source = "${flake}/config/fish/completions";
