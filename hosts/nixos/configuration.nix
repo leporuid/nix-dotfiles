@@ -136,8 +136,8 @@
       "--accept-routes"
       "--accept-dns=false"
       "--ssh"
-      "--advertise-routes=10.0.50.0/24,169.254.169.254/32"
-      "--advertise-tags=tag:all,tag:border0-managed"
+      "--advertise-routes=10.0.50.0/24"
+      "--advertise-tags=tag:all"
     ];
 
     # Reapplied on every activation via `tailscale set`
@@ -146,8 +146,8 @@
       "--accept-routes"
       "--accept-dns=false"
       "--ssh"
-      "--advertise-routes=10.0.50.0/24,169.254.169.254/32"
-      "--advertise-tags=tag:all,tag:border0-managed"
+      "--advertise-routes=10.0.50.0/24"
+      "--advertise-tags=tag:all"
     ];
   };
 
@@ -234,7 +234,6 @@
     ];
     secrets = {
       tailscale-oracle.file = "${inputs.nix-secrets}/hosts/nixos/tailscale-oracle.age";
-      tailzero-invite.file = "${inputs.nix-secrets}/hosts/nixos/tailzero-invite.age";
     };
   };
 
