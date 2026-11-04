@@ -33,7 +33,7 @@
 
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
 
-    ktoolbox.url = "github:leporuid/KToolBox/fix-test";
+    ktoolbox.url = "github:leporuid/KToolBox/uv2nix";
     ktoolbox.inputs.nixpkgs.follows = "nixpkgs";
 
     homebrew-rayburst.url = "github:AnInsomniacy/homebrew-rayburst";

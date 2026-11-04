@@ -401,7 +401,7 @@
       },
       "original": {
         "owner": "leporuid",
-        "ref": "fix-test",
+        "ref": "uv2nix",
         "repo": "KToolBox",
         "type": "github"
       }
