@@ -1,5 +1,10 @@
-{ pkgs, ... }:
-with pkgs;
+{
+  lib,
+  stdenvNoCC,
+  fetchurl,
+  ...
+}:
+
 let
   version = "v0.2-115-gcd16a55";
   sources = {
@@ -25,10 +30,10 @@ let
     };
   };
 
-  system = stdenv.hostPlatform.system;
+  system = stdenvNoCC.hostPlatform.system;
   sourceInfo = sources.${system} or (throw "Tailzero Unsupported Current Architecture: ${system}");
 in
-stdenv.mkDerivation {
+stdenvNoCC.mkDerivation {
   pname = "tailzero";
   inherit version;
 
@@ -40,14 +45,15 @@ stdenv.mkDerivation {
   dontUnpack = true;
 
   installPhase = ''
-    mkdir -p $out/bin
-    cp $src $out/bin/tailzero
-    chmod +x $out/bin/tailzero
+    runHook preInstall
+    install -Dm755 $src "$out/bin/tailzero"
+    runHook postInstall
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Border0 Tailzero Connector";
     homepage = "https://border0.com";
+    mainProgram = "tailzero";
     platforms = builtins.attrNames sources;
   };
 }
