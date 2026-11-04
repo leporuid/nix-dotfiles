@@ -16,7 +16,17 @@ pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
   buildPhase = ''
     runHook preBuild
 
-    export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+    # Resolve host Xcode installation dynamically (pattern from xmtp/libxmtp)
+    _XCODE_DEV="/Applications/Xcode.app/Contents/Developer"
+    if DEVELOPER_DIR= /usr/bin/xcode-select -p &>/dev/null; then
+      _SEL=$(DEVELOPER_DIR= /usr/bin/xcode-select -p)
+      if [[ "$_SEL" != /nix/* ]]; then
+        _XCODE_DEV="$_SEL"
+      fi
+    fi
+    export DEVELOPER_DIR="$_XCODE_DEV"
+    export SDKROOT="$($_XCODE_DEV/usr/bin/xcrun --show-sdk-path --sdk macosx)"
+
     /usr/bin/xcrun swift build -c release --disable-sandbox
 
     runHook postBuild
