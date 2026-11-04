@@ -11,7 +11,7 @@ pkgs.stdenvNoCC.mkDerivation {
     owner = "pr0d1r2";
     repo = "age-plugin-se";
     rev = "main";
-    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    hash = "sha256-+tiZZDr9gr/Dsi+ujaf4LAf8Ar9Bn4zpe2EAgWSxpxY=";
   };
 
   postPatch = ''
