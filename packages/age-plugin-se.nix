@@ -24,7 +24,7 @@ import PackageDescription
 
 let package = Package(
   name: "AgeSecureEnclavePlugin",
-  platforms: [.macOS(.v14)],
+  platforms: [.macOS("26.0")],
   dependencies: [],
   targets: [
     .executableTarget(
@@ -59,7 +59,8 @@ EOF
 
     /usr/bin/xcrun swift build \
       -c release \
-      --disable-sandbox
+      --disable-sandbox \
+      -Xswiftc -Xfrontend -Xswiftc -disable-availability-checking
 
     runHook postBuild
   '';
