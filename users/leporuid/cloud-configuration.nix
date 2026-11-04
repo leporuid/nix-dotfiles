@@ -95,7 +95,7 @@ in
     ];
     syntaxes = { };
     themes."Catppuccin Mocha" = {
-      src = inputs.catppuccin-bat;
+      src = "${flake}/config/bat";
       file = "themes/Catppuccin Mocha.tmTheme";
     };
   };

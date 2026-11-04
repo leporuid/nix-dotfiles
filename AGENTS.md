@@ -4,6 +4,7 @@
 - **Inspect Narrowly**: Read only the target module or line range instead of scanning the entire repository.
 - **Edit In-Place**: Patch files directly rather than outputting full-file copy-paste tutorials in chat.
 - **Verify Locally**: Run `nix flake check` (or targeted `nix eval`) before replying. Fix errors before presenting results.
+- **Purge Stale Direnv Cache**: When modifying Flake inputs, toolchains, or local build derivations that encounter persistent build or locking failures, purge the stale cache with `rm -rf .direnv` before rebuilding.
 - **Strict English Code Comments**: All code comments (`#`, `//`, `/* */`) across all Nix expressions, shell scripts, and configuration files must strictly be written in English. Never use Chinese or non-English comments in the codebase or in code snippets presented in conversations.
 - **Respond Concisely**: Think in English, keep code comments in English, and reply in concise Traditional Chinese (Taiwan usage).
 

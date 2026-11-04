@@ -39,9 +39,6 @@
     homebrew-rayburst.url = "github:AnInsomniacy/homebrew-rayburst";
     homebrew-rayburst.flake = false;
 
-    catppuccin-bat.url = "github:catppuccin/bat";
-    catppuccin-bat.flake = false;
-
     gallery-ai.url = "github:CrimsonGlory/gallery-ai";
     gallery-ai.flake = false;
 

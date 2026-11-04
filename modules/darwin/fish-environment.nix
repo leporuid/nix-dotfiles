@@ -11,11 +11,26 @@ let
     '';
 in
 {
+  # Fish from Nix has a built-in preinit hook looking for /etc/fish/nixos-env-preinit.fish.
+  # We preserve terminal-provided PATH entries (the d12frosted technique from seruman/nix.d)
+  # while sourcing nix-darwin's setEnvironment.fish translated by babelfish (clo4/nix-dotfiles).
   environment.etc."fish/nixos-env-preinit.fish".text = ''
-    if [ -z "$__NIX_DARWIN_SET_ENVIRONMENT_DONE" ]
+    set -l __inherited_path $PATH
+
+    if test -z "$__NIX_DARWIN_SET_ENVIRONMENT_DONE" -a -f /etc/fish/setEnvironment.fish
       source /etc/fish/setEnvironment.fish
+      set -g __NIX_DARWIN_SET_ENVIRONMENT_DONE 1
     end
+
+    # Restore inherited terminal PATH entries at the tail to preserve parent tools
+    for entry in $__inherited_path
+      if test -n "$entry"; and test "$entry" != .; and not contains -- "$entry" $PATH
+        set -gx --append PATH "$entry"
+      end
+    end
+    set -e __inherited_path
   '';
+
   environment.etc."fish/setEnvironment.fish".source =
     babelfishTranslate config.system.build.setEnvironment "setEnvironment";
 }
