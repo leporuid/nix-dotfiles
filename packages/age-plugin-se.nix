@@ -9,7 +9,7 @@ pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
   src = pkgs.fetchFromGitHub {
     owner = "pr0d1r2";
     repo = "age-plugin-se";
-    rev = "6a01275884604dada06d9ec5d84085448841eaca";
+    rev = "main";
     hash = "sha256-wHGNIWcb05S757a3ovTqxLHAtwSeixJexV2+Biuridg=";
   };
 
