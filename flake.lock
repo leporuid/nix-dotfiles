@@ -110,22 +110,6 @@
         "type": "github"
       }
     },
-    "catppuccin-bat": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1751237777,
-        "narHash": "sha256-lJapSgRVENTrbmpVyn+UQabC9fpV1G1e+CdlJ090uvg=",
-        "owner": "catppuccin",
-        "repo": "bat",
-        "rev": "6810349b28055dce54076712fc05fc68da4b8ec0",
-        "type": "github"
-      },
-      "original": {
-        "owner": "catppuccin",
-        "repo": "bat",
-        "type": "github"
-      }
-    },
     "determinate": {
       "inputs": {
         "determinate-nixd-aarch64-darwin": "determinate-nixd-aarch64-darwin",
@@ -282,11 +266,11 @@
     "gallery-ai": {
       "flake": false,
       "locked": {
-        "lastModified": 1793684415,
-        "narHash": "sha256-bctBgOpgS+0xg0CQ22R5GnXuIQ/uP8FNIBf/6MVAPyk=",
+        "lastModified": 1793768016,
+        "narHash": "sha256-FIrX1l+rH8cecXNRgYjatMLRi1ex1C88BRL2GgnBnUQ=",
         "owner": "CrimsonGlory",
         "repo": "gallery-ai",
-        "rev": "d90d4d26a9eb7dd933f0c11f73477839ef949656",
+        "rev": "873bf7997d863bba03647b162f6caac06c67a524",
         "type": "github"
       },
       "original": {
@@ -433,11 +417,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1793750192,
-        "narHash": "sha256-ueNHsKFN7SA7Lzk4DPnjWgpIET+IaJZ8uIIeDszen+Y=",
+        "lastModified": 1793770482,
+        "narHash": "sha256-tCNNF2NBOjk4QR5spvUopbvzUKEHFfxr4yFcmzxyldw=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "78f777ba4f6141fca604a5cee3f6ff8dfab09f48",
+        "rev": "8ae4eb614271ecbbd62e2641a0c2aa1fff3cf9ca",
         "type": "github"
       },
       "original": {
@@ -743,7 +727,6 @@
       "inputs": {
         "agenix": "agenix",
         "blueprint": "blueprint",
-        "catppuccin-bat": "catppuccin-bat",
         "determinate": "determinate",
         "disko": "disko",
         "gallery-ai": "gallery-ai",
@@ -897,11 +880,11 @@
     "yt-ai": {
       "flake": false,
       "locked": {
-        "lastModified": 1793754962,
-        "narHash": "sha256-lAQJhcNTpJtW622haJ9iyKuZkQq7kVz+wDAsLVPplc8=",
+        "lastModified": 1793764056,
+        "narHash": "sha256-MDIc/tqpXqwK4NvzEP5XaexZd61Lmk+dkA7nxd2j0eA=",
         "owner": "CrimsonGlory",
         "repo": "yt-ai",
-        "rev": "570c5438556f7951b13153ac30236474db73e291",
+        "rev": "92fb0fb133f635ea3531de0b76ef00db56c4198d",
         "type": "github"
       },
       "original": {
