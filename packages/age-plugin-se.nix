@@ -1,50 +1,66 @@
 { pkgs, ... }:
-pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
-  pname = "age-plugin-se";
-  version = "0.2.1-unstable-2026-11-02";
+with pkgs;
+stdenvNoCC.mkDerivation (
+  finalAttrs:
+  let
+    inherit (finalAttrs) version;
+    sources = {
+      "aarch64-darwin" = fetchzip {
+        url = "https://github.com/remko/age-plugin-se/releases/download/v${version}/age-plugin-se-v${version}-macos.zip";
+        hash = "sha256-9dJ7tPaFQy2xNeaRt8JnIxVu/+cMYNluKqRAWyJ7RQk=";
+      };
+      "aarch64-linux" = fetchzip {
+        url = "https://github.com/remko/age-plugin-se/releases/download/v${version}/age-plugin-se-v${version}-aarch64-linux.tgz";
+        hash = "sha256-66mnfTXk3MuReoLltFBLM6V4FC9FDj+FNpH5NfvZqFo=";
+      };
+      "x86_64-linux" = fetchzip {
+        url = "https://github.com/remko/age-plugin-se/releases/download/v${version}/age-plugin-se-v${version}-x86_64-linux.tgz";
+        hash = "sha256-LvF094XcnndqVk7jVDkcCUV/ElW52JjmrKCFKAUwwQ8=";
+      };
+    };
+  in
+  {
+    pname = "age-plugin-se";
+    version = "0.2.1";
 
-  # Allow impure build to access host Xcode SDK and swift compiler
-  __noChroot = true;
+    src = sources.${stdenvNoCC.hostPlatform.system};
 
-  src = pkgs.fetchFromGitHub {
-    owner = "ink-splatters";
-    repo = "age-plugin-se";
-    rev = "79522b16a2352c06947ff45a132bb641dcb16132";
-    hash = "sha256-wHGNIWcb05S757a3ovTqxLHAtwSeixJexV2+Biuridg=";
-  };
+    installPhase = ''
+      runHook preInstall
 
-  buildPhase = ''
-    runHook preBuild
-
-    # Resolve host Xcode installation dynamically (pattern from xmtp/libxmtp)
-    _XCODE_DEV="/Applications/Xcode.app/Contents/Developer"
-    if DEVELOPER_DIR= /usr/bin/xcode-select -p &>/dev/null; then
-      _SEL=$(DEVELOPER_DIR= /usr/bin/xcode-select -p)
-      if [[ "$_SEL" != /nix/* ]]; then
-        _XCODE_DEV="$_SEL"
+      if [ -d $src/usr/bin ]; then
+        install -Dm755 $src/usr/bin/age-plugin-se $out/bin/age-plugin-se
+      elif [ -f $src/age-plugin-se ]; then
+        install -Dm755 $src/age-plugin-se $out/bin/age-plugin-se
+      else
+        echo "error: age-plugin-se not found in $src" >&2
+        exit 1
       fi
-    fi
-    export DEVELOPER_DIR="$_XCODE_DEV"
-    export SDKROOT="$($_XCODE_DEV/usr/bin/xcrun --show-sdk-path --sdk macosx)"
 
-    /usr/bin/xcrun swift build -c release --disable-sandbox
+      runHook postInstall
+    '';
 
-    runHook postBuild
-  '';
+    passthru.tests = {
+      version = testers.testVersion {
+        package = finalAttrs.finalPackage;
+        version = "v${version}";
+      };
 
-  installPhase = ''
-    runHook preInstall
+      help = runCommand "test-age-plugin-se-help" { nativeBuildInputs = [ finalAttrs.finalPackage ]; } ''
+        age-plugin-se --help
+        touch $out
+      '';
+    };
 
-    install -Dm755 .build/release/age-plugin-se $out/bin/age-plugin-se
-
-    runHook postInstall
-  '';
-
-  meta = with pkgs.lib; {
-    description = "Age plugin for Apple Secure Enclave (built with host Xcode)";
-    homepage = "https://github.com/ink-splatters/age-plugin-se";
-    license = licenses.mit;
-    mainProgram = "age-plugin-se";
-    platforms = platforms.darwin;
-  };
-})
+    meta = {
+      inherit (age-plugin-se.meta) description homepage license;
+      sourceProvenance = [ lib.sourceTypes.binaryNativeCode ];
+      mainProgram = "age-plugin-se";
+      platforms = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "aarch64-darwin"
+      ];
+    };
+  }
+)
