@@ -9,17 +9,29 @@ pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
   src = pkgs.fetchFromGitHub {
     owner = "pr0d1r2";
     repo = "age-plugin-se";
-    rev = "main";
+    rev = "6a01275884604dada06d9ec5d84085448841eaca";
     hash = "sha256-wHGNIWcb05S757a3ovTqxLHAtwSeixJexV2+Biuridg=";
   };
 
   postPatch = ''
-    # Remove remote swift-crypto dependency not needed on macOS so swift build runs offline
-    substituteInPlace Package.swift \
-      --replace-fail '.package(url: "https://github.com/apple/swift-crypto.git", "2.0.0"..<"5.0.0")' "" \
-      --replace-fail '.product(
-          name: "Crypto", package: "swift-crypto",
-          condition: .when(platforms: [.linux, .windows]))' ""
+    # Rewrite Package.swift for macOS offline build without Linux/Windows dependencies
+    cat << 'EOF' > Package.swift
+// swift-tools-version: 6.2
+import PackageDescription
+
+let package = Package(
+  name: "AgeSecureEnclavePlugin",
+  platforms: [.macOS(.v14)],
+  dependencies: [],
+  targets: [
+    .executableTarget(
+      name: "age-plugin-se",
+      dependencies: [],
+      path: "Sources",
+      exclude: ["SPEC.md", "SPEC-ARCHIVE.md"])
+  ]
+)
+EOF
   '';
 
   buildPhase = ''
