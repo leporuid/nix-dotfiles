@@ -2,7 +2,7 @@
 
 pkgs.stdenvNoCC.mkDerivation {
   pname = "age-plugin-se";
-  version = "0.2.1-unstable-2026-11-02";
+  version = "v0.2.1";
 
   # Allow impure build to access host Xcode SDK and swift compiler
   __noChroot = true;
