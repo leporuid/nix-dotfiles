@@ -230,7 +230,6 @@
   age = {
     identityPaths = [
       "/etc/ssh/ssh_host_ed25519_key"
-      "/etc/nixos/secrets/keys.txt"
     ];
     secrets = {
       tailscale-oracle.file = "${inputs.nix-secrets}/hosts/nixos/tailscale-oracle.age";
@@ -329,8 +328,8 @@
 
   # Symlink raw application configs from config/ to /etc/
   environment.etc = {
-    # Expose the deployed system flake at /etc/nixos/current
-    "nixos/current".source = flake;
+    # Expose the deployed system flake at /etc/nixos
+    "nixos".source = flake;
 
     "direnv/direnv.toml".source = "${flake}/config/direnv/direnv.toml";
     "fish/completions".source = "${flake}/config/fish/completions";
