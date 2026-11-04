@@ -207,7 +207,7 @@
     settings = {
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
-      PermitRootLogin = "no";
+      PermitRootLogin = "prohibit-password";
       ClientAliveInterval = 60;
       ClientAliveCountMax = 3;
       X11Forwarding = false;
@@ -267,14 +267,24 @@
   users = {
     mutableUsers = false;
     defaultUserShell = pkgs.bashInteractive;
-    users.${vars.username} = {
-      isNormalUser = true;
-      shell = pkgs.bashInteractive;
-      extraGroups = [ "wheel" ];
-      hashedPassword = "!";
-      openssh.authorizedKeys = {
-        keys = vars.sshKeys;
-        keyFiles = vars.sshKeyFiles;
+    users = {
+      root = {
+        hashedPassword = "!";
+        openssh.authorizedKeys = {
+          keys = vars.sshKeys;
+          keyFiles = vars.sshKeyFiles;
+        };
+      };
+
+      ${vars.username} = {
+        isNormalUser = true;
+        shell = pkgs.bashInteractive;
+        extraGroups = [ "wheel" ];
+        hashedPassword = "!";
+        openssh.authorizedKeys = {
+          keys = vars.sshKeys;
+          keyFiles = vars.sshKeyFiles;
+        };
       };
     };
   };
@@ -450,6 +460,7 @@
     warn-dirty = false;
 
     trusted-users = [
+      "root"
       "leporuid"
     ];
   };
