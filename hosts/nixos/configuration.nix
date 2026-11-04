@@ -286,6 +286,9 @@
 
   # Symlink raw application configs from config/ to /etc/
   environment.etc = {
+    # Expose the deployed system flake at /etc/nixos
+    "nixos".source = flake;
+
     "direnv/direnv.toml".source = "${flake}/config/direnv/direnv.toml";
     "fish/completions".source = "${flake}/config/fish/completions";
     "fish/conf.d".source = "${flake}/config/fish/conf.d";
@@ -293,6 +296,14 @@
     "jj/config.toml".source = "${flake}/config/jj/config.toml";
     "starship.toml".source = "${flake}/config/starship.toml";
     "configuration-revision".text = flake.rev or flake.dirtyRev or "unknown";
+
+    # Enforce a clean and standard /etc/shells without /nix/store clutter
+    "shells".text = lib.mkForce ''
+      /bin/sh
+      /run/current-system/sw/bin/sh
+      /run/current-system/sw/bin/bash
+      /run/current-system/sw/bin/fish
+    '';
   };
 
   environment.sessionVariables = {
