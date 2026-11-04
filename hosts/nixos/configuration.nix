@@ -212,6 +212,13 @@
   };
 
   security.sudo.wheelNeedsPassword = false;
+  security.sudo.extraConfig = ''
+    Defaults env_keep += "SSH_AUTH_SOCK"
+  '';
+
+  programs.ssh.knownHosts = {
+    "github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5A9WykxjBQj48tkmV";
+  };
   security.sudo.extraRules = [
     {
       users = [ vars.username ];

@@ -64,11 +64,6 @@
       url = "git+ssh://git@github.com/leporuid/nix-secrets.git";
       flake = false;
     };
-
-    age-plugin-se = {
-      url = "github:ink-splatters/age-plugin-se/general";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs =
