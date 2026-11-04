@@ -266,11 +266,11 @@
     "gallery-ai": {
       "flake": false,
       "locked": {
-        "lastModified": 1793768016,
-        "narHash": "sha256-FIrX1l+rH8cecXNRgYjatMLRi1ex1C88BRL2GgnBnUQ=",
+        "lastModified": 1793816324,
+        "narHash": "sha256-9B+682NqfPvdY4pgbdAgG0i4EM07Pw5q4HTOUlFtI9k=",
         "owner": "CrimsonGlory",
         "repo": "gallery-ai",
-        "rev": "873bf7997d863bba03647b162f6caac06c67a524",
+        "rev": "b8792c196e80448f43506b28be841295dd47e478",
         "type": "github"
       },
       "original": {
@@ -392,11 +392,11 @@
         "uv2nix": "uv2nix"
       },
       "locked": {
-        "lastModified": 1790995799,
-        "narHash": "sha256-BNhmsm773NL7zftwdHmmYlCJixKJ9GvOSo16fmYVp/c=",
+        "lastModified": 1793829935,
+        "narHash": "sha256-FemJz9nx1hT7THZgvUmynvszXRaTcccTvDqLZYerTT4=",
         "owner": "leporuid",
         "repo": "KToolBox",
-        "rev": "a3eed4d9169ac13d1d00fa009b3a7a0d5744a671",
+        "rev": "6aab07d087787387244ac982662b50312b0e86d1",
         "type": "github"
       },
       "original": {
@@ -417,11 +417,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1793792991,
-        "narHash": "sha256-iwRRrAXTwwL63dt634RWz2ou3p8SIqlkFUKJhS9oGbc=",
+        "lastModified": 1793818102,
+        "narHash": "sha256-Qyub1vLoLAscOcIe21Od+xDX1AVgwChlCq89lDOeLa8=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "6182a0cd6e1ca9fa9de72155dc9bc4335a4f0b8e",
+        "rev": "44c1de435b942fafd93b2fb379b9a38a7f6efc6e",
         "type": "github"
       },
       "original": {
@@ -533,11 +533,11 @@
     "nix-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1793772969,
-        "narHash": "sha256-dsugZ2rNOgtlnmQwQXYaoaymYrXbdmUiMF/JVaiW5fQ=",
+        "lastModified": 1793824265,
+        "narHash": "sha256-PBRkvuddpjI23vmHg8CRRc2tlRmFQv+NVWVl+Hvz7JA=",
         "ref": "refs/heads/main",
-        "rev": "67cdcb9c03cef2329b39cf603833229558e8d7f1",
-        "revCount": 4,
+        "rev": "f9aaa573e626506dc6dcc7d2d35be9a7920cf8a8",
+        "revCount": 5,
         "type": "git",
         "url": "ssh://git@github.com/leporuid/nix-secrets.git"
       },
