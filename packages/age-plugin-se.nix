@@ -1,5 +1,6 @@
 { pkgs, ... }:
-pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
+
+pkgs.stdenvNoCC.mkDerivation {
   pname = "age-plugin-se";
   version = "0.2.1-unstable-2026-11-02";
 
@@ -14,7 +15,7 @@ pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
   };
 
   postPatch = ''
-    # Remove Package.resolved and rewrite Package.swift for 100% offline macOS build
+    # Remove Package.resolved to avoid pulling remote dependencies
     rm -f Package.resolved
 
     cat << 'EOF' > Package.swift
@@ -30,7 +31,8 @@ let package = Package(
       name: "age-plugin-se",
       dependencies: [],
       path: "Sources",
-      exclude: ["SPEC.md", "SPEC-ARCHIVE.md"])
+      exclude: ["SPEC.md", "SPEC-ARCHIVE.md"]
+    )
   ]
 )
 EOF
@@ -39,18 +41,25 @@ EOF
   buildPhase = ''
     runHook preBuild
 
-    # Resolve host Xcode installation dynamically
-    _XCODE_DEV="/Applications/Xcode.app/Contents/Developer"
-    if DEVELOPER_DIR= /usr/bin/xcode-select -p &>/dev/null; then
-      _SEL=$(DEVELOPER_DIR= /usr/bin/xcode-select -p)
-      if [[ "$_SEL" != /nix/* ]] && [ -d "$_SEL" ]; then
-        _XCODE_DEV="$_SEL"
-      fi
+    _XCODE_DEV="$(/usr/bin/xcode-select -p 2>/dev/null || true)"
+
+    # Command Line Tools do not contain full Xcode SDK (xcodebuild is full Xcode marker)
+    if [ ! -x "$_XCODE_DEV/usr/bin/xcodebuild" ]; then
+      _XCODE_DEV="/Applications/Xcode.app/Contents/Developer"
     fi
+
+    if [ ! -x "$_XCODE_DEV/usr/bin/xcodebuild" ]; then
+      echo "error: full Xcode installation was not found"
+      echo "xcode-select path: $(/usr/bin/xcode-select -p 2>/dev/null || true)"
+      exit 1
+    fi
+
     export DEVELOPER_DIR="$_XCODE_DEV"
     export SDKROOT="$(/usr/bin/xcrun --sdk macosx --show-sdk-path)"
 
-    /usr/bin/xcrun swift build -c release --disable-sandbox
+    /usr/bin/xcrun swift build \
+      -c release \
+      --disable-sandbox
 
     runHook postBuild
   '';
@@ -58,16 +67,18 @@ EOF
   installPhase = ''
     runHook preInstall
 
-    install -Dm755 .build/release/age-plugin-se $out/bin/age-plugin-se
+    install -Dm755 \
+      .build/release/age-plugin-se \
+      "$out/bin/age-plugin-se"
 
     runHook postInstall
   '';
 
-  meta = with pkgs.lib; {
-    description = "Age plugin for Apple Secure Enclave (built via host Xcode)";
+  meta = {
+    description = "Age plugin for Apple's Secure Enclave";
     homepage = "https://github.com/pr0d1r2/age-plugin-se";
-    license = licenses.mit;
+    license = pkgs.lib.licenses.mit;
     mainProgram = "age-plugin-se";
-    platforms = platforms.darwin;
+    platforms = pkgs.lib.platforms.darwin;
   };
-})
+}
