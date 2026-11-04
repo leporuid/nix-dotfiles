@@ -124,12 +124,16 @@
     useRoutingFeatures = "both";
     authKeyFile = config.age.secrets."tailscale-oracle".path;
     authKeyParameters.preauthorized = true;
+    extraUpFlags = [
+      "--ssh"
+    ];
     extraSetFlags = [
       "--accept-dns=false"
       "--accept-routes"
       "--advertise-exit-node"
-      "--advertise-routes=10.0.50.0/24,169.254.169.254/32"
+      "--advertise-routes=10.0.50.0/24"
       "--advertise-tags=tag:all,tag:border0-managed"
+      "--ssh"
     ];
   };
 
