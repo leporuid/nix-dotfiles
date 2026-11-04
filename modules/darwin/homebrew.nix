@@ -18,6 +18,7 @@ in
   environment.variables = {
     HOMEBREW_NO_AUTO_UPDATE = "1";
     HOMEBREW_NO_ENV_HINTS = "1";
+    HOMEBREW_NO_ANALYTICS = "1";
   };
 
   homebrew = {
