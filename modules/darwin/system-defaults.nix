@@ -6,14 +6,15 @@
   vars,
   ...
 }:
+with inputs;
 {
   # =========================================================================
   # 1. Imports and System Modules
   # =========================================================================
   imports = [
-    inputs.determinate.darwinModules.default
-    inputs.self.modules.common.vars
-    inputs.mac-app-util.darwinModules.default
+    determinate.darwinModules.default
+    self.modules.common.vars
+    mac-app-util.darwinModules.default
   ];
 
   # =========================================================================
@@ -28,7 +29,7 @@
   # Safe injection of custom NIX_PATH that works seamlessly alongside determinateNix
   # and ensures SSH sessions automatically source the Nix daemon environment.
   environment.extraInit = lib.mkForce ''
-    export NIX_PATH="nixpkgs=${inputs.nixpkgs.outPath}:home-manager=${inputs.home-manager.outPath}''${NIX_PATH:+:$NIX_PATH}"
+    export NIX_PATH="nixpkgs=${nixpkgs.outPath}:home-manager=${home-manager.outPath}''${NIX_PATH:+:$NIX_PATH}"
 
     if [ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ] && [ -n "''${SSH_CONNECTION:-}" ] && [ "''${SHLVL:-0}" -eq 1 ]; then
       . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
@@ -39,7 +40,7 @@
     fish
     pkg-config
     ghostty-bin.terminfo
-    inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re
+    self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re
 
     (writeShellScriptBin "tailscale" ''
       export TAILSCALE_BE_CLI=1
@@ -81,8 +82,8 @@
       inherit (vars.caches) extra-substituters extra-trusted-public-keys;
 
       nix-path = [
-        "nixpkgs=${inputs.nixpkgs}"
-        "home-manager=${inputs.home-manager}"
+        "nixpkgs=${nixpkgs}"
+        "home-manager=${home-manager}"
       ];
 
       # Performance and storage optimization for macOS APFS
@@ -119,12 +120,32 @@
     HardResourceLimits.NumberOfFiles = 1048576;
   };
 
+  # Weekly automated APFS purgeable space and local snapshot reclamation (Plan 2)
+  launchd.daemons.apfs-purge = {
+    serviceConfig = {
+      ProgramArguments = [
+        "/System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util"
+        "-P"
+        "-minsize"
+        "0"
+        "/System/Volumes/Data"
+      ];
+      StartCalendarInterval = [
+        {
+          Hour = 3;
+          Minute = 0;
+          Weekday = 0;
+        }
+      ];
+    };
+  };
+
   # =========================================================================
   # 4. macOS System Architecture and Native Configurations
   # =========================================================================
   system = {
     tools.darwin-uninstaller.enable = false;
-    configurationRevision = inputs.self.rev or inputs.self.dirtyRev or null;
+    configurationRevision = self.rev or self.dirtyRev or null;
 
     activationScripts = {
       # Disable default symlinking of system packages to /Applications/Nix Apps
@@ -138,7 +159,7 @@
         rm -rf "/Applications/Nix Apps"
 
         # Physically copy M3U8DLProtocol.app to /Applications via APFS clone without symlinks
-        m3u8App="${inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re}/Applications/M3U8DLProtocol.app"
+        m3u8App="${self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re}/Applications/M3U8DLProtocol.app"
         if [ -d "$m3u8App" ]; then
           rm -rf /Applications/M3U8DLProtocol.app
           /bin/cp -cR "$m3u8App" /Applications/M3U8DLProtocol.app 2>/dev/null || /bin/cp -R "$m3u8App" /Applications/M3U8DLProtocol.app

@@ -8,6 +8,7 @@
   config,
   ...
 }:
+with inputs;
 {
   # =========================================================================
   # 1. Imports
@@ -16,12 +17,12 @@
     ./hardware-configuration.nix
     ./disk-config.nix
 
-    inputs.agenix.nixosModules.default
-    inputs.disko.nixosModules.disko
-    inputs.determinate.nixosModules.default
+    agenix.nixosModules.default
+    disko.nixosModules.disko
+    determinate.nixosModules.default
 
-    inputs.self.modules.common.vars
-    "${inputs.nixpkgs}/nixos/modules/virtualisation/oci-image.nix"
+    self.modules.common.vars
+    "${nixpkgs}/nixos/modules/virtualisation/oci-image.nix"
   ];
 
   # =========================================================================
@@ -235,7 +236,7 @@
       "/etc/ssh/ssh_host_ed25519_key"
     ];
     secrets = {
-      tailscale-oracle.file = "${inputs.nix-secrets}/hosts/nixos/tailscale-oracle.age";
+      tailscale-oracle.file = "${nix-secrets}/hosts/nixos/tailscale-oracle.age";
     };
   };
 
@@ -365,7 +366,7 @@
   environment.systemPackages = with pkgs; [
     age
     rage
-    ((inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
+    ((agenix.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
       ageBin = "${pkgs.rage}/bin/rage";
     }).overrideAttrs (_: {
       doCheck = false;
@@ -474,8 +475,8 @@
   };
 
   nix.channel.enable = false;
-  nix.nixPath = [ "nixpkgs=${inputs.nixpkgs}" ];
-  nix.registry.nixpkgs.flake = inputs.nixpkgs;
+  nix.nixPath = [ "nixpkgs=${nixpkgs}" ];
+  nix.registry.nixpkgs.flake = nixpkgs;
   nix.registry.self.flake = flake;
 
   services.getty.autologinUser = null;
