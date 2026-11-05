@@ -341,7 +341,7 @@ with inputs;
     "fish/functions".source = "${flake}/config/fish/functions";
     "jj/config.toml".source = "${flake}/config/jj/config.toml";
     "starship.toml".source = "${flake}/config/starship.toml";
-    "configuration-revision".text = flake.rev or flake.dirtyRev or "unknown";
+    "configuration-revision".text = flake.rev or flake.dirtyRev;
 
     # Enforce a clean and standard /etc/shells without /nix/store clutter
     "shells".text = lib.mkForce ''
@@ -488,6 +488,5 @@ with inputs;
   };
 
   nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
-  system.configurationRevision = flake.rev or flake.dirtyRev or null;
   system.stateVersion = "26.11";
 }

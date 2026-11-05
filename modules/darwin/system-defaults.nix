@@ -4,6 +4,7 @@
   config,
   lib,
   vars,
+  flake,
   ...
 }:
 with inputs;
@@ -145,7 +146,7 @@ with inputs;
   # =========================================================================
   system = {
     tools.darwin-uninstaller.enable = false;
-    configurationRevision = self.rev or self.dirtyRev or null;
+    configurationRevision = flake.rev or flake.dirtyRev or null;
 
     activationScripts = {
       # Disable default symlinking of system packages to /Applications/Nix Apps
