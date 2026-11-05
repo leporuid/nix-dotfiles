@@ -14,6 +14,10 @@
   ];
 
   networking.hostName = vars.hostname;
+  networking.knownNetworkServices = [
+    "Wi-Fi"
+    "Thunderbolt Bridge"
+  ];
   nixpkgs.hostPlatform = "aarch64-darwin";
 
   system.primaryUser = vars.username;

@@ -16,6 +16,7 @@ with inputs;
     determinate.darwinModules.default
     self.modules.common.vars
     mac-app-util.darwinModules.default
+    nix-index-database.darwinModules.nix-index
   ];
 
   # =========================================================================
@@ -67,6 +68,8 @@ with inputs;
   # =========================================================================
   # 3. Nix Core and Determinate Installer Integration
   # =========================================================================
+
+  programs.nix-index-database.comma.enable = true;
 
   documentation.doc.enable = false;
   home-manager.backupFileExtension = "hm-backup";

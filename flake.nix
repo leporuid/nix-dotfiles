@@ -48,6 +48,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     homebrew-rayburst.url = "github:AnInsomniacy/homebrew-rayburst";
     homebrew-rayburst.flake = false;
 
