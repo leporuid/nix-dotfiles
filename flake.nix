@@ -36,6 +36,18 @@
     ktoolbox.url = "github:leporuid/KToolBox/uv2nix";
     ktoolbox.inputs.nixpkgs.follows = "nixpkgs";
 
+    direnv-instant = {
+      url = "github:Mic92/direnv-instant";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    multiverse.url = "github:fzakaria/nixpkgs-multiverse";
+
+    mac-app-util = {
+      url = "github:hraban/mac-app-util";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     homebrew-rayburst.url = "github:AnInsomniacy/homebrew-rayburst";
     homebrew-rayburst.flake = false;
 

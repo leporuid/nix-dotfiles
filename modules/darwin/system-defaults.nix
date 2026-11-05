@@ -13,6 +13,7 @@
   imports = [
     inputs.determinate.darwinModules.default
     inputs.self.modules.common.vars
+    inputs.mac-app-util.darwinModules.default
   ];
 
   # =========================================================================

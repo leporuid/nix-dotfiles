@@ -44,6 +44,9 @@
     };
 
     kernel.sysctl = {
+      # Allow unprivileged processes to bind ports 80/443 without root
+      "net.ipv4.ip_unprivileged_port_start" = 80;
+
       # BBR congestion control & FQ scheduler for optimal latency on Oracle Cloud
       "net.core.default_qdisc" = "fq";
       "net.ipv4.tcp_congestion_control" = "bbr";
@@ -484,5 +487,6 @@
   };
 
   nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
+  system.configurationRevision = flake.rev or flake.dirtyRev or null;
   system.stateVersion = "26.11";
 }
