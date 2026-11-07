@@ -29,10 +29,12 @@ This repository collects project-specific expectations, tool contracts, and arch
   - Shell hook exports `IN_NIX_CONFIG_DEVSHELL=1`, unlocking commands in `run.fish`.
   - Single-Nix invariant: `packages/{nixos-rebuild.nix,nixos-anywhere.nix}` wrap scripts via `pkgs.writeShellScriptBin` to avoid putting a second `nix` binary in `PATH`.
 - **Command Launcher (`run`)**:
+  Commands follow the `run <verb>-<host>` format generated dynamically by `run.fish` (with `run <verb>-host` alias for the current machine):
   ```bash
-  run macbook-pro switch   # Apply Home Manager user profile on macOS
-  run MacBook-Pro switch   # Apply nix-darwin system configuration (requires sudo)
-  run nixos switch         # Build and deploy remote NixOS configuration to Oracle Cloud
+  run switch-MacBook-Pro   # Apply nix-darwin system configuration on macOS (requires sudo)
+  run switch-macbook-pro   # Apply Home Manager user profile on macOS
+  run switch-host          # Shortcut for current host (e.g. switch-MacBook-Pro)
+  run switch-nixos         # Build and deploy remote NixOS configuration to Oracle Cloud
   run edit-age             # Interactively select and edit encrypted secrets with fzf + agenix
   ```
 - **Secrets Management**:
