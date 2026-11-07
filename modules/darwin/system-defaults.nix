@@ -27,15 +27,7 @@ with inputs;
     '';
   };
 
-  # Safe injection of custom NIX_PATH that works seamlessly alongside determinateNix
-  # and ensures SSH sessions automatically source the Nix daemon environment.
-  environment.extraInit = lib.mkForce ''
-    export NIX_PATH="nixpkgs=${nixpkgs.outPath}:home-manager=${home-manager.outPath}''${NIX_PATH:+:$NIX_PATH}"
 
-    if [ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ] && [ -n "''${SSH_CONNECTION:-}" ] && [ "''${SHLVL:-0}" -eq 1 ]; then
-      . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-    fi
-  '';
 
   environment.systemPackages = with pkgs; [
     fish
