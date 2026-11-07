@@ -19,10 +19,12 @@
 # directly invoked by it. Instead, I use a wrapper function
 # in Fish that appends `--command $(status fish-path)`.
 
-if [[ -o interactive && ! ( "$TERM_PROGRAM" = "WarpTerminal" ) ]]; then
-  if type has-ancestor >/dev/null && type fish >/dev/null && ! has-ancestor fish; then
-    exec fish -l
-  elif ! type fish >/dev/null; then
+if [[ -o interactive ]]; then
+  if type fish >/dev/null 2>&1; then
+    if ! type has-ancestor >/dev/null 2>&1 || ! has-ancestor fish; then
+      exec fish -l
+    fi
+  else
     echo
     echo "  WARNING: fish not found in PATH - falling back to zsh"
     echo

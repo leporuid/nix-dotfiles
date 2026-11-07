@@ -13,8 +13,8 @@ This repository collects project-specific expectations, tool contracts, and arch
 | `run.fish` | Interactive command runner and environment launcher (`run <verb>-<host>`). |
 | `hosts/MacBook-Pro/` | Darwin host configuration (`darwin-configuration.nix`) and user profile bridge. |
 | `hosts/nixos/` | Self-contained native NixOS configuration for Oracle Cloud ARM A1 (`configuration.nix`). |
-| `modules/darwin/` | System-level Darwin modules (`system-defaults.nix`, `fish-environment.nix`, `homebrew.nix`, `nixcord.nix`). |
-| `modules/home/` | Home Manager modules (`my-config.nix`, `my-programs-fish.nix`, `my-programs-neovim.nix`). |
+| `modules/darwin/` | System-level Darwin modules (`system-defaults.nix`, `fish-environment.nix`, `applications.nix`). |
+| `modules/home/` | Home Manager modules (`my-config.nix`, `my-themes.nix`, `my-programs-fish.nix`, `my-programs-neovim.nix`). |
 | `modules/common/` | Shared multi-platform modules (`vars.nix` for users/hosts/caches, `nixpkgs-unstable.nix`). |
 | `packages/*.nix` | Custom derivations and package wrappers consumed via `perSystem.self.<name>`. |
 | `users/leporuid/` | Shared user profiles (`cloud-configuration.nix`, `home-configuration.nix`). |
@@ -72,7 +72,7 @@ This repository collects project-specific expectations, tool contracts, and arch
 
 ### macOS (`hosts/MacBook-Pro`)
 - Managed by `nix-darwin` + Home Manager.
-- **Login Shell**: System shell is Zsh, which cleanly hands off to Fish for interactive sessions when not inside Warp.
+- **Login Shell**: System shell is Zsh, which cleanly hands off to Fish for interactive sessions (compatible with Terminus, Blink, Ghostty).
 - **Symlinks**: Uses out-of-store symlinks (`my.config.useOutOfStoreSymlinks = true`) pointing to `~/Developer/nix-dotfiles/config/`.
 - **Privilege Separation**: Strict privilege model; only trust `config.system.primaryUser`, never broad `@admin`.
 
