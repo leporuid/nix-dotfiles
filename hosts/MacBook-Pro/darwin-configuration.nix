@@ -2,6 +2,7 @@
   inputs,
   pkgs,
   config,
+  lib,
   vars,
   ...
 }:
@@ -43,4 +44,5 @@
 
   nix.enable = !config.determinateNix.enable;
   nix.channel.enable = false;
+  nix.nixPath = lib.mkForce [ ];
 }
