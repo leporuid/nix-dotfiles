@@ -83,40 +83,15 @@ with inputs;
       builder.state = "enabled";
     };
 
-    customSettings = {
-      inherit (vars.caches) extra-substituters extra-trusted-public-keys;
-
+    customSettings = vars.customSettings // {
       nix-path = [
         "nixpkgs=${nixpkgs}"
         "home-manager=${home-manager}"
       ];
-
-      # Performance and storage optimization for macOS APFS
-      accept-flake-config = true;
-      auto-optimise-store = false;
-      builders-use-substitutes = true;
-      connect-timeout = 5;
       eval-cores = 0;
-      fallback = true;
-      http-connections = 50;
       keep-derivations = true;
-      keep-going = true;
       keep-outputs = true;
       lazy-trees = true;
-      log-lines = 25;
-      max-free = 3221225472;
-      max-jobs = "auto";
-      min-free = 1073741824;
-      stalled-download-timeout = 20;
-      warn-dirty = false;
-
-      extra-trusted-users = [
-        config.system.primaryUser
-      ];
-      extra-experimental-features = [
-        "parallel-eval"
-        "provenance"
-      ];
     };
   };
 

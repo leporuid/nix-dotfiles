@@ -34,6 +34,34 @@ in
       timezone = "Asia/Taipei";
       inherit caches;
 
+      # Centralized Determinate Nix core performance, daemon, and cache settings
+      customSettings = {
+        inherit (caches) extra-substituters extra-trusted-public-keys;
+
+        accept-flake-config = true;
+        auto-optimise-store = !isDarwin;
+        builders-use-substitutes = true;
+        connect-timeout = 5;
+        fallback = true;
+        http-connections = 50;
+        keep-going = true;
+        log-lines = 25;
+        max-free = 3221225472;
+        max-jobs = "auto";
+        min-free = 1073741824;
+        stalled-download-timeout = 20;
+        warn-dirty = false;
+
+        extra-trusted-users = [
+          "root"
+          username
+        ];
+        extra-experimental-features = [
+          "parallel-eval"
+          "provenance"
+        ];
+      };
+
       sshKeys = [
         # My iPhone, blink terminal
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGr7upNdIAAtGkiQaUkCaj5g6QW843fL3bbsJyP/0tAB"
