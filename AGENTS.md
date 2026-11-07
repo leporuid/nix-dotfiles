@@ -95,5 +95,6 @@ This repository collects project-specific expectations, tool contracts, and arch
    - Conversation responses to the user should be in concise Traditional Chinese (Taiwan usage).
 4. **Cache & Git Hygiene**:
    - **Purge Stale Direnv Cache**: When modifying Flake inputs, toolchains, or local build derivations that encounter persistent build or locking failures, purge the stale cache with `rm -rf .direnv` before rebuilding.
+   - **Flake Input Updates**: Always use `nix flake update --flake ~/Developer/nix-dotfiles && cd ~/Developer/nix-dotfiles` when updating flake inputs (instead of `cd ~/Developer/nix-dotfiles && nix flake lock --update-input blueprint`).
    - **Git Staging Guardrail**: Flakes evaluate only files tracked by Git. Always stage newly added files (`git add`) before running `nix flake check` or evaluations.
    - For all Git version control operations, use `client:execute_mcp` with the `git` MCP server.
