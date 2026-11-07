@@ -101,3 +101,6 @@ This repository collects project-specific expectations, tool contracts, and arch
    - **Flake Input Updates**: Always use `nix flake update --flake ~/Developer/nix-dotfiles && cd ~/Developer/nix-dotfiles` when updating flake inputs (instead of `cd ~/Developer/nix-dotfiles && nix flake lock --update-input blueprint`).
    - **Git Staging Guardrail**: Flakes evaluate only files tracked by Git. Always stage newly added files (`git add`) before running `nix flake check` or evaluations.
    - For all Git version control operations, use `client:execute_mcp` with the `git` MCP server.
+5. **Tiered Execution Strategy (Architect vs. Executor)**:
+   - **Architect Mode (Pro Tier Reasoning)**: Prioritize deep, structured analysis when comparing external repositories, evaluating architecture trade-offs, or planning complex refactors before modifying code.
+   - **Executor Mode (Flash Tier Efficiency)**: Once the plan is established, transition to token-minimal, surgical execution—apply targeted in-place patches, stage specific files (`git add <files>`), and commit with concise conventional commit messages without dumping full files.
