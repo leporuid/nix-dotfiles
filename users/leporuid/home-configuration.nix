@@ -27,7 +27,6 @@
   my.config.source = {
     ".config/ghostty/config" = "config/ghostty/config";
     ".config/ghostty/os-config" = "config/ghostty/os-config-darwin";
-    ".config/ghostty/themes" = "config/ghostty/themes";
     ".config/github-copilot/versions.json" = "config/github-copilot/versions.json";
     ".config/github-copilot/xcode/mcp.json" = "config/github-copilot/xcode/mcp.json";
     ".config/kitty" = "config/kitty";
