@@ -33,6 +33,8 @@ This repository collects project-specific expectations, tool contracts, and arch
   ```fish
   run switch-MacBook-Pro   # Apply nix-darwin + Home Manager unified configuration on macOS (requires sudo)
   run switch-host          # Shortcut for current host (e.g. switch-MacBook-Pro on macOS)
+  run build-host           # Build current host toplevel closure without activating (outputs ./result)
+  run check-host           # Fast evaluation check without creating ./result or building closures
   run switch-nixos         # Build and deploy remote NixOS configuration to Oracle Cloud
   run edit-age             # Interactively select and edit encrypted secrets with fzf + agenix
   ```

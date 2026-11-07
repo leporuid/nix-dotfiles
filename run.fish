@@ -48,25 +48,7 @@ function dry -d "Dry-run a function (replaces _run with _pretty_print)"
     $argv
 end
 
-function mc-rcon -d "Connect to nixos and begin an interactive RCON session"
-    echo (set_color --italics)"connecting to nixos and executing rcon-cli..."(set_color normal)
-    _run ssh leporuid@nixos "sudo podman exec -i minecraft-family rcon-cli"
-end
 
-function mc-stop
-    echo (set_color --italics)"connecting to nixos and stopping server..."(set_color normal)
-    _run ssh leporuid@nixos "sudo systemctl stop podman-minecraft-family.service"
-end
-
-function mc-start
-    echo (set_color --italics)"connecting to nixos and stopping server..."(set_color normal)
-    _run ssh leporuid@nixos "sudo systemctl start podman-minecraft-family.service"
-end
-
-function mc-logs
-    echo (set_color --italics)"connecting to nixos and stopping server..."(set_color normal)
-    _run ssh leporuid@nixos "journalctl -xefu podman-minecraft-family.service"
-end
 
 function check-applied -d "Check if the currently applied configuration needs to be updated"
     set last_commit_timestamp (git log -1 --format=%at)
@@ -128,6 +110,10 @@ end
 function nixos -a verb
     set rebuild_args
     set maybe_sudo
+    set target_verb $verb
+    if test $verb = check
+        set target_verb dry-build
+    end
 
     if test $this_host != nixos
         # If not building on nixos, set nixos to be the target.
@@ -135,11 +121,10 @@ function nixos -a verb
         set --append rebuild_args --elevate=sudo --target-host leporuid@nixos
         echo (set_color --dim --italics)"not on nixos, targeting remote host..."(set_color normal)
 
-        # If the current system isn't x86-64 Linux, then nixos needs to build
-        # its own configuration. --no-reexec (--no-build-nix) is also required because
-        # the local system will attempt to execute a version of `nix` that it can't
-        # run.
-        if test (nix eval --impure --raw --expr 'builtins.currentSystem') != aarch64-linux
+        # If the current system isn't aarch64 Linux, then nixos needs to build
+        # its own configuration remotely. --no-reexec (--no-build-nix) is also required
+        # because the local system will attempt to execute a version of `nix` that it can't run.
+        if test (uname -m)-(uname -s | string lower) != aarch64-linux
             set --append rebuild_args --build-host leporuid@nixos --no-reexec
             echo (set_color --dim --italics)"not on aarch64-linux, performing remote build..."(set_color normal)
         end
@@ -150,7 +135,7 @@ function nixos -a verb
         echo (set_color --dim --italics)"on nixos, using sudo..."(set_color normal)
     end
 
-    _run $maybe_sudo nixos-rebuild $verb --flake .#nixos $rebuild_args $argv[2..]
+    _run $maybe_sudo nixos-rebuild $target_verb --flake .#nixos $rebuild_args $argv[2..]
 end
 
 
@@ -170,7 +155,7 @@ end
 # decent support for.
 
 set hosts (ls hosts)
-set verbs build switch
+set verbs build switch check
 
 for host in $hosts
     functions -q $host; or continue
