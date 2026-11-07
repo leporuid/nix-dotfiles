@@ -22,6 +22,11 @@ in
       set -g __NIX_DARWIN_SET_ENVIRONMENT_DONE 1
     end
 
+    # Ensure Determinate / Nix daemon environment is reliably sourced in preinit
+    if test -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish'
+      source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish'
+    end
+
     # Restore inherited terminal PATH entries at the tail to preserve parent tools
     for entry in $__inherited_path
       if test -n "$entry"; and test "$entry" != .; and not contains -- "$entry" $PATH
