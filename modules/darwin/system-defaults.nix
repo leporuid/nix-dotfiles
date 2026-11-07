@@ -44,10 +44,21 @@ with inputs;
     ghostty-bin.terminfo
     self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re
 
-    (writeShellScriptBin "tailscale" ''
-      export TAILSCALE_BE_CLI=1
-      exec /Applications/Tailscale.app/Contents/MacOS/Tailscale "$@"
-    '')
+    (writeShellApplication {
+      name = "tailscale";
+      text = ''
+        export TAILSCALE_BE_CLI=1
+        exec /Applications/Tailscale.app/Contents/MacOS/Tailscale "$@"
+      '';
+    })
+
+    (writeShellApplication {
+      name = "apfs-purge";
+      text = ''
+        date
+        exec sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -P -minsize 0 /System/Volumes/Data
+      '';
+    })
   ];
 
   environment.enableAllTerminfo = true;
