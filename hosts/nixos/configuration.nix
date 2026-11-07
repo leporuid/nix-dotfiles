@@ -437,19 +437,45 @@ with inputs;
     operation = "switch";
   };
 
-  determinateNix = {
-    enable = true;
+  determinate.enable = true;
 
-    determinateNixd = {
-      garbageCollector.strategy = "automatic";
-    };
+  nix.settings = {
+    inherit (vars.caches) extra-substituters extra-trusted-public-keys;
 
-    customSettings = vars.customSettings // {
-      nix-path = [ "nixpkgs=${nixpkgs}" ];
-    };
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
+
+    accept-flake-config = true;
+    auto-optimise-store = true;
+    builders-use-substitutes = true;
+    connect-timeout = 5;
+    fallback = true;
+    http-connections = 50;
+    keep-going = true;
+    log-lines = 25;
+    max-free = 3221225472;
+    max-jobs = "auto";
+    min-free = 1073741824;
+    stalled-download-timeout = 20;
+    warn-dirty = false;
+
+    trusted-users = [
+      "root"
+      "leporuid"
+    ];
+  };
+
+  nix.optimise.automatic = true;
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 14d";
   };
 
   nix.channel.enable = false;
+  nix.nixPath = [ "nixpkgs=${nixpkgs}" ];
   nix.registry.nixpkgs.flake = nixpkgs;
   nix.registry.self.flake = flake;
 
