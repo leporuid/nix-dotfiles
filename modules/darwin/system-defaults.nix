@@ -15,7 +15,6 @@ with inputs;
   imports = [
     determinate.darwinModules.default
     self.modules.common.vars
-    mac-app-util.darwinModules.default
     nix-index-database.darwinModules.nix-index
   ];
 
@@ -42,7 +41,6 @@ with inputs;
     fish
     pkg-config
     ghostty-bin.terminfo
-    self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re
 
     (writeShellApplication {
       name = "tailscale";
@@ -163,48 +161,9 @@ with inputs;
     configurationRevision = flake.rev or flake.dirtyRev or null;
 
     activationScripts = {
-      # Disable default symlinking of system packages to /Applications/Nix Apps
-      applications.text = lib.mkForce "";
-
       postActivation.text = ''
         sudo -u ${config.system.primaryUser} \
           /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
-
-        # Clean up legacy Nix Apps symlink directory if present
-        rm -rf "/Applications/Nix Apps"
-
-        # Physically copy M3U8DLProtocol.app to /Applications via APFS clone without symlinks
-        m3u8App="${self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re}/Applications/M3U8DLProtocol.app"
-        if [ -d "$m3u8App" ]; then
-          rm -rf /Applications/M3U8DLProtocol.app
-          /bin/cp -cR "$m3u8App" /Applications/M3U8DLProtocol.app 2>/dev/null || /bin/cp -R "$m3u8App" /Applications/M3U8DLProtocol.app
-          chmod -R u+w /Applications/M3U8DLProtocol.app
-        fi
-
-        # Physically copy Discord.app to /Applications via APFS clone to allow Vencord patching
-        discordPkg="${config.programs.nixcord.discord.package}"
-        if [ -d "$discordPkg/Applications/Discord.app" ]; then
-          rm -rf /Applications/Discord.app
-          /bin/cp -cR "$discordPkg/Applications/Discord.app" /Applications/Discord.app 2>/dev/null || /bin/cp -R "$discordPkg/Applications/Discord.app" /Applications/Discord.app
-          chmod -R u+w /Applications/Discord.app
-        fi
-
-        # Automatically link Home Manager Applications to /Applications
-        hmApps="/Users/${config.system.primaryUser}/Applications/Home Manager Apps"
-        if [ -d "$hmApps" ]; then
-          echo "Linking Home Manager Applications to /Applications..."
-          for app in "$hmApps"/*.app; do
-            if [ -e "$app" ]; then
-              appName="$(basename "$app")"
-              target="/Applications/$appName"
-              if [ -d "$target" ] && [ ! -L "$target" ]; then
-                echo "Notice: Removing stale directory $target to link from Home Manager..."
-                rm -rf "$target"
-              fi
-              ln -sfn "$app" "$target"
-            fi
-          done
-        fi
       '';
     };
 
@@ -269,6 +228,12 @@ with inputs;
         "com.apple.desktopservices" = {
           DSDontWriteNetworkStores = true;
           DSDontWriteUSBStores = true;
+        };
+        "com.apple.screencapture" = {
+          location = "/Volumes/SDXC/Screenshots";
+          type = "png";
+          "show-thumbnail" = false;
+          target = "clipboard";
         };
       };
     };

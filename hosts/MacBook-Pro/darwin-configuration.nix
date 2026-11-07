@@ -9,11 +9,12 @@
   imports = [
     inputs.self.darwinModules.system-defaults
     inputs.self.darwinModules.fish-environment
-    inputs.self.darwinModules.homebrew
-    inputs.self.darwinModules.nixcord
+    inputs.self.darwinModules.applications
   ];
 
   networking.hostName = vars.hostname;
+  networking.computerName = "🐰MacBook Pro";
+  networking.localHostName = vars.hostname;
   networking.knownNetworkServices = [
     "Wi-Fi"
     "Thunderbolt Bridge"

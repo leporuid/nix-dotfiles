@@ -1,5 +1,6 @@
 {
   flake,
+  inputs,
   config,
   ...
 }:
@@ -7,6 +8,7 @@
   home.stateVersion = "26.11";
 
   imports = [
+    inputs.mac-app-util.homeManagerModules.default
     "${flake}/users/leporuid/home-configuration.nix"
   ];
 
