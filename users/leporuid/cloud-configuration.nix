@@ -46,7 +46,6 @@ in
     neovimWithDependencies
 
     pkgs.ast-grep
-    pkgs.bat
     pkgs.bun
     pkgs.curl
     pkgs.delta

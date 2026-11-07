@@ -12,17 +12,6 @@ let
   } ''
     bat cache --build --source "${flake}/config/bat" --target "$out"
   '';
-
-  # Wrap bat using writeShellApplication to inject Nix store cache and theme.
-  batWrapped = pkgs.writeShellApplication {
-    name = "bat";
-    runtimeInputs = [ pkgs.bat ];
-    text = ''
-      export BAT_THEME="Catppuccin Mocha"
-      export BAT_CACHE_PATH="${batCache}"
-      exec bat "$@"
-    '';
-  };
 in
 {
   # =========================================================================
@@ -36,18 +25,23 @@ in
   };
 
   # =========================================================================
-  # 2. Bat Theme (Precompiled Cache in Nix Store, No Activation Overhead)
+  # 2. Bat Wrapped via writeShellApplication (Direct package, No programs.bat activation)
   # =========================================================================
-  programs.bat = {
-    enable = true;
-    package = batWrapped;
-    extraPackages = with pkgs.bat-extras; [
-      batdiff
-      batman
-      batgrep
-      batwatch
-    ];
-  };
+  home.packages = [
+    (pkgs.writeShellApplication {
+      name = "bat";
+      runtimeInputs = [ pkgs.bat ];
+      text = ''
+        export BAT_THEME="Catppuccin Mocha"
+        export BAT_CACHE_PATH="${batCache}"
+        exec bat "$@"
+      '';
+    })
+    pkgs.bat-extras.batdiff
+    pkgs.bat-extras.batman
+    pkgs.bat-extras.batgrep
+    pkgs.bat-extras.batwatch
+  ];
 
   # =========================================================================
   # 3. Environment Variables
