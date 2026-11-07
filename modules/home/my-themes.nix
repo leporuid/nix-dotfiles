@@ -30,7 +30,12 @@
     ];
     syntaxes = { };
     themes."Catppuccin Mocha" = {
-      src = "${flake}/config/bat";
+      src = pkgs.fetchFromGitHub {
+        owner = "catppuccin";
+        repo = "bat";
+        rev = "main";
+        hash = "sha256-6WVKQErGdaqb++oaXnY3i6/GuH2FhTgK0v4TN4Y0Wbw=";
+      };
       file = "themes/Catppuccin Mocha.tmTheme";
     };
   };
