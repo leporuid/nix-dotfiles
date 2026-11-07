@@ -5,6 +5,25 @@
   lib,
   ...
 }:
+let
+  # Precompile bat themes into the Nix store at build time.
+  batCache = pkgs.runCommand "bat-cache" {
+    nativeBuildInputs = [ pkgs.bat ];
+  } ''
+    bat cache --build --source "${flake}/config/bat" --target "$out"
+  '';
+
+  # Wrap bat using writeShellApplication to inject Nix store cache and theme.
+  batWrapped = pkgs.writeShellApplication {
+    name = "bat";
+    runtimeInputs = [ pkgs.bat ];
+    text = ''
+      export BAT_THEME="Catppuccin Mocha"
+      export BAT_CACHE_PATH="${batCache}"
+      exec bat "$@"
+    '';
+  };
+in
 {
   # =========================================================================
   # 1. Ghostty Theme (Native Base File + Merging via my.config.source)
@@ -17,21 +36,17 @@
   };
 
   # =========================================================================
-  # 2. Bat Theme
+  # 2. Bat Theme (Precompiled Cache in Nix Store, No Activation Overhead)
   # =========================================================================
   programs.bat = {
     enable = true;
+    package = batWrapped;
     extraPackages = with pkgs.bat-extras; [
       batdiff
       batman
       batgrep
       batwatch
     ];
-    syntaxes = { };
-    themes."Catppuccin Mocha" = {
-      src = "${flake}/config/bat";
-      file = "themes/Catppuccin Mocha.tmTheme";
-    };
   };
 
   # =========================================================================
@@ -39,6 +54,7 @@
   # =========================================================================
   home.sessionVariables = {
     BAT_THEME = "Catppuccin Mocha";
+    BAT_CACHE_PATH = "${batCache}";
     MANPAGER = "batman";
     FZF_DEFAULT_OPTS = lib.concatStringsSep " " [
       "--no-sort"
