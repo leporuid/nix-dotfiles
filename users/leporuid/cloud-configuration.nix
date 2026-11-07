@@ -33,6 +33,7 @@ in
     inputs.self.homeModules.my-config
     inputs.self.homeModules.my-programs-fish
     inputs.self.homeModules.my-programs-neovim
+    inputs.self.homeModules.my-themes
     inputs.self.modules.common.nixpkgs-unstable
     ../../config/nvim/plugins.nix
   ];
@@ -85,20 +86,7 @@ in
 
   fonts.fontconfig.enable = !pkgs.stdenv.hostPlatform.isDarwin;
 
-  programs.bat = {
-    config.theme = "Catppuccin Mocha";
-    extraPackages = with pkgs.bat-extras; [
-      batdiff
-      batman
-      batgrep
-      batwatch
-    ];
-    syntaxes = { };
-    themes."Catppuccin Mocha" = {
-      src = "${flake}/config/bat";
-      file = "themes/Catppuccin Mocha.tmTheme";
-    };
-  };
+
 
   my.config.source = {
     ".config/atuin" = "config/atuin";
@@ -129,10 +117,7 @@ in
 
   home.sessionVariables = {
     ATUIN_NOBIND = "true";
-    BAT_THEME = "Catppuccin Mocha";
-    MANPAGER = "batman";
-    FZF_DEFAULT_OPTS = "--no-sort --reverse --margin=0,1 --exit-0 --select-1 --pointer ▸▹ --prompt • --color bg+:#414559,bg:#303446,spinner:#f2d5cf,hl:#e78284,fg:#c6d0f5,header:#e78284,info:#ca9ee6,pointer:#f2d5cf,marker:#babbf1,fg+:#c6d0f5,prompt:#ca9ee6,hl+:#e78284,selected-bg:#51576d,border:#414559,label:#c6d0f5";
-    JJ_CONFIG = "${config.home.homeDirectory}/.config/jj/config.toml";
+    JJ_CONFIG = "${config.home.homeDirectory}/${platformConfig}/jj/config.toml";
     ZDOTDIR = "$HOME/.config/zsh";
     NIX_CONFIG_REV = flake.rev or flake.dirtyRev;
     NIX_CONFIG_DIR = config.my.config.directory;
