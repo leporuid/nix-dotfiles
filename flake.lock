@@ -552,11 +552,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1794136683,
-        "narHash": "sha256-cvhBTH6nsE6R6b6uNjoSeuCOH4iaurC5A+/prTxk8Rw=",
+        "lastModified": 1794177011,
+        "narHash": "sha256-AWWXWrj5CI0T16H+PHvBwdhbZ/zK7HQk7NIh9H7gz2g=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "b351c893c53850908a89bc30ea2cbf6437ada413",
+        "rev": "fa49802a24e35dafe296d688d84f6470ecb1d965",
         "type": "github"
       },
       "original": {
@@ -726,13 +726,15 @@
       }
     },
     "nix-secrets": {
-      "flake": false,
+      "inputs": {
+        "nixpkgs": "nixpkgs_6"
+      },
       "locked": {
-        "lastModified": 1793824265,
-        "narHash": "sha256-PBRkvuddpjI23vmHg8CRRc2tlRmFQv+NVWVl+Hvz7JA=",
+        "lastModified": 1794170080,
+        "narHash": "sha256-vVG1vA8l8fg6y0X59VLJqR9tq5r7Ng0jKqLCR1rukhQ=",
         "ref": "refs/heads/main",
-        "rev": "f9aaa573e626506dc6dcc7d2d35be9a7920cf8a8",
-        "revCount": 5,
+        "rev": "b3c40cc33e52c1464f897f252e1d76bd601312af",
+        "revCount": 8,
         "type": "git",
         "url": "ssh://git@github.com/leporuid/nix-secrets.git"
       },
@@ -753,11 +755,11 @@
         "treefmt-nix": "treefmt-nix_5"
       },
       "locked": {
-        "lastModified": 1794159897,
-        "narHash": "sha256-M+35oe7+cLLqj28tBwlxG5s1vji8IZb/1p1GzkRy6O4=",
+        "lastModified": 1794174907,
+        "narHash": "sha256-35sQQC4+cscfgFBQZ06ZUg6zcMfJeQPf7t2MuwYxD1Q=",
         "owner": "4evy",
         "repo": "nixcord",
-        "rev": "93699d1aa4829372a3eb5550f3a19ddc52aad8a5",
+        "rev": "9c4f5cc5c7bdf31c352092dbeb340df6219ca775",
         "type": "github"
       },
       "original": {
@@ -931,6 +933,22 @@
         "type": "github"
       }
     },
+    "nixpkgs_7": {
+      "locked": {
+        "lastModified": 1794042290,
+        "narHash": "sha256-ziZn2PvCJE5JEEpqTdxXwJpPB+L3YqoCpTAMCzyaP3U=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "f4a03c008967841f2a0b3cb7c436fc6fc31671f6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "pyproject-build-systems": {
       "inputs": {
         "nixpkgs": [
@@ -1003,7 +1021,7 @@
         "nix-index-database": "nix-index-database",
         "nix-secrets": "nix-secrets",
         "nixcord": "nixcord",
-        "nixpkgs": "nixpkgs_6",
+        "nixpkgs": "nixpkgs_7",
         "treefmt-nix": "treefmt-nix_6",
         "yt-ai": "yt-ai"
       }

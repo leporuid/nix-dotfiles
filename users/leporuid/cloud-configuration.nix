@@ -93,6 +93,7 @@ in
     ".config/fish/conf.d" = "config/fish/conf.d";
     ".config/fish/config.fish" = "config/fish/config.fish";
     ".config/fish/functions" = "config/fish/functions";
+    ".config/gallery-dl" = "config/gallery-dl";
     ".config/git" = "config/git";
     ".config/helix" = "config/helix";
     ".config/mise" = "config/mise";
