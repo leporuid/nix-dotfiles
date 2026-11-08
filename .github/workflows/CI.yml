@@ -4,12 +4,26 @@ on:
   pull_request:
 jobs:
   check:
+    name: ${{ matrix.name }}
     runs-on: ubuntu-22.04
     permissions:
       contents: read
       id-token: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: flake-check
+            command: nix flake check
+          - name: darwin-eval
+            command: nix eval --raw .#darwinConfigurations.MacBook-Pro.config.system.build.toplevel.drvPath
+          - name: nixos-eval
+            command: nix eval --raw .#nixosConfigurations.nixos.config.system.build.toplevel.drvPath
+
     steps:
       - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/determinate-nix-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
-      - run: nix flake check
+      - name: Run ${{ matrix.name }}
+        run: ${{ matrix.command }}
