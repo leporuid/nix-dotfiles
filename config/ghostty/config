@@ -7,16 +7,22 @@ font-size = 12
 window-height = 30
 window-width = 80
 window-theme = auto
-background-opacity = 0.80
+background-opacity = 0.92
+background-blur-radius = 20
 link-url = true
 cursor-style = "underline"
 auto-update-channel = stable
-theme = "Glass"
+theme = "Catppuccin Macchiato"
 shell-integration-features = no-cursor
 
 
 # This file will be linked to the appropriate os-config file depending on the current platform
 config-file = os-config
+
+window-padding-x = 14
+window-padding-y = 10
+window-padding-balance = true
+window-decoration = none
 
 # Keybind for Claude Code
 keybind = shift+enter=text:\n
