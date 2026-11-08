@@ -99,12 +99,19 @@ in
     ".config/nushell" = "config/nushell";
     ".config/nvim" = "config/nvim";
     ".config/starship.toml" = "config/starship.toml";
+    ".config/syntax-highlight" = "config/syntax-highlight";
     ".config/tmux" = "config/tmux";
     ".config/zellij" = "config/zellij";
     ".config/zsh" = "config/zsh";
     ".zshenv" = "config/zsh/home_zshenv";
     ".npmrc" = "config/npm/npmrc";
     "${platformConfig}/jj" = "config/jj";
+
+    # Agent configurations & skill mappings
+    ".claude/settings.json" = "config/claude/settings.json";
+    ".agents/skills" = ".agents/skills";
+    ".claude/skills" = ".agents/skills";
+    ".gemini/skills" = ".agents/skills";
   };
 
   # Ensure session variables are in a known path for both standalone HM and system modules.
@@ -113,6 +120,14 @@ in
 
   home.file.".config/direnv/lib/nix-direnv.sh".source =
     "${pkgs.nix-direnv}/share/nix-direnv/direnvrc";
+
+  # Unified agent instructions distribution across harnesses
+  home.file.".claude/CLAUDE.md".source = "${flake}/AGENTS.md";
+  home.file.".codex/AGENTS.md".source = "${flake}/AGENTS.md";
+  home.file.".config/opencode/AGENTS.md".source = "${flake}/AGENTS.md";
+
+  # Ghostty cursor shaders (from wave-os / sahaj-b/ghostty-cursor-shaders)
+  home.file.".config/ghostty/shaders".source = inputs.ghostty-cursor-shaders;
 
   home.sessionVariables = {
     ATUIN_NOBIND = "true";

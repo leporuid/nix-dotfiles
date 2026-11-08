@@ -79,6 +79,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    ghostty-cursor-shaders = {
+      url = "github:sahaj-b/ghostty-cursor-shaders";
+      flake = false;
+    };
+
     nix-secrets = {
       url = "git+ssh://git@github.com/leporuid/nix-secrets.git";
       flake = false;
