@@ -68,10 +68,25 @@ function check-applied -d "Check if the currently applied configuration needs to
     end
 end
 
-function edit-age -d "Edit the encrypted files stored in this repository"
-    set file (fd --type file --glob '*.age' | fzf --height=40% --layout=reverse)
-    or return
-    agenix -e $file $argv
+function edit-age -d "Edit the encrypted files stored in nix-secrets"
+    set -l secrets_dir ""
+    if test -d "$HOME/Developer/nix-secrets"
+        set secrets_dir "$HOME/Developer/nix-secrets"
+    else if test -d "../nix-secrets"
+        set secrets_dir "../nix-secrets"
+    end
+
+    if test -n "$secrets_dir"
+        set file (fd --type file --glob '*.age' . $secrets_dir | fzf --height=40% --layout=reverse)
+        or return
+        pushd $secrets_dir
+        agenix -e (path resolve $file) $argv
+        popd
+    else
+        set file (fd --type file --glob '*.age' | fzf --height=40% --layout=reverse)
+        or return
+        agenix -e $file $argv
+    end
 end
 
 function build-oci-image -d "Build the OCI Ampere A1 qcow2 custom image for nixos"
@@ -139,10 +154,12 @@ function deploy-vpnpack -d "Build and deploy vpn-pack to UniFi Cloud Gateway via
 
     # Check for tailscale-unifi.age secret to auto-authenticate
     set -l secret_file ""
-    if test -f "secrets/tailscale-unifi.age"
-        set secret_file "secrets/tailscale-unifi.age"
+    if test -f "$HOME/Developer/nix-secrets/secrets/tailscale-unifi.age"
+        set secret_file "$HOME/Developer/nix-secrets/secrets/tailscale-unifi.age"
     else if test -f "../nix-secrets/secrets/tailscale-unifi.age"
         set secret_file "../nix-secrets/secrets/tailscale-unifi.age"
+    else if test -f "secrets/tailscale-unifi.age"
+        set secret_file "secrets/tailscale-unifi.age"
     end
 
     if test -n "$secret_file"
