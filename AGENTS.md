@@ -24,7 +24,12 @@ This repository collects project-specific expectations, tool contracts, and arch
 
 ## 2. Environment & Tooling Contracts
 
-- **Nix Toolchain**: Built with Determinate Nix (`determinateNix` on macOS, `determinate` on NixOS).
+- **Nix Toolchain**: Built with Determinate Nix (`determinateNix` on macOS, `determinate` on NixOS) aligning with the [Determinate Nix Reference Manual](https://manual.determinate.systems/introduction.html).
+  - **Modern CLI Invariant**: Exclusively use modern Nix 3 CLI commands (`nix profile`, `nix store`, `nix flake`) instead of legacy tools (`nix-env`, `nix-collect-garbage`).
+  - **Profile Lifecycle**: Manage profile generations via `nix profile wipe-history [--profile <path>] [--older-than <duration>]`.
+  - **Store Management**: Run store garbage collection via `nix store gc --verbose` and hard-link deduplication via `nix store optimise --verbose`.
+  - **Build Diagnostics**: Use `nix top` and `nix ps` for active build process inspection and memory monitoring.
+  - **Configuration Semantics**: Centralize daemon options in `modules/common/vars.nix` (`vars.customSettings`) supporting additive `extra-*` options, `parallel-eval`, and FlakeHub substituters (`https://install.determinate.systems`).
 - **Development Shell**: Enter the shell via `nix develop` or automatic `direnv` activation.
   - Shell hook exports `IN_NIX_CONFIG_DEVSHELL=1`, unlocking commands in `run.fish`.
   - Single-Nix invariant: `packages/{nixos-rebuild.nix,nixos-anywhere.nix}` wrap scripts via `pkgs.writeShellScriptBin` to avoid putting a second `nix` binary in `PATH`.
