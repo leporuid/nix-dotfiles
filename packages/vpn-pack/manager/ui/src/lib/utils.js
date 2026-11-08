@@ -1,0 +1,217 @@
+import {
+    BYTES_PER_KB, SECONDS_PER_MINUTE, SECONDS_PER_HOUR, SECONDS_PER_DAY,
+    OCTET_MAX, CIDR_PREFIX_MAX, BASE64_KEY_LENGTH, DECODED_KEY_BYTES,
+    PORT_MIN, PORT_MAX, MTU_MIN, KEEPALIVE_MIN,
+    ROUTE_METRIC_MIN, ROUTE_METRIC_MAX,
+} from './constants.js';
+
+export function formatBytes(bytes) {
+    if (bytes == null) return 'N/A';
+    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    let i = 0;
+    let val = bytes;
+    while (val >= BYTES_PER_KB && i < units.length - 1) {
+        val /= BYTES_PER_KB;
+        i++;
+    }
+    return `${val.toFixed(1)} ${units[i]}`;
+}
+
+export function relativeTime(dateStr) {
+    if (!dateStr || dateStr === '0001-01-01T00:00:00Z') return 'never';
+    const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+    if (diff < 0) return 'just now';
+    if (diff < SECONDS_PER_MINUTE) return `${diff}s ago`;
+    if (diff < SECONDS_PER_HOUR) return `${Math.floor(diff / SECONDS_PER_MINUTE)}m ago`;
+    if (diff < SECONDS_PER_DAY) return `${Math.floor(diff / SECONDS_PER_HOUR)}h ago`;
+    return `${Math.floor(diff / SECONDS_PER_DAY)}d ago`;
+}
+
+export function isValidCIDR(value) {
+    const match = value.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})$/);
+    if (!match) return false;
+    const octets = [match[1], match[2], match[3], match[4]].map(Number);
+    const prefix = Number(match[5]);
+    return octets.every(o => o >= 0 && o <= OCTET_MAX) && prefix >= 0 && prefix <= CIDR_PREFIX_MAX;
+}
+
+export function isValidIPOrCIDR(value) {
+    if (!value) return false;
+    if (isValidCIDR(value)) return true;
+    const ipv4 = value.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+    if (ipv4) return [ipv4[1], ipv4[2], ipv4[3], ipv4[4]].map(Number).every(o => o >= 0 && o <= OCTET_MAX);
+    try {
+        const parts = value.split('/');
+        const addr = parts[0];
+        if (!addr.includes(':')) return false;
+        if (parts.length === 2) {
+            const prefix = Number(parts[1]);
+            if (!Number.isInteger(prefix) || prefix < 0 || prefix > 128) return false;
+        }
+        if (parts.length > 2) return false;
+        const expanded = addr.split('::');
+        if (expanded.length > 2) return false;
+        const groups = addr.replace('::', ':').split(':').filter(g => g !== '');
+        return groups.every(g => /^[\da-fA-F]{1,4}$/.test(g));
+    } catch {
+        return false;
+    }
+}
+
+export function isValidBase64Key(value) {
+    if (!value || value.length !== BASE64_KEY_LENGTH) return false;
+    try {
+        return atob(value).length === DECODED_KEY_BYTES;
+    } catch {
+        return false;
+    }
+}
+
+export function isValidPort(value) {
+    const n = Number(value);
+    return Number.isInteger(n) && n >= PORT_MIN && n <= PORT_MAX;
+}
+
+export function isValidEndpoint(value) {
+    if (!value) return false;
+
+    let host, portStr;
+
+    if (value.startsWith('[')) {
+        const closeBracket = value.indexOf(']');
+        if (closeBracket === -1) return false;
+        host = value.slice(1, closeBracket);
+        if (value[closeBracket + 1] !== ':') return false;
+        portStr = value.slice(closeBracket + 2);
+    } else {
+        const lastColon = value.lastIndexOf(':');
+        if (lastColon <= 0) return false;
+        host = value.slice(0, lastColon);
+        portStr = value.slice(lastColon + 1);
+    }
+
+    if (!host || !portStr) return false;
+
+    const portNum = Number(portStr);
+    if (!Number.isInteger(portNum) || portNum < PORT_MIN || portNum > PORT_MAX) return false;
+
+    return isValidHost(host);
+}
+
+function isValidHost(host) {
+    if (/^\d{1,3}(\.\d{1,3}){3}$/.test(host)) {
+        return host.split('.').every(o => {
+            const n = Number(o);
+            return n >= 0 && n <= OCTET_MAX;
+        });
+    }
+    if (/^[a-zA-Z0-9]([a-zA-Z0-9-]{0,62}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,62}[a-zA-Z0-9])?)*$/.test(host)) {
+        return true;
+    }
+    if (host.includes(':')) {
+        return /^[0-9a-fA-F:]+$/.test(host) && /[0-9a-fA-F]/.test(host);
+    }
+    return false;
+}
+
+export function isValidMTU(value) {
+    const n = Number(value);
+    return Number.isInteger(n) && n >= MTU_MIN && n <= PORT_MAX;
+}
+
+export function isValidKeepalive(value) {
+    const n = Number(value);
+    return Number.isInteger(n) && n >= KEEPALIVE_MIN && n <= PORT_MAX;
+}
+
+export function isValidRouteMetric(value) {
+    const n = Number(value);
+    return Number.isInteger(n) && n >= ROUTE_METRIC_MIN && n <= ROUTE_METRIC_MAX;
+}
+
+export function validateTunnelFields(data) {
+    const errors = {};
+    if (!data.name?.trim()) errors.name = 'Required';
+    if (!isValidPort(data.listenPort)) errors.listenPort = `Must be ${PORT_MIN}-${PORT_MAX}`;
+    if (!data.tunnelAddress?.trim()) errors.tunnelAddress = 'Required';
+    else if (!isValidCIDR(data.tunnelAddress.trim())) errors.tunnelAddress = 'Invalid CIDR (e.g. 10.255.0.1/30)';
+    if (!data.peerPublicKey?.trim()) errors.peerPublicKey = 'Required';
+    else if (!isValidBase64Key(data.peerPublicKey.trim())) errors.peerPublicKey = `Invalid key (must be ${BASE64_KEY_LENGTH}-char base64)`;
+    if (data.peerEndpoint?.trim() && !isValidEndpoint(data.peerEndpoint.trim())) {
+        errors.peerEndpoint = 'Invalid format (e.g. 85.12.34.56:51820)';
+    }
+    if (!isValidMTU(data.mtu)) errors.mtu = `Must be ${MTU_MIN}-${PORT_MAX}`;
+    if (!isValidKeepalive(data.persistentKeepalive)) errors.persistentKeepalive = `Must be ${KEEPALIVE_MIN}-${PORT_MAX}`;
+    if (data.routeMetric != null && !isValidRouteMetric(data.routeMetric)) errors.routeMetric = `Must be ${ROUTE_METRIC_MIN}-${ROUTE_METRIC_MAX}`;
+
+    const ips = typeof data.allowedIPs === 'string'
+        ? data.allowedIPs.split(',').map(s => s.trim()).filter(Boolean)
+        : Array.isArray(data.allowedIPs) ? data.allowedIPs : [];
+    for (const c of ips) {
+        if (!isValidCIDR(c)) {
+            errors.allowedIPs = `Invalid CIDR: ${c}`;
+            break;
+        }
+    }
+
+    if (data.localSubnets != null) {
+        const subs = typeof data.localSubnets === 'string'
+            ? data.localSubnets.split(',').map(s => s.trim()).filter(Boolean)
+            : Array.isArray(data.localSubnets) ? data.localSubnets : [];
+        for (const c of subs) {
+            if (!isValidCIDR(c)) {
+                errors.localSubnets = `Invalid CIDR: ${c}`;
+                break;
+            }
+        }
+    }
+    return errors;
+}
+
+export const stateColors = {
+    Running: 'bg-success',
+    Starting: 'bg-blue',
+    NoState: 'bg-blue',
+    NeedsLogin: 'bg-warning',
+    NeedsMachineAuth: 'bg-warning',
+    InUseOtherUser: 'bg-warning',
+    Stopped: 'bg-error',
+};
+
+export const stateLabels = {
+    Running: 'Running',
+    Starting: 'Starting',
+    NoState: 'Connecting',
+    NeedsLogin: 'Needs Login',
+    NeedsMachineAuth: 'Needs Machine Auth',
+    InUseOtherUser: 'In Use By Another User',
+    Stopped: 'Stopped',
+    Unknown: 'Unknown',
+    Unavailable: 'Unavailable',
+};
+
+export function formatUptime(seconds) {
+    if (seconds == null || seconds <= 0) return 'N/A';
+    const days = Math.floor(seconds / SECONDS_PER_DAY);
+    const hours = Math.floor((seconds % SECONDS_PER_DAY) / SECONDS_PER_HOUR);
+    const minutes = Math.floor((seconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE);
+    if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    if (minutes > 0) return `${minutes}m`;
+    return '< 1m';
+}
+
+export function sortPeers(peers) {
+    return [...peers].sort((a, b) => {
+        if (a.online !== b.online) return a.online ? -1 : 1;
+        return (a.hostName || '').localeCompare(b.hostName || '');
+    });
+}
+
+export function tunnelStatusInfo(tunnel) {
+    if (tunnel.connected) return { dot: 'bg-success', label: 'Connected' };
+    if (tunnel.lastHandshake && tunnel.lastHandshake !== '0001-01-01T00:00:00Z') {
+        return { dot: 'bg-warning', label: 'Handshake stale' };
+    }
+    return { dot: 'bg-text-secondary', label: 'No handshake' };
+}

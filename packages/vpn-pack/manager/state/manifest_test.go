@@ -1,0 +1,514 @@
+package state_test
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+	"sync"
+	"testing"
+
+	"unifi-tailscale/manager/domain"
+	"unifi-tailscale/manager/state"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+func TestLoadManifest(t *testing.T) {
+	t.Run("file not found returns v2", func(t *testing.T) {
+		dir := t.TempDir()
+		m, err := state.LoadManifest(filepath.Join(dir, "manifest.json"))
+		require.NoError(t, err)
+		assert.Equal(t, 2, m.Version)
+	})
+
+	t.Run("valid v2 JSON", func(t *testing.T) {
+		dir := t.TempDir()
+		path := filepath.Join(dir, "manifest.json")
+		data := `{"version":2,"siteId":"site1","tailscale":{"zoneId":"z1","chainPrefix":"TS"}}`
+		require.NoError(t, os.WriteFile(path, []byte(data), 0600))
+
+		m, err := state.LoadManifest(path)
+		require.NoError(t, err)
+		assert.Equal(t, 2, m.Version)
+		assert.Equal(t, "site1", m.SiteID)
+		assert.Equal(t, "z1", m.Tailscale.ZoneID)
+		assert.Equal(t, "TS", m.Tailscale.ChainPrefix)
+	})
+
+	t.Run("v1 JSON migrated to v2", func(t *testing.T) {
+		dir := t.TempDir()
+		path := filepath.Join(dir, "manifest.json")
+		v1 := map[string]any{
+			"version":      1,
+			"firewallMode": "integration",
+			"modeB": map[string]any{
+				"zoneID":    "zone-abc",
+				"policyIDs": []string{"p1", "p2"},
+			},
+		}
+		data, _ := json.Marshal(v1)
+		require.NoError(t, os.WriteFile(path, data, 0600))
+
+		m, err := state.LoadManifest(path)
+		require.NoError(t, err)
+		assert.Equal(t, 2, m.Version)
+		assert.Equal(t, "zone-abc", m.Tailscale.ZoneID)
+		assert.Equal(t, []string{"p1", "p2"}, m.Tailscale.PolicyIDs)
+		assert.Equal(t, "VPN", m.Tailscale.ChainPrefix)
+	})
+
+	t.Run("corrupt JSON returns empty manifest with Recovered=true", func(t *testing.T) {
+		dir := t.TempDir()
+		path := filepath.Join(dir, "manifest.json")
+		require.NoError(t, os.WriteFile(path, []byte("{invalid"), 0600))
+
+		m, err := state.LoadManifest(path)
+		require.NoError(t, err)
+		require.NotNil(t, m)
+		assert.True(t, m.Recovered(), "Recovered() should be true after parse failure")
+		assert.Equal(t, "", m.SiteID, "recovered manifest should be empty")
+		assert.Equal(t, "", m.Tailscale.ZoneID)
+	})
+
+	t.Run("corrupt JSON quarantines the original payload", func(t *testing.T) {
+		dir := t.TempDir()
+		path := filepath.Join(dir, "manifest.json")
+		require.NoError(t, os.WriteFile(path, []byte("{invalid"), 0600))
+
+		_, err := state.LoadManifest(path)
+		require.NoError(t, err)
+
+		matches, err := filepath.Glob(path + ".corrupt-*")
+		require.NoError(t, err)
+		require.NotEmpty(t, matches, "expected a quarantine .corrupt-* file")
+		got, err := os.ReadFile(matches[0])
+		require.NoError(t, err)
+		assert.Equal(t, "{invalid", string(got))
+	})
+
+	t.Run("valid manifest reports Recovered=false", func(t *testing.T) {
+		dir := t.TempDir()
+		path := filepath.Join(dir, "manifest.json")
+		require.NoError(t, os.WriteFile(path, []byte(`{"version":2,"siteId":"s"}`), 0600))
+
+		m, err := state.LoadManifest(path)
+		require.NoError(t, err)
+		assert.False(t, m.Recovered())
+	})
+
+	t.Run("missing file reports Recovered=false", func(t *testing.T) {
+		dir := t.TempDir()
+		m, err := state.LoadManifest(filepath.Join(dir, "manifest.json"))
+		require.NoError(t, err)
+		assert.False(t, m.Recovered())
+	})
+}
+
+func TestManifestSaveRoundtrip(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "manifest.json")
+
+	m, err := state.LoadManifest(path)
+	require.NoError(t, err)
+
+	require.NoError(t, m.SetSiteID("my-site"))
+	require.NoError(t, m.SetTailscaleZone("z1", "VPN Pack: Tailscale", []string{"p1"}, "TS"))
+
+	m2, err := state.LoadManifest(path)
+	require.NoError(t, err)
+	assert.Equal(t, "my-site", m2.SiteID)
+	assert.Equal(t, "z1", m2.Tailscale.ZoneID)
+	assert.Equal(t, []string{"p1"}, m2.Tailscale.PolicyIDs)
+	assert.Equal(t, "TS", m2.Tailscale.ChainPrefix)
+}
+
+func TestGetWgS2sZones(t *testing.T) {
+	t.Run("empty map", func(t *testing.T) {
+		m := &state.Manifest{}
+		zones := m.GetWgS2sZones()
+		assert.Empty(t, zones)
+	})
+
+	t.Run("2 tunnels same zone", func(t *testing.T) {
+		m := &state.Manifest{
+			WgS2s: map[string]domain.ZoneManifest{
+				"t1": {ZoneID: "z1", ZoneName: "Zone One"},
+				"t2": {ZoneID: "z1", ZoneName: "Zone One"},
+			},
+		}
+		zones := m.GetWgS2sZones()
+		require.Len(t, zones, 1)
+		assert.Equal(t, "z1", zones[0].ZoneID)
+		assert.Equal(t, 2, zones[0].TunnelCount)
+	})
+
+	t.Run("2 different zones", func(t *testing.T) {
+		m := &state.Manifest{
+			WgS2s: map[string]domain.ZoneManifest{
+				"t1": {ZoneID: "z1", ZoneName: "Zone One"},
+				"t2": {ZoneID: "z2", ZoneName: "Zone Two"},
+			},
+		}
+		zones := m.GetWgS2sZones()
+		assert.Len(t, zones, 2)
+	})
+}
+
+func TestGetTailscaleChainPrefix(t *testing.T) {
+	t.Run("empty returns VPN", func(t *testing.T) {
+		m := &state.Manifest{}
+		assert.Equal(t, "VPN", m.GetTailscaleChainPrefix())
+	})
+
+	t.Run("custom prefix", func(t *testing.T) {
+		m := &state.Manifest{Tailscale: domain.ZoneManifest{ChainPrefix: "CUSTOM"}}
+		assert.Equal(t, "CUSTOM", m.GetTailscaleChainPrefix())
+	})
+}
+
+func TestWanPortCycle(t *testing.T) {
+	dir := t.TempDir()
+	m, err := state.LoadManifest(filepath.Join(dir, "manifest.json"))
+	require.NoError(t, err)
+
+	require.NoError(t, m.SetWanPort("test-marker", "pol-1", "Test Policy", 8080))
+	assert.Equal(t, "pol-1", m.GetWanPortPolicyID("test-marker"))
+
+	require.NoError(t, m.RemoveWanPort("test-marker"))
+	assert.Equal(t, "", m.GetWanPortPolicyID("test-marker"))
+}
+
+func TestManifest_SetterPersistence(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		dir := t.TempDir()
+		m := state.NewManifest(filepath.Join(dir, "manifest.json"))
+		require.NoError(t, m.SetSiteID("test-site"))
+		data, err := os.ReadFile(m.Path())
+		require.NoError(t, err)
+		var loaded state.Manifest
+		require.NoError(t, json.Unmarshal(data, &loaded))
+		assert.Equal(t, 2, loaded.Version)
+		assert.Equal(t, "test-site", loaded.SiteID)
+	})
+
+	t.Run("unwritable path", func(t *testing.T) {
+		m := state.NewManifest("/proc/nonexistent/manifest.json")
+		err := m.SetSiteID("test-site")
+		assert.Error(t, err)
+	})
+}
+
+func TestManifest_AtomicPersistence(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "manifest.json")
+
+	m := state.NewManifest(path)
+	require.NoError(t, m.SetSiteID("initial"))
+
+	require.NoError(t, m.SetSiteID("updated"))
+
+	_, err := os.Stat(path + ".tmp")
+	assert.True(t, os.IsNotExist(err))
+
+	m2, err := state.LoadManifest(path)
+	require.NoError(t, err)
+	assert.Equal(t, "updated", m2.SiteID)
+}
+
+func TestManifest_ConcurrentAccess(t *testing.T) {
+	dir := t.TempDir()
+	m, err := state.LoadManifest(filepath.Join(dir, "manifest.json"))
+	require.NoError(t, err)
+
+	var wg sync.WaitGroup
+	const goroutines = 10
+	const iterations = 100
+
+	for i := 0; i < goroutines; i++ {
+		wg.Add(1)
+		go func(id int) {
+			defer wg.Done()
+			for j := 0; j < iterations; j++ {
+				tunnelID := fmt.Sprintf("tunnel-%d-%d", id, j)
+				_ = m.SetWgS2sZone(tunnelID, domain.ZoneManifest{ZoneID: "zone-1", ZoneName: "Zone One", PolicyIDs: []string{"p1"}, ChainPrefix: "VPN"})
+			}
+		}(i)
+	}
+
+	for i := 0; i < goroutines; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for j := 0; j < iterations; j++ {
+				_ = m.GetWgS2sZones()
+				_, _ = m.GetWgS2sZone("tunnel-0-0")
+				_ = m.GetWgS2sSnapshot()
+			}
+		}()
+	}
+
+	for i := 0; i < goroutines; i++ {
+		wg.Add(1)
+		go func(id int) {
+			defer wg.Done()
+			marker := fmt.Sprintf("marker-%d", id)
+			for j := 0; j < iterations; j++ {
+				_ = m.SetWanPort(marker, "pol-1", "Test", 8080+id)
+				_ = m.GetWanPortPolicyID(marker)
+				_, _ = m.GetWanPortEntry(marker)
+				_ = m.RemoveWanPort(marker)
+			}
+		}(i)
+	}
+
+	for i := 0; i < goroutines; i++ {
+		wg.Add(1)
+		go func(id int) {
+			defer wg.Done()
+			for j := 0; j < iterations; j++ {
+				_ = m.SetSiteID(fmt.Sprintf("site-%d", id))
+				_ = m.GetSiteID()
+				_ = m.HasSiteID()
+			}
+		}(i)
+	}
+
+	wg.Wait()
+}
+
+func TestManifest_SnapshotIsolation(t *testing.T) {
+	dir := t.TempDir()
+	m, err := state.LoadManifest(filepath.Join(dir, "manifest.json"))
+	require.NoError(t, err)
+
+	require.NoError(t, m.SetWanPort("a", "p1", "A", 80))
+	require.NoError(t, m.SetWanPort("b", "p2", "B", 443))
+
+	snap := m.GetWanPortsSnapshot()
+	require.NoError(t, m.RemoveWanPort("a"))
+
+	assert.Contains(t, snap, "a")
+	assert.Equal(t, "", m.GetWanPortPolicyID("a"))
+}
+
+func TestManifestDNSPolicy(t *testing.T) {
+	dir := t.TempDir()
+	m := state.NewManifest(filepath.Join(dir, "manifest.json"))
+
+	assert.False(t, m.HasDNSPolicy("test"))
+	_, ok := m.GetDNSPolicy("test")
+	assert.False(t, ok)
+
+	require.NoError(t, m.SetDNSPolicy("test", "pol-123", "example.ts.net", "100.100.100.100"))
+	assert.True(t, m.HasDNSPolicy("test"))
+	entry, ok := m.GetDNSPolicy("test")
+	require.True(t, ok)
+	assert.Equal(t, "pol-123", entry.PolicyID)
+	assert.Equal(t, "example.ts.net", entry.Domain)
+	assert.Equal(t, "100.100.100.100", entry.IPAddress)
+
+	require.NoError(t, m.RemoveDNSPolicy("test"))
+	assert.False(t, m.HasDNSPolicy("test"))
+
+	require.NoError(t, m.SetDNSPolicy("test2", "pol-456", "other.ts.net", "100.100.100.100"))
+	require.NoError(t, m.ResetIntegration())
+	assert.False(t, m.HasDNSPolicy("test2"))
+}
+
+func TestManifest_RemoveNonExistingTunnel(t *testing.T) {
+	dir := t.TempDir()
+	m, err := state.LoadManifest(filepath.Join(dir, "manifest.json"))
+	require.NoError(t, err)
+
+	require.NoError(t, m.RemoveWgS2sTunnel("nonexistent-tunnel"))
+}
+
+func TestMigrateExitNode(t *testing.T) {
+	t.Run("old exitNodePolicy mode=all + ts advertising → advertise=true, policy cleared", func(t *testing.T) {
+		dir := t.TempDir()
+		path := filepath.Join(dir, "manifest.json")
+		data := `{"version":2,"exitNodePolicy":{"mode":"all","clients":[]}}`
+		require.NoError(t, os.WriteFile(path, []byte(data), 0600))
+
+		m, err := state.LoadManifest(path)
+		require.NoError(t, err)
+
+		m.MigrateExitNode(true)
+		assert.True(t, m.GetAdvertiseExitNodeEnabled())
+		assert.Equal(t, domain.ExitNodeOff, m.GetExitNodePolicy().Mode)
+	})
+
+	t.Run("old exitNodePolicy mode=selective → advertise=true, policy cleared", func(t *testing.T) {
+		dir := t.TempDir()
+		path := filepath.Join(dir, "manifest.json")
+		data := `{"version":2,"exitNodePolicy":{"mode":"selective","clients":[{"ip":"192.168.1.10"}]}}`
+		require.NoError(t, os.WriteFile(path, []byte(data), 0600))
+
+		m, err := state.LoadManifest(path)
+		require.NoError(t, err)
+
+		m.MigrateExitNode(false)
+		assert.True(t, m.GetAdvertiseExitNodeEnabled())
+		assert.Equal(t, domain.ExitNodeOff, m.GetExitNodePolicy().Mode)
+	})
+
+	t.Run("old exitNodePolicy mode=off + ts not advertising → advertise=false", func(t *testing.T) {
+		dir := t.TempDir()
+		path := filepath.Join(dir, "manifest.json")
+		data := `{"version":2,"exitNodePolicy":{"mode":"off"}}`
+		require.NoError(t, os.WriteFile(path, []byte(data), 0600))
+
+		m, err := state.LoadManifest(path)
+		require.NoError(t, err)
+
+		m.MigrateExitNode(false)
+		assert.False(t, m.GetAdvertiseExitNodeEnabled())
+		assert.Equal(t, domain.ExitNodeOff, m.GetExitNodePolicy().Mode)
+	})
+
+	t.Run("old exitNodePolicy mode=off + ts IS advertising → advertise=true", func(t *testing.T) {
+		dir := t.TempDir()
+		path := filepath.Join(dir, "manifest.json")
+		data := `{"version":2,"exitNodePolicy":{"mode":"off"}}`
+		require.NoError(t, os.WriteFile(path, []byte(data), 0600))
+
+		m, err := state.LoadManifest(path)
+		require.NoError(t, err)
+
+		m.MigrateExitNode(true)
+		assert.True(t, m.GetAdvertiseExitNodeEnabled())
+	})
+
+	t.Run("no exitNodePolicy + ts advertising → advertise=true", func(t *testing.T) {
+		dir := t.TempDir()
+		path := filepath.Join(dir, "manifest.json")
+		data := `{"version":2}`
+		require.NoError(t, os.WriteFile(path, []byte(data), 0600))
+
+		m, err := state.LoadManifest(path)
+		require.NoError(t, err)
+
+		m.MigrateExitNode(true)
+		assert.True(t, m.GetAdvertiseExitNodeEnabled())
+	})
+
+	t.Run("no exitNodePolicy + ts not advertising → no-op", func(t *testing.T) {
+		dir := t.TempDir()
+		path := filepath.Join(dir, "manifest.json")
+		data := `{"version":2}`
+		require.NoError(t, os.WriteFile(path, []byte(data), 0600))
+
+		m, err := state.LoadManifest(path)
+		require.NoError(t, err)
+
+		m.MigrateExitNode(false)
+		assert.False(t, m.GetAdvertiseExitNodeEnabled())
+	})
+
+	t.Run("already migrated → no-op", func(t *testing.T) {
+		dir := t.TempDir()
+		path := filepath.Join(dir, "manifest.json")
+		data := `{"version":2,"advertiseExitNode":true}`
+		require.NoError(t, os.WriteFile(path, []byte(data), 0600))
+
+		m, err := state.LoadManifest(path)
+		require.NoError(t, err)
+
+		m.MigrateExitNode(false)
+		assert.True(t, m.GetAdvertiseExitNodeEnabled())
+	})
+
+	t.Run("already has remoteExitNode → no-op", func(t *testing.T) {
+		dir := t.TempDir()
+		path := filepath.Join(dir, "manifest.json")
+		data := `{"version":2,"remoteExitNode":{"peerId":"abc","mode":"all"}}`
+		require.NoError(t, os.WriteFile(path, []byte(data), 0600))
+
+		m, err := state.LoadManifest(path)
+		require.NoError(t, err)
+
+		m.MigrateExitNode(true)
+		assert.False(t, m.GetAdvertiseExitNodeEnabled())
+		assert.NotNil(t, m.GetRemoteExitNode())
+		assert.Equal(t, "abc", m.GetRemoteExitNode().PeerID)
+	})
+}
+
+func TestManifest_RemoteExitNodeRoundtrip(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "manifest.json")
+
+	m := state.NewManifest(path)
+
+	assert.Nil(t, m.GetRemoteExitNode())
+
+	rem := &domain.RemoteExitNode{
+		PeerID:  "node-123",
+		Mode:    domain.ExitNodeAll,
+		Clients: nil,
+	}
+	require.NoError(t, m.SetRemoteExitNode(rem))
+
+	got := m.GetRemoteExitNode()
+	require.NotNil(t, got)
+	assert.Equal(t, "node-123", got.PeerID)
+	assert.Equal(t, domain.ExitNodeAll, got.Mode)
+
+	m2, err := state.LoadManifest(path)
+	require.NoError(t, err)
+	got2 := m2.GetRemoteExitNode()
+	require.NotNil(t, got2)
+	assert.Equal(t, "node-123", got2.PeerID)
+
+	require.NoError(t, m.SetRemoteExitNode(nil))
+	assert.Nil(t, m.GetRemoteExitNode())
+}
+
+func TestManifest_AdvertiseExitNodeRoundtrip(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "manifest.json")
+
+	m := state.NewManifest(path)
+
+	assert.False(t, m.GetAdvertiseExitNodeEnabled())
+
+	require.NoError(t, m.SetAdvertiseExitNode(true))
+	assert.True(t, m.GetAdvertiseExitNodeEnabled())
+
+	m2, err := state.LoadManifest(path)
+	require.NoError(t, err)
+	assert.True(t, m2.GetAdvertiseExitNodeEnabled())
+
+	require.NoError(t, m.SetAdvertiseExitNode(false))
+	assert.False(t, m.GetAdvertiseExitNodeEnabled())
+}
+
+func TestManifest_RemoteExitNodeSnapshotIsolation(t *testing.T) {
+	dir := t.TempDir()
+	m := state.NewManifest(filepath.Join(dir, "manifest.json"))
+
+	rem := &domain.RemoteExitNode{
+		PeerID:  "peer-1",
+		Mode:    domain.ExitNodeSelective,
+		Clients: []domain.ExitNodeClient{{IP: "192.168.1.10", Label: "pc"}},
+	}
+	require.NoError(t, m.SetRemoteExitNode(rem))
+
+	// Mutating the original after Set must not affect manifest (write isolation)
+	rem.PeerID = "mutated-src"
+	rem.Clients[0].IP = "mutated-src"
+
+	got := m.GetRemoteExitNode()
+	assert.Equal(t, "peer-1", got.PeerID)
+	assert.Equal(t, "192.168.1.10", got.Clients[0].IP)
+
+	// Mutating the snapshot from Get must not affect manifest (read isolation)
+	got.PeerID = "mutated-snap"
+	got.Clients[0].IP = "mutated-snap"
+
+	got2 := m.GetRemoteExitNode()
+	assert.Equal(t, "peer-1", got2.PeerID)
+	assert.Equal(t, "192.168.1.10", got2.Clients[0].IP)
+}

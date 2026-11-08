@@ -4,6 +4,7 @@
 }:
 pkgs.mkShellNoCC {
   packages = [
+    perSystem.llm-agents.antigravity-cli
     perSystem.llm-agents.default
     perSystem.home-manager.default
     # Agenix uses rage by default which lacks age-plugin support; override with age for age-plugin-se

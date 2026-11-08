@@ -1,0 +1,180 @@
+package main
+
+import (
+	"context"
+	"errors"
+	"flag"
+	"fmt"
+	"log/slog"
+	"os"
+	"os/signal"
+	"path/filepath"
+	"strings"
+	"syscall"
+
+	"unifi-tailscale/manager/client"
+	"unifi-tailscale/manager/config"
+	"unifi-tailscale/manager/logredact"
+	"unifi-tailscale/manager/service"
+	"unifi-tailscale/manager/sse"
+	"unifi-tailscale/manager/state"
+)
+
+func main() {
+	listenSocket := flag.String("listen-socket", "/run/vpn-pack/manager.sock", "manager API unix-socket listener path")
+	socket := flag.String("socket", "/run/tailscale/tailscaled.sock", "tailscaled socket path")
+	showVersion := flag.Bool("version", false, "print version and exit")
+	cleanup := flag.Bool("cleanup", false, "remove UDAPI rules, WG S2S interfaces, and Integration API zones/policies, then exit")
+	flag.Parse()
+
+	if *showVersion {
+		fmt.Printf("vpn-pack %s (tailscale %s, commit: %s, built: %s)\n", config.Version, config.TailscaleVersion, config.GitCommit, config.BuildDate)
+		os.Exit(0)
+	}
+
+	slog.SetDefault(slog.New(logredact.Wrap(slog.NewJSONHandler(os.Stderr, nil))))
+
+	if *cleanup {
+		if err := runCleanup(); err != nil {
+			os.Exit(1)
+		}
+		return
+	}
+
+	slog.Info("starting vpn-pack", "version", config.Version, "tailscale", config.TailscaleVersion, "commit", config.GitCommit, "buildDate", config.BuildDate)
+
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+
+	info := detectDevice()
+	slog.Info("device detected",
+		"model", info.Model,
+		"modelShort", info.ModelShort,
+		"firmware", info.Firmware,
+		"unifiVersion", info.UniFiVersion,
+		"hasTUN", info.HasTUN,
+		"hasUDAPISocket", info.HasUDAPISocket,
+		"persistentFree", info.PersistentFree,
+		"activeVPNClients", info.ActiveVPNClients,
+	)
+
+	resolved, err := awaitSupportedUniFiVersion(ctx, info.UniFiVersion, defaultUniFiGateDeps())
+	switch {
+	case errors.Is(err, context.Canceled):
+		// Shutdown asked for while we were waiting out a package upgrade. This
+		// is not a configuration error, so it must not become exit 78.
+		slog.Info("shutdown requested while waiting for the UniFi Network version")
+		return
+	case err != nil:
+		slog.Error("version requirement not met", "err", err)
+		os.Exit(78)
+	}
+	info.UniFiVersion = resolved
+
+	apiKey := service.LoadAPIKey()
+	ic := buildIntegrationAPI(apiKey)
+
+	nginxToken := loadNginxToken()
+	if nginxToken == "" {
+		slog.Warn("token factor DISABLED: no per-install X-VpnPack-Token secret found (env VPNPACK_TOKEN unset and file absent) — API is gated only by peer-uid + nginx auth; expected in dev, but on-device it means the installer did not provision the secret",
+			"file", config.NginxTokenPath)
+	} else {
+		slog.Info("token factor enabled")
+	}
+
+	sweepStartupOrphanTmps([]string{
+		filepath.Dir(config.ManifestPath),
+		config.WgS2sConfigDir,
+	})
+
+	manifest, err := LoadManifest(config.ManifestPath)
+	if err != nil {
+		slog.Warn("manifest load failed", "err", err)
+		manifest = state.NewManifest(config.ManifestPath)
+	}
+	if manifest.Recovered() {
+		// BUG-L8: with the manifest gone, the integration zones/policies in
+		// UniFi may be orphaned. Scan-based cleanup that does not depend on
+		// manifest state is the scope of BUG-L17 / Task 10.12; until then,
+		// the operator can run `vpn-pack-manager --cleanup` to remove the
+		// known resources (best-effort while the manifest is empty).
+		slog.Warn("manifest was corrupted at load; quarantined and reset to empty; integration zones may be orphaned — run `vpn-pack-manager --cleanup` to remove residual resources",
+			"path", config.ManifestPath)
+	}
+
+	ln, err := systemdListener()
+	if err != nil {
+		slog.Error("systemd socket activation failed", "err", err)
+		os.Exit(1)
+	}
+	if ln != nil {
+		slog.Info("socket source", "via", "systemd")
+	} else {
+		ln, err = openManagerSocket(*listenSocket)
+		if err != nil {
+			slog.Error("listener open failed", "err", err, "path", *listenSocket)
+			os.Exit(1)
+		}
+		slog.Info("socket source", "via", "self", "path", *listenSocket)
+	}
+
+	srv := NewServer(ctx, ServerOptions{
+		Listener:    ln,
+		SocketPath:  *socket,
+		DeviceInfo:  info,
+		Tailscale:   client.NewBoundedTailscaleControl(NewTailscaleControl(*socket), config.TailscaleLocalAPITimeout),
+		Hub:         sse.NewHub(),
+		Manifest:    manifest,
+		Integration: ic,
+		Firewall:    NewFirewallManager(config.UDAPISocketPath, ic, manifest),
+		Nginx:       NewNginxManager(),
+		LogBuf:      NewLogBuffer(config.LogBufferSize),
+		Updater:     newUpdateChecker(),
+		NginxToken:  nginxToken,
+	})
+
+	if err := srv.Run(ctx); err != nil {
+		slog.Error("server failed", "err", err)
+		os.Exit(1)
+	}
+
+	slog.Info("shutting down")
+}
+
+// loadNginxToken returns the per-install shared secret used for the
+// X-VpnPack-Token factor. The VPNPACK_TOKEN env var (if set by systemd or
+// a dev shell) wins; otherwise the secret is read from the installer-
+// provisioned file. A missing file or empty value returns "" and the
+// token factor is left disabled (fail-open) — see httpmw.Token.
+func loadNginxToken() string {
+	if v := strings.TrimSpace(os.Getenv("VPNPACK_TOKEN")); v != "" {
+		return v
+	}
+	b, err := os.ReadFile(config.NginxTokenPath)
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(b))
+}
+
+// buildIntegrationAPI returns a real IntegrationClient when the UniFi
+// loopback cert SPKI pin can be loaded, or a NoopIntegrationAPI when
+// not (SEC-C5 fail-closed). The Server path is nil-unsafe so a no-op
+// implementation is always required when the real client is absent.
+func buildIntegrationAPI(apiKey string) IntegrationAPI {
+	pin, err := client.LoadSPKIPin(config.UniFiCertPath)
+	if err != nil {
+		slog.Error("integration disabled — SPKI pin unavailable", "err", err, "certPath", config.UniFiCertPath)
+		return client.NoopIntegrationAPI()
+	}
+	ic, err := client.NewIntegrationClient(client.IntegrationConfig{
+		Endpoint: config.IntegrationBaseURL,
+		APIKey:   apiKey,
+		SPKIPin:  pin,
+	})
+	if err != nil {
+		slog.Error("integration disabled — client construct failed", "err", err)
+		return client.NoopIntegrationAPI()
+	}
+	return ic
+}

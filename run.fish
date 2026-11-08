@@ -103,6 +103,88 @@ function install-oci -d "Install NixOS on an OCI instance via nixos-anywhere + n
         $target $argv[2..]
 end
 
+function deploy-vpnpack -d "Build and deploy vpn-pack to UniFi Cloud Gateway via SSH"
+    if not set -q argv[1]
+        echo "Usage: run deploy-vpnpack <user@unifi-ip | unifi-ip> [--reauth] [extra-nix-build-args...]"
+        return 1
+    end
+    set -l target $argv[1]
+    if not string match -q "*@*" $target
+        set target "root@$target"
+    end
+
+    set -l reauth false
+    set -l nix_build_args
+    for arg in $argv[2..]
+        if test $arg = "--reauth"
+            set reauth true
+        else
+            set --append nix_build_args $arg
+        end
+    end
+
+    _run nix build .#vpn-pack $nix_build_args
+    or return 1
+
+    set -l tarball (realpath result/vpn-pack.tar.gz 2>/dev/null; or realpath result/vpn-pack-*.tar.gz 2>/dev/null | head -n1)
+    if not test -n "$tarball"
+        echo "Error: built vpn-pack tarball not found in result/"
+        return 1
+    end
+
+    set -l tarball_name (basename $tarball)
+    _run scp $tarball "$target:/root/"
+    or return 1
+
+    _run ssh $target "cd /root && rm -rf vpn-pack && tar xzf $tarball_name && cd vpn-pack && bash install.sh"
+    or return 1
+
+    # Check for tailscale-unifi.age secret to auto-authenticate
+    set -l secret_file ""
+    if test -f "secrets/tailscale-unifi.age"
+        set secret_file "secrets/tailscale-unifi.age"
+    else if test -f "../nix-secrets/secrets/tailscale-unifi.age"
+        set secret_file "../nix-secrets/secrets/tailscale-unifi.age"
+    end
+
+    if test -n "$secret_file"
+        set -l identity ""
+        if test -f "$HOME/.ssh/id_ed25519"
+            set identity "$HOME/.ssh/id_ed25519"
+        else if test -f "/etc/ssh/ssh_host_ed25519_key"
+            set identity "/etc/ssh/ssh_host_ed25519_key"
+        end
+
+        set -l authkey ""
+        if test -n "$identity"; and command -vq age
+            set authkey (age -d -i $identity $secret_file 2>/dev/null | string trim)
+        else if test -n "$identity"; and command -vq rage
+            set authkey (rage -d -i $identity $secret_file 2>/dev/null | string trim)
+        end
+
+        if test -n "$authkey"
+            set -l needs_auth false
+            if test $reauth = true
+                set needs_auth true
+            else
+                if not ssh $target "/persistent/vpn-pack/bin/tailscale status >/dev/null 2>&1"
+                    set needs_auth true
+                end
+            end
+
+            if test $needs_auth = true
+                echo (set_color green --bold)"==> Authenticating Tailscale on $target with tag:unifi..."(set_color normal)
+                echo $authkey | ssh $target 'read -r k; /persistent/vpn-pack/bin/tailscale up --authkey="$k" --advertise-tags=tag:unifi --ssh --hostname=dream-router --reset'
+            else
+                echo (set_color cyan)"==> Tailscale is already authenticated on $target. Ensuring tag:unifi is set..."(set_color normal)
+                ssh $target '/persistent/vpn-pack/bin/tailscale set --advertise-tags=tag:unifi --ssh' 2>/dev/null; or true
+            end
+        else
+            echo (set_color yellow)"[!] Found $secret_file, but failed to decrypt using $identity."(set_color normal)
+        end
+    end
+end
+
 #
 # --- Functions for building/switching hosts
 #

@@ -1,0 +1,356 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"log/slog"
+	"os"
+	"os/signal"
+	"path/filepath"
+	"syscall"
+	"time"
+	"unifi-tailscale/manager/config"
+	"unifi-tailscale/manager/domain"
+
+	"github.com/fsnotify/fsnotify"
+)
+
+var interfaceExistsFunc = interfaceExists
+
+func interfaceExists(name string) bool {
+	_, err := os.Stat("/sys/class/net/" + name)
+	return err == nil
+}
+
+func (s *Server) runFirewallWatcher(ctx context.Context) {
+	sighup := make(chan os.Signal, 1)
+	signal.Notify(sighup, syscall.SIGHUP)
+	defer signal.Stop(sighup)
+
+	ticker := time.NewTicker(config.PollInterval)
+	defer ticker.Stop()
+
+	debounced := s.startInotifyWatcher(ctx)
+	s.watcherRunning.Store(true)
+	s.health.RecordSuccess(WatcherFirewall)
+	defer s.watcherRunning.Store(false)
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+
+		case _, ok := <-debounced:
+			if !ok {
+				debounced = nil
+				continue
+			}
+			s.checkAndRestoreRules(ctx)
+
+		case <-ticker.C:
+			s.checkAndRestoreRules(ctx)
+
+		case <-sighup:
+			slog.Info("SIGHUP received, forcing reapply")
+			result, ran := s.guardedSetupTailscaleFirewall(ctx)
+			switch {
+			case !ran:
+				slog.Info("SIGHUP reapply skipped: another reconcile in flight")
+			case result.Err() != nil:
+				slog.Warn("SIGHUP reapply failed", "err", result.Err())
+			}
+		}
+	}
+}
+
+func (s *Server) startInotifyWatcher(ctx context.Context) <-chan struct{} {
+	debounced := make(chan struct{}, 1)
+
+	watcher, err := initFsWatcher()
+	if err != nil {
+		close(debounced)
+		return debounced
+	}
+
+	go s.runInotifyLoop(ctx, watcher, debounced)
+	return debounced
+}
+
+func initFsWatcher() (*fsnotify.Watcher, error) {
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		slog.Error("fsnotify unavailable, polling only", "err", err)
+		return nil, err
+	}
+
+	configDir := filepath.Dir(config.UDAPIConfigPath)
+	if err := watcher.Add(configDir); err != nil {
+		slog.Warn("inotify watch failed, polling only", "path", configDir, "err", err)
+		_ = watcher.Close()
+		return nil, err
+	}
+
+	slog.Info("inotify watching", "path", configDir)
+	return watcher, nil
+}
+
+func (s *Server) runInotifyLoop(ctx context.Context, watcher *fsnotify.Watcher, debounced chan<- struct{}) {
+	defer func() { _ = watcher.Close() }()
+	defer close(debounced)
+
+	var debounceTimer *time.Timer
+	var debounceCh <-chan time.Time
+
+	for {
+		select {
+		case <-ctx.Done():
+			if debounceTimer != nil {
+				debounceTimer.Stop()
+			}
+			return
+
+		case event, ok := <-watcher.Events:
+			if !ok {
+				return
+			}
+			if s.handleFsEvent(event) {
+				if debounceTimer == nil {
+					debounceTimer = time.NewTimer(config.DebounceDuration)
+					debounceCh = debounceTimer.C
+				} else {
+					debounceTimer.Reset(config.DebounceDuration)
+				}
+			}
+
+		case err, ok := <-watcher.Errors:
+			if !ok {
+				return
+			}
+			slog.Warn("inotify error", "err", err)
+
+		case <-debounceCh:
+			debounceTimer = nil
+			debounceCh = nil
+			select {
+			case debounced <- struct{}{}:
+			default:
+			}
+		}
+	}
+}
+
+func (s *Server) handleFsEvent(event fsnotify.Event) bool {
+	base := filepath.Base(event.Name)
+	return base == filepath.Base(config.UDAPIConfigPath) && event.Has(fsnotify.Write)
+}
+
+func (s *Server) checkAndRestoreRules(ctx context.Context) {
+	if !s.restoring.CompareAndSwap(false, true) {
+		return
+	}
+	defer s.restoring.Store(false)
+
+	s.retryIntegrationSetup(ctx)
+	s.restoreTailscaleRules(ctx)
+	s.restoreWgS2sRules(ctx)
+	s.restoreExitNodeRules(ctx)
+}
+
+func (s *Server) retryIntegrationSetup(ctx context.Context) {
+	if !s.integrationReady() {
+		return
+	}
+
+	ts := s.manifest.GetTailscaleZone()
+	if ts.ZoneID != "" {
+		s.health.ResetRetries(WatcherFirewall)
+		return
+	}
+
+	if !s.health.ShouldRetry(WatcherFirewall) {
+		return
+	}
+	s.health.RecordRetryAttempt(WatcherFirewall)
+
+	slog.Info("retrying integration zone/policy setup", "attempt", s.health.RetryCount(WatcherFirewall))
+
+	result := s.fwOrch.SetupTailscaleFirewall(ctx)
+	if result.Err() != nil {
+		slog.Warn("integration setup retry failed", "attempt", s.health.RetryCount(WatcherFirewall), "err", result.Err())
+		return
+	}
+
+	ts = s.manifest.GetTailscaleZone()
+	if ts.ZoneID == "" {
+		return
+	}
+
+	slog.Info("integration setup succeeded", "zoneId", ts.ZoneID, "attempt", s.health.RetryCount(WatcherFirewall))
+	s.health.RecordSuccess(WatcherFirewall)
+
+	s.openTailscaleWanPort(ctx)
+}
+
+func (s *Server) restoreTailscaleRules(ctx context.Context) {
+	if !s.integrationReady() {
+		return
+	}
+	if s.health.IsDegraded(WatcherFirewall) {
+		return
+	}
+	if !interfaceExistsFunc(config.TailscaleInterface) {
+		return
+	}
+
+	// SEC-C15: ts-forward may be present but at the wrong position relative
+	// to UBIOS_FORWARD_JUMP after manual flushes or restore-from-save. Audit
+	// the order on every tick; the call is idempotent when ordering is sane.
+	if err := s.fw.AuditAndFixTsForwardOrder(ctx); err != nil {
+		slog.Warn("ts-forward order audit failed", "err", err)
+	}
+
+	// M5: same regression risk for ts-input vs UBIOS_INPUT_JUMP. If ts-input
+	// drifts before the UBIOS jump, its terminal `-i tailscale0 -j ACCEPT`
+	// shadows the zone policies (Tailscale -> Gateway BLOCK becomes a no-op).
+	if err := s.fw.AuditAndFixTsInputOrder(ctx); err != nil {
+		slog.Warn("ts-input order audit failed", "err", err)
+	}
+
+	forward, input, output, ipset := s.fw.CheckTailscaleRulesPresent(ctx)
+
+	ts := s.manifest.GetTailscaleZone()
+	noZone := ts.ZoneID == ""
+	if noZone {
+		ipset = true
+	}
+
+	if forward && input && output && ipset {
+		return
+	}
+
+	var missing []string
+	if !forward {
+		missing = append(missing, "FORWARD_IN")
+	}
+	if !input {
+		missing = append(missing, "INPUT")
+	}
+	if !output {
+		missing = append(missing, "OUTPUT")
+	}
+	if !ipset {
+		missing = append(missing, "VPN_subnets")
+	}
+
+	slog.Info("firewall rules missing, restoring", "missing", missing)
+
+	if err := s.fw.RestoreTailscaleRules(ctx); err != nil {
+		slog.Warn("firewall restore failed", "err", err)
+		s.health.RecordError(WatcherFirewall, err)
+		return
+	}
+
+	t := time.Now()
+	s.lastRestore.Store(&t)
+	slog.Info("firewall rules restored")
+	s.health.RecordSuccess(WatcherFirewall)
+}
+
+func (s *Server) restoreWgS2sRules(ctx context.Context) {
+	if s.wgManager == nil {
+		return
+	}
+	if s.health.IsDegraded(WatcherFirewall) {
+		return
+	}
+
+	s.wgS2sSvc.ReconcileZones(ctx)
+
+	tunnels := s.wgManager.GetTunnels()
+	var specs []domain.WgS2sCheckSpec
+	for _, t := range tunnels {
+		if !t.Enabled {
+			continue
+		}
+		specs = append(specs, domain.WgS2sCheckSpec{
+			InterfaceName: t.InterfaceName,
+			ChainPrefix:   s.manifest.GetWgS2sChainPrefix(t.ID),
+			Subnets:       t.AllowedIPs,
+		})
+	}
+	if len(specs) == 0 {
+		return
+	}
+
+	present := s.fw.CheckWgS2sRulesPresent(ctx, specs)
+	for _, t := range tunnels {
+		if !t.Enabled {
+			continue
+		}
+		if present[t.InterfaceName] {
+			continue
+		}
+		slog.Info("wg-s2s firewall rules missing, restoring", "iface", t.InterfaceName)
+		s.logBuf.Add(newLogEntry("info", fmt.Sprintf("firewall rules missing, restoring iface=%s", t.InterfaceName), "wgs2s"))
+		if err := s.fw.SetupWgS2sFirewall(ctx, t.ID, t.InterfaceName, t.AllowedIPs); err != nil {
+			slog.Warn("wg-s2s firewall restore failed", "iface", t.InterfaceName, "err", err)
+			s.logBuf.Add(newLogEntry("warn", fmt.Sprintf("firewall restore failed iface=%s err=%v", t.InterfaceName, err), "wgs2s"))
+		}
+	}
+}
+
+func (s *Server) restoreExitNodeRules(ctx context.Context) {
+	if s.exitSvc == nil {
+		return
+	}
+
+	if s.remoteExitSvc != nil {
+		if err := s.remoteExitSvc.SyncManifestFromTailscale(ctx); err != nil {
+			slog.Warn("exit node manifest sync failed", "err", err)
+		}
+	}
+
+	rem := s.manifest.GetRemoteExitNode()
+	var policy domain.ExitNodePolicy
+	if rem != nil && rem.Mode != domain.ExitNodeOff {
+		policy = domain.ExitNodePolicy{Mode: rem.Mode, Clients: rem.Clients}
+	}
+	if err := s.exitSvc.Reconcile(ctx, policy); err != nil {
+		slog.Warn("exit node rule restore failed", "err", err)
+	}
+}
+
+func (s *Server) reconcileWanPortPolicies(ctx context.Context) {
+	if s.health.IsDegraded(WatcherFirewall) {
+		return
+	}
+	wanPorts := s.manifest.GetWanPortsSnapshot()
+	if len(wanPorts) == 0 {
+		return
+	}
+
+	siteID := s.manifest.GetSiteID()
+	policies, err := s.ic.ListPolicies(ctx, siteID)
+	if err != nil {
+		slog.Warn("WAN port reconciliation failed: cannot list policies", "err", err)
+		return
+	}
+
+	policySet := make(map[string]bool, len(policies))
+	for _, p := range policies {
+		policySet[p.ID] = true
+	}
+
+	for marker, entry := range wanPorts {
+		if policySet[entry.PolicyID] {
+			continue
+		}
+		slog.Info("WAN port policy missing from API, recreating", "marker", marker, "port", entry.Port)
+		if err := s.manifest.RemoveWanPort(marker); err != nil {
+			slog.Warn("failed to remove stale WAN port entry from manifest", "marker", marker, "err", err)
+		}
+		if err := s.fw.OpenWanPort(ctx, entry.Port, marker); err != nil {
+			slog.Warn("WAN port policy recreation failed", "marker", marker, "err", err)
+		}
+	}
+}

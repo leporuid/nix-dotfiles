@@ -1,0 +1,883 @@
+package service
+
+import (
+	"context"
+	"crypto/rand"
+	"encoding/base64"
+	"errors"
+	"fmt"
+	"strings"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"unifi-tailscale/manager/domain"
+	"unifi-tailscale/manager/internal/wgs2s"
+)
+
+func testBase64Key(t *testing.T) string {
+	t.Helper()
+	key := make([]byte, 32)
+	_, err := rand.Read(key)
+	require.NoError(t, err)
+	return base64.StdEncoding.EncodeToString(key)
+}
+
+func TestValidateCreateRequest(t *testing.T) {
+	validReq := func(t *testing.T) *WgS2sCreateRequest {
+		t.Helper()
+		return &WgS2sCreateRequest{
+			TunnelConfig: wgs2s.TunnelConfig{
+				Name:          "test-tunnel",
+				ListenPort:    51820,
+				TunnelAddress: "10.0.0.1/24",
+				PeerPublicKey: testBase64Key(t),
+				AllowedIPs:    []string{"10.0.0.0/24"},
+			},
+		}
+	}
+
+	tests := []struct {
+		name    string
+		modify  func(*WgS2sCreateRequest)
+		wantErr bool
+		errMsg  string
+	}{
+		{"valid minimal", func(r *WgS2sCreateRequest) {}, false, ""},
+		{"missing name", func(r *WgS2sCreateRequest) { r.Name = "" }, true, "name"},
+		{"zero port", func(r *WgS2sCreateRequest) { r.ListenPort = 0 }, true, "listenPort"},
+		{"negative port", func(r *WgS2sCreateRequest) { r.ListenPort = -1 }, true, "listenPort"},
+		{"port exceeds 65535", func(r *WgS2sCreateRequest) { r.ListenPort = 65536 }, true, "listenPort"},
+		{"port at max", func(r *WgS2sCreateRequest) { r.ListenPort = 65535 }, false, ""},
+		{"invalid tunnelAddress", func(r *WgS2sCreateRequest) { r.TunnelAddress = "not-cidr" }, true, "tunnelAddress"},
+		{"short peerKey", func(r *WgS2sCreateRequest) { r.PeerPublicKey = "abc" }, true, "peerPublicKey"},
+		{"bad base64 peerKey", func(r *WgS2sCreateRequest) { r.PeerPublicKey = "!!!not-base64-at-all-but-is-44-chars-long!==" }, true, "peerPublicKey"},
+		{"invalid allowedIP", func(r *WgS2sCreateRequest) { r.AllowedIPs = []string{"bad"} }, true, "allowedIP"},
+		{"valid multiple CIDRs", func(r *WgS2sCreateRequest) { r.AllowedIPs = []string{"10.0.0.0/24", "192.168.1.0/24"} }, false, ""},
+		{"zero routeMetric (default)", func(r *WgS2sCreateRequest) { r.RouteMetric = 0 }, false, ""},
+		{"valid routeMetric", func(r *WgS2sCreateRequest) { r.RouteMetric = 200 }, false, ""},
+		{"routeMetric at max", func(r *WgS2sCreateRequest) { r.RouteMetric = 9999 }, false, ""},
+		{"negative routeMetric", func(r *WgS2sCreateRequest) { r.RouteMetric = -1 }, true, "routeMetric"},
+		{"routeMetric exceeds max", func(r *WgS2sCreateRequest) { r.RouteMetric = 10000 }, true, "routeMetric"},
+		{"name at 128 chars", func(r *WgS2sCreateRequest) { r.Name = strings.Repeat("a", 128) }, false, ""},
+		{"name exceeds 128 chars", func(r *WgS2sCreateRequest) { r.Name = strings.Repeat("a", 129) }, true, "name"},
+		{"zero MTU (default)", func(r *WgS2sCreateRequest) { r.MTU = 0 }, false, ""},
+		{"negative MTU", func(r *WgS2sCreateRequest) { r.MTU = -1 }, true, "mtu"},
+		{"MTU below min", func(r *WgS2sCreateRequest) { r.MTU = 575 }, true, "mtu"},
+		{"MTU at min", func(r *WgS2sCreateRequest) { r.MTU = 576 }, false, ""},
+		{"MTU at max", func(r *WgS2sCreateRequest) { r.MTU = 65535 }, false, ""},
+		{"MTU exceeds max", func(r *WgS2sCreateRequest) { r.MTU = 65536 }, true, "mtu"},
+		{"zero keepalive (default)", func(r *WgS2sCreateRequest) { r.PersistentKeepalive = 0 }, false, ""},
+		{"negative keepalive", func(r *WgS2sCreateRequest) { r.PersistentKeepalive = -1 }, true, "persistentKeepalive"},
+		{"keepalive at max", func(r *WgS2sCreateRequest) { r.PersistentKeepalive = 86400 }, false, ""},
+		{"keepalive exceeds max", func(r *WgS2sCreateRequest) { r.PersistentKeepalive = 86401 }, true, "persistentKeepalive"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := validReq(t)
+			tt.modify(req)
+			err := validateCreateRequest(req)
+			if tt.wantErr {
+				require.Error(t, err)
+				if tt.errMsg != "" {
+					assert.Contains(t, err.Error(), tt.errMsg)
+				}
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestHumanizeWgS2sError(t *testing.T) {
+	tests := []struct {
+		name string
+		err  error
+		want string
+	}{
+		{"nil", nil, ""},
+		{"not found", errors.New("tunnel not found"), "Tunnel not found"},
+		{"port in use", errors.New("port in use"), "already in use"},
+		{"permission denied", errors.New("permission denied"), "Insufficient permissions"},
+		{"unknown", errors.New("something else"), "WG S2S error:"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := humanizeWgS2sError(tt.err)
+			if tt.err == nil {
+				assert.Equal(t, "", result)
+			} else {
+				assert.Contains(t, result, tt.want)
+			}
+		})
+	}
+}
+
+func TestValidateUpdateRequest(t *testing.T) {
+	tests := []struct {
+		name    string
+		modify  func(*wgs2s.TunnelConfig)
+		wantErr bool
+		errMsg  string
+	}{
+		{"empty update", func(c *wgs2s.TunnelConfig) {}, false, ""},
+		{"valid tunnelAddress", func(c *wgs2s.TunnelConfig) { c.TunnelAddress = "10.0.0.1/24" }, false, ""},
+		{"invalid tunnelAddress", func(c *wgs2s.TunnelConfig) { c.TunnelAddress = "not-cidr" }, true, "tunnelAddress"},
+		{"valid peerPublicKey", func(c *wgs2s.TunnelConfig) { c.PeerPublicKey = testBase64Key(t) }, false, ""},
+		{"invalid peerPublicKey", func(c *wgs2s.TunnelConfig) { c.PeerPublicKey = "short" }, true, "peerPublicKey"},
+		{"valid allowedIPs", func(c *wgs2s.TunnelConfig) { c.AllowedIPs = []string{"10.0.0.0/24"} }, false, ""},
+		{"invalid allowedIP", func(c *wgs2s.TunnelConfig) { c.AllowedIPs = []string{"bad"} }, true, "allowedIP"},
+		{"negative port", func(c *wgs2s.TunnelConfig) { c.ListenPort = -1 }, true, "listenPort"},
+		{"port exceeds 65535", func(c *wgs2s.TunnelConfig) { c.ListenPort = 65536 }, true, "listenPort"},
+		{"zero port (no change)", func(c *wgs2s.TunnelConfig) { c.ListenPort = 0 }, false, ""},
+		{"positive port", func(c *wgs2s.TunnelConfig) { c.ListenPort = 51821 }, false, ""},
+		{"port at max", func(c *wgs2s.TunnelConfig) { c.ListenPort = 65535 }, false, ""},
+		{"zero routeMetric (no change)", func(c *wgs2s.TunnelConfig) { c.RouteMetric = 0 }, false, ""},
+		{"valid routeMetric", func(c *wgs2s.TunnelConfig) { c.RouteMetric = 500 }, false, ""},
+		{"negative routeMetric", func(c *wgs2s.TunnelConfig) { c.RouteMetric = -1 }, true, "routeMetric"},
+		{"routeMetric exceeds max", func(c *wgs2s.TunnelConfig) { c.RouteMetric = 10000 }, true, "routeMetric"},
+		{"empty name (keep existing)", func(c *wgs2s.TunnelConfig) { c.Name = "" }, false, ""},
+		{"name at 128 chars", func(c *wgs2s.TunnelConfig) { c.Name = strings.Repeat("a", 128) }, false, ""},
+		{"name exceeds 128 chars", func(c *wgs2s.TunnelConfig) { c.Name = strings.Repeat("a", 129) }, true, "name"},
+		{"zero MTU (no change)", func(c *wgs2s.TunnelConfig) { c.MTU = 0 }, false, ""},
+		{"negative MTU", func(c *wgs2s.TunnelConfig) { c.MTU = -1 }, true, "mtu"},
+		{"MTU below min", func(c *wgs2s.TunnelConfig) { c.MTU = 575 }, true, "mtu"},
+		{"MTU at min", func(c *wgs2s.TunnelConfig) { c.MTU = 576 }, false, ""},
+		{"MTU exceeds max", func(c *wgs2s.TunnelConfig) { c.MTU = 65536 }, true, "mtu"},
+		{"zero keepalive (no change)", func(c *wgs2s.TunnelConfig) { c.PersistentKeepalive = 0 }, false, ""},
+		{"negative keepalive", func(c *wgs2s.TunnelConfig) { c.PersistentKeepalive = -1 }, true, "persistentKeepalive"},
+		{"keepalive at max", func(c *wgs2s.TunnelConfig) { c.PersistentKeepalive = 86400 }, false, ""},
+		{"keepalive exceeds max", func(c *wgs2s.TunnelConfig) { c.PersistentKeepalive = 86401 }, true, "persistentKeepalive"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := wgs2s.TunnelConfig{}
+			tt.modify(&cfg)
+			err := validateUpdateRequest(&cfg)
+			if tt.wantErr {
+				require.Error(t, err)
+				if tt.errMsg != "" {
+					assert.Contains(t, err.Error(), tt.errMsg)
+				}
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+// --- Mock types for service-level tests ---
+
+type mockWgS2sWireGuard struct {
+	createTunnelFn  func(wgs2s.TunnelConfig, string) (*wgs2s.TunnelConfig, error)
+	deleteTunnelFn  func(string) error
+	enableTunnelFn  func(string) error
+	disableTunnelFn func(string) error
+	updateTunnelFn  func(string, wgs2s.TunnelConfig) (*wgs2s.TunnelConfig, error)
+	getTunnelsFn    func() []wgs2s.TunnelConfig
+	getStatusesFn   func() []wgs2s.WgS2sStatus
+	getPublicKeyFn  func(string) (string, error)
+}
+
+func (m *mockWgS2sWireGuard) CreateTunnel(cfg wgs2s.TunnelConfig, pk string) (*wgs2s.TunnelConfig, error) {
+	if m.createTunnelFn != nil {
+		return m.createTunnelFn(cfg, pk)
+	}
+	return &cfg, nil
+}
+
+func (m *mockWgS2sWireGuard) DeleteTunnel(id string) error {
+	if m.deleteTunnelFn != nil {
+		return m.deleteTunnelFn(id)
+	}
+	return nil
+}
+
+func (m *mockWgS2sWireGuard) EnableTunnel(id string) error {
+	if m.enableTunnelFn != nil {
+		return m.enableTunnelFn(id)
+	}
+	return nil
+}
+
+func (m *mockWgS2sWireGuard) DisableTunnel(id string) error {
+	if m.disableTunnelFn != nil {
+		return m.disableTunnelFn(id)
+	}
+	return nil
+}
+
+func (m *mockWgS2sWireGuard) UpdateTunnel(id string, updates wgs2s.TunnelConfig) (*wgs2s.TunnelConfig, error) {
+	if m.updateTunnelFn != nil {
+		return m.updateTunnelFn(id, updates)
+	}
+	return &updates, nil
+}
+
+func (m *mockWgS2sWireGuard) GetTunnels() []wgs2s.TunnelConfig {
+	if m.getTunnelsFn != nil {
+		return m.getTunnelsFn()
+	}
+	return nil
+}
+
+func (m *mockWgS2sWireGuard) GetStatuses() []wgs2s.WgS2sStatus {
+	if m.getStatusesFn != nil {
+		return m.getStatusesFn()
+	}
+	return nil
+}
+
+func (m *mockWgS2sWireGuard) GetPublicKey(id string) (string, error) {
+	if m.getPublicKeyFn != nil {
+		return m.getPublicKeyFn(id)
+	}
+	return "", nil
+}
+
+type mockWgS2sFirewall struct {
+	setupZoneFn        func(context.Context, string, string, string) *ZoneSetupResult
+	setupFirewallFn    func(context.Context, string, string, []string) error
+	removeFirewallFn   func(context.Context, string, string, []string)
+	removeIPSetFn      func(context.Context, string, []string)
+	teardownZoneFn     func(context.Context, string)
+	openWanPortFn      func(context.Context, int, string)
+	closeWanPortFn     func(context.Context, int, string)
+	checkRulesFn       func(context.Context, []domain.WgS2sCheckSpec) map[string]bool
+	integrationReadyFn func() bool
+}
+
+func (m *mockWgS2sFirewall) SetupZone(ctx context.Context, tid, zid, zname string) *ZoneSetupResult {
+	if m.setupZoneFn != nil {
+		return m.setupZoneFn(ctx, tid, zid, zname)
+	}
+	return nil
+}
+func (m *mockWgS2sFirewall) SetupFirewall(ctx context.Context, tid, iface string, ips []string) error {
+	if m.setupFirewallFn != nil {
+		return m.setupFirewallFn(ctx, tid, iface, ips)
+	}
+	return nil
+}
+func (m *mockWgS2sFirewall) RemoveFirewall(ctx context.Context, tid, iface string, ips []string) {
+	if m.removeFirewallFn != nil {
+		m.removeFirewallFn(ctx, tid, iface, ips)
+	}
+}
+func (m *mockWgS2sFirewall) RemoveIPSetEntries(ctx context.Context, tid string, cidrs []string) {
+	if m.removeIPSetFn != nil {
+		m.removeIPSetFn(ctx, tid, cidrs)
+	}
+}
+func (m *mockWgS2sFirewall) TeardownZone(ctx context.Context, tid string) {
+	if m.teardownZoneFn != nil {
+		m.teardownZoneFn(ctx, tid)
+	}
+}
+func (m *mockWgS2sFirewall) OpenWanPort(ctx context.Context, port int, iface string) {
+	if m.openWanPortFn != nil {
+		m.openWanPortFn(ctx, port, iface)
+	}
+}
+func (m *mockWgS2sFirewall) CloseWanPort(ctx context.Context, port int, iface string) {
+	if m.closeWanPortFn != nil {
+		m.closeWanPortFn(ctx, port, iface)
+	}
+}
+func (m *mockWgS2sFirewall) CheckRulesPresent(ctx context.Context, specs []domain.WgS2sCheckSpec) map[string]bool {
+	if m.checkRulesFn != nil {
+		return m.checkRulesFn(ctx, specs)
+	}
+	return nil
+}
+func (m *mockWgS2sFirewall) IntegrationReady() bool {
+	if m.integrationReadyFn != nil {
+		return m.integrationReadyFn()
+	}
+	return false
+}
+
+type mockWgS2sManifest struct {
+	getZoneFn  func(string) (ZoneInfo, bool)
+	getZonesFn func() []WgS2sZoneEntry
+}
+
+func (m *mockWgS2sManifest) GetZone(tid string) (ZoneInfo, bool) {
+	if m.getZoneFn != nil {
+		return m.getZoneFn(tid)
+	}
+	return ZoneInfo{}, false
+}
+func (m *mockWgS2sManifest) GetZones() []WgS2sZoneEntry {
+	if m.getZonesFn != nil {
+		return m.getZonesFn()
+	}
+	return nil
+}
+
+func newTestWgS2sService(wg WgS2sWireGuard, opts ...func(*WgS2sService)) *WgS2sService {
+	svc := NewWgS2sService(WgS2sConfig{
+		WG:       wg,
+		Manifest: &mockWgS2sManifest{},
+	})
+	for _, opt := range opts {
+		opt(svc)
+	}
+	return svc
+}
+
+func TestCreateTunnelValidation(t *testing.T) {
+	svc := newTestWgS2sService(&mockWgS2sWireGuard{})
+	_, err := svc.CreateTunnel(context.Background(), &WgS2sCreateRequest{})
+	require.Error(t, err)
+	var se *Error
+	require.True(t, errors.As(err, &se))
+	assert.Equal(t, ErrValidation, se.Kind)
+}
+
+func TestCreateTunnelSuccess(t *testing.T) {
+	tunnel := &wgs2s.TunnelConfig{
+		ID: "t1", Name: "test", InterfaceName: "wg-s2s0",
+		ListenPort: 51820, TunnelAddress: "10.0.0.1/24",
+		AllowedIPs: []string{"10.0.0.0/24"},
+	}
+	svc := newTestWgS2sService(&mockWgS2sWireGuard{
+		createTunnelFn: func(_ wgs2s.TunnelConfig, _ string) (*wgs2s.TunnelConfig, error) {
+			return tunnel, nil
+		},
+		getPublicKeyFn: func(string) (string, error) { return "pubkey", nil },
+	})
+
+	resp, err := svc.CreateTunnel(context.Background(), &WgS2sCreateRequest{
+		TunnelConfig: wgs2s.TunnelConfig{
+			Name:          "test",
+			ListenPort:    51820,
+			TunnelAddress: "10.0.0.1/24",
+			PeerPublicKey: testBase64Key(t),
+			AllowedIPs:    []string{"10.0.0.0/24"},
+		},
+	})
+	require.NoError(t, err)
+	assert.Equal(t, "t1", resp.ID)
+	assert.Equal(t, "pubkey", resp.PublicKey)
+	assert.Equal(t, "ok", resp.SetupStatus)
+	assert.Nil(t, resp.Firewall)
+}
+
+func TestCreateTunnelFirewallPartial(t *testing.T) {
+	tunnel := &wgs2s.TunnelConfig{
+		ID: "t1", Name: "test", InterfaceName: "wg-s2s0",
+		ListenPort: 51820, TunnelAddress: "10.0.0.1/24",
+		AllowedIPs: []string{"10.0.0.0/24"},
+	}
+	svc := newTestWgS2sService(
+		&mockWgS2sWireGuard{
+			createTunnelFn: func(_ wgs2s.TunnelConfig, _ string) (*wgs2s.TunnelConfig, error) {
+				return tunnel, nil
+			},
+			getPublicKeyFn: func(string) (string, error) { return "pubkey", nil },
+		},
+		func(s *WgS2sService) {
+			s.fw = &mockWgS2sFirewall{
+				setupFirewallFn: func(context.Context, string, string, []string) error {
+					return fmt.Errorf("UDAPI unreachable")
+				},
+				integrationReadyFn: func() bool { return false },
+			}
+		},
+	)
+
+	resp, err := svc.CreateTunnel(context.Background(), &WgS2sCreateRequest{
+		TunnelConfig: wgs2s.TunnelConfig{
+			Name:          "test",
+			ListenPort:    51820,
+			TunnelAddress: "10.0.0.1/24",
+			PeerPublicKey: testBase64Key(t),
+			AllowedIPs:    []string{"10.0.0.0/24"},
+		},
+	})
+	require.NoError(t, err)
+	assert.Equal(t, "partial", resp.SetupStatus)
+	require.NotNil(t, resp.Firewall)
+	assert.Contains(t, resp.Firewall.Errors[0], "UDAPI unreachable")
+}
+
+func TestDeleteTunnelNotFound(t *testing.T) {
+	svc := newTestWgS2sService(&mockWgS2sWireGuard{})
+	err := svc.DeleteTunnel(context.Background(), "nonexistent")
+	require.Error(t, err)
+	var se *Error
+	require.True(t, errors.As(err, &se))
+	assert.Equal(t, ErrNotFound, se.Kind)
+}
+
+// TestDeleteTunnel_FirewallBeforeWgDelete covers the BUG-L10 service-level
+// ordering: firewall teardown must happen BEFORE the low-level wg.DeleteTunnel
+// (which removes the kernel interface + disk entry + keys). Removing firewall
+// rules referencing a still-existing iface is safe; removing rules referencing
+// a gone iface can leak stale UDAPI state.
+func TestDeleteTunnel_FirewallBeforeWgDelete(t *testing.T) {
+	tunnel := wgs2s.TunnelConfig{
+		ID: "t1", InterfaceName: "wg-s2s0",
+		ListenPort: 51820, AllowedIPs: []string{"10.0.0.0/24"},
+	}
+	var order []string
+	wg := &mockWgS2sWireGuard{
+		getTunnelsFn:   func() []wgs2s.TunnelConfig { return []wgs2s.TunnelConfig{tunnel} },
+		deleteTunnelFn: func(string) error { order = append(order, "wg-delete"); return nil },
+	}
+	fw := &mockWgS2sFirewall{
+		removeFirewallFn: func(_ context.Context, _, _ string, _ []string) {
+			order = append(order, "fw-remove")
+		},
+		closeWanPortFn: func(_ context.Context, _ int, _ string) {
+			order = append(order, "fw-close-wan")
+		},
+		teardownZoneFn: func(_ context.Context, _ string) {
+			order = append(order, "fw-teardown-zone")
+		},
+	}
+	svc := newTestWgS2sService(wg, func(s *WgS2sService) { s.fw = fw })
+	require.NoError(t, svc.DeleteTunnel(context.Background(), "t1"))
+
+	// Firewall removal (rules + WAN port + zone) must precede wg-delete.
+	wgIdx := -1
+	for i, c := range order {
+		if c == "wg-delete" {
+			wgIdx = i
+			break
+		}
+	}
+	if wgIdx < 0 {
+		t.Fatalf("wg-delete missing from %v", order)
+	}
+	for i, c := range order {
+		if i < wgIdx {
+			continue
+		}
+		if c == "fw-remove" || c == "fw-close-wan" || c == "fw-teardown-zone" {
+			t.Fatalf("firewall step %q came after wg-delete; order=%v", c, order)
+		}
+	}
+}
+
+func TestDeleteTunnelSuccess(t *testing.T) {
+	tunnel := wgs2s.TunnelConfig{
+		ID: "t1", InterfaceName: "wg-s2s0",
+		ListenPort: 51820, AllowedIPs: []string{"10.0.0.0/24"},
+	}
+
+	var deletedID string
+	var removedFW, closedWan, tornDownZone bool
+
+	wg := &mockWgS2sWireGuard{
+		getTunnelsFn:   func() []wgs2s.TunnelConfig { return []wgs2s.TunnelConfig{tunnel} },
+		deleteTunnelFn: func(id string) error { deletedID = id; return nil },
+	}
+	fw := &mockWgS2sFirewall{
+		removeFirewallFn: func(_ context.Context, id, iface string, ips []string) {
+			removedFW = true
+			assert.Equal(t, "t1", id)
+			assert.Equal(t, "wg-s2s0", iface)
+			assert.Equal(t, []string{"10.0.0.0/24"}, ips)
+		},
+		closeWanPortFn: func(_ context.Context, port int, iface string) {
+			closedWan = true
+			assert.Equal(t, 51820, port)
+		},
+		teardownZoneFn: func(_ context.Context, id string) {
+			tornDownZone = true
+			assert.Equal(t, "t1", id)
+		},
+	}
+
+	svc := newTestWgS2sService(wg, func(s *WgS2sService) { s.fw = fw })
+	err := svc.DeleteTunnel(context.Background(), "t1")
+
+	require.NoError(t, err)
+	assert.Equal(t, "t1", deletedID)
+	assert.True(t, removedFW, "RemoveFirewall should be called")
+	assert.True(t, closedWan, "CloseWanPort should be called")
+	assert.True(t, tornDownZone, "TeardownZone should be called")
+}
+
+func TestDeleteTunnelWgError(t *testing.T) {
+	tunnel := wgs2s.TunnelConfig{
+		ID: "t1", InterfaceName: "wg-s2s0",
+		ListenPort: 51820, AllowedIPs: []string{"10.0.0.0/24"},
+	}
+
+	var fwCalled bool
+	wg := &mockWgS2sWireGuard{
+		getTunnelsFn:   func() []wgs2s.TunnelConfig { return []wgs2s.TunnelConfig{tunnel} },
+		deleteTunnelFn: func(string) error { return fmt.Errorf("wg: interface busy") },
+	}
+	fw := &mockWgS2sFirewall{
+		removeFirewallFn: func(context.Context, string, string, []string) { fwCalled = true },
+		closeWanPortFn:   func(context.Context, int, string) { fwCalled = true },
+		teardownZoneFn:   func(context.Context, string) { fwCalled = true },
+	}
+
+	svc := newTestWgS2sService(wg, func(s *WgS2sService) { s.fw = fw })
+	err := svc.DeleteTunnel(context.Background(), "t1")
+
+	require.Error(t, err)
+	var se *Error
+	require.True(t, errors.As(err, &se))
+	assert.Equal(t, ErrUpstream, se.Kind)
+	// New contract (BUG-L10): firewall teardown runs BEFORE wg.DeleteTunnel.
+	// On wg-delete failure the saga restores firewall + WAN port so the
+	// operator can safely retry without dangling state.
+	assert.True(t, fwCalled, "firewall teardown must precede wg.DeleteTunnel")
+}
+
+// TestDeleteTunnel_WgFailureRestoresFirewall covers the BUG-L10 service-level
+// rollback contract: if wg.DeleteTunnel fails after the firewall has been
+// torn down, the saga must re-install firewall rules + WAN port so the
+// system isn't left with a live tunnel and no firewall.
+func TestDeleteTunnel_WgFailureRestoresFirewall(t *testing.T) {
+	tunnel := wgs2s.TunnelConfig{
+		ID: "t1", InterfaceName: "wg-s2s0",
+		ListenPort: 51820, AllowedIPs: []string{"10.0.0.0/24"},
+	}
+	var order []string
+	wg := &mockWgS2sWireGuard{
+		getTunnelsFn:   func() []wgs2s.TunnelConfig { return []wgs2s.TunnelConfig{tunnel} },
+		deleteTunnelFn: func(string) error { order = append(order, "wg-delete-fail"); return fmt.Errorf("wg: busy") },
+	}
+	fw := &mockWgS2sFirewall{
+		removeFirewallFn: func(_ context.Context, _, _ string, _ []string) { order = append(order, "fw-remove") },
+		closeWanPortFn:   func(_ context.Context, _ int, _ string) { order = append(order, "fw-close-wan") },
+		teardownZoneFn:   func(_ context.Context, _ string) { order = append(order, "fw-teardown-zone") },
+		setupFirewallFn: func(_ context.Context, _, _ string, _ []string) error {
+			order = append(order, "fw-setup-restore")
+			return nil
+		},
+		openWanPortFn: func(_ context.Context, _ int, _ string) { order = append(order, "fw-open-wan-restore") },
+	}
+	svc := newTestWgS2sService(wg, func(s *WgS2sService) { s.fw = fw })
+	if err := svc.DeleteTunnel(context.Background(), "t1"); err == nil {
+		t.Fatal("expected error from wg.DeleteTunnel failure")
+	}
+
+	// "wg-delete-fail" must precede the restore-side firewall calls.
+	wgIdx := -1
+	for i, c := range order {
+		if c == "wg-delete-fail" {
+			wgIdx = i
+			break
+		}
+	}
+	if wgIdx < 0 {
+		t.Fatalf("wg-delete-fail missing from %v", order)
+	}
+	sawRestore := false
+	for _, c := range order[wgIdx+1:] {
+		if c == "fw-setup-restore" || c == "fw-open-wan-restore" {
+			sawRestore = true
+		}
+	}
+	if !sawRestore {
+		t.Fatalf("firewall restore did not run after wg failure; order=%v", order)
+	}
+}
+
+// TestUpdateTunnel_ListenPortChangeSyncsWanPort covers M3: changing an enabled
+// tunnel's listenPort must resync the WAN inbound policy. The bug it catches:
+// UpdateTunnel never touched the WAN port, so the old UDP port stayed open on
+// WAN forever and the new one was never opened. Because OpenWanPort is
+// idempotent by marker (not by port), the order must be CloseWanPort(old) then
+// OpenWanPort(new) — a bare OpenWanPort(new) would no-op.
+func TestUpdateTunnel_ListenPortChangeSyncsWanPort(t *testing.T) {
+	existing := wgs2s.TunnelConfig{
+		ID: "t1", InterfaceName: "wg-s2s0", Enabled: true,
+		ListenPort: 51820, TunnelAddress: "10.0.0.1/24",
+	}
+	updated := existing
+	updated.ListenPort = 51999
+
+	wg := &mockWgS2sWireGuard{
+		getTunnelsFn: func() []wgs2s.TunnelConfig { return []wgs2s.TunnelConfig{existing} },
+		updateTunnelFn: func(_ string, _ wgs2s.TunnelConfig) (*wgs2s.TunnelConfig, error) {
+			return &updated, nil
+		},
+	}
+
+	var order []string
+	var closedPort, openedPort int
+	fw := &mockWgS2sFirewall{
+		closeWanPortFn: func(_ context.Context, port int, _ string) {
+			order = append(order, "close")
+			closedPort = port
+		},
+		openWanPortFn: func(_ context.Context, port int, _ string) {
+			order = append(order, "open")
+			openedPort = port
+		},
+	}
+	svc := newTestWgS2sService(wg, func(s *WgS2sService) { s.fw = fw })
+
+	_, err := svc.UpdateTunnel(context.Background(), "t1", wgs2s.TunnelConfig{ListenPort: 51999})
+	require.NoError(t, err)
+
+	require.Equal(t, []string{"close", "open"}, order, "must close old port before opening new")
+	assert.Equal(t, 51820, closedPort, "old port must be closed")
+	assert.Equal(t, 51999, openedPort, "new port must be opened")
+}
+
+// TestUpdateTunnel_NoPortChangeLeavesWanAlone locks the guard: an update that
+// does not change the listen port must not touch the WAN policy.
+func TestUpdateTunnel_NoPortChangeLeavesWanAlone(t *testing.T) {
+	existing := wgs2s.TunnelConfig{
+		ID: "t1", InterfaceName: "wg-s2s0", Enabled: true,
+		ListenPort: 51820, TunnelAddress: "10.0.0.1/24",
+	}
+	updated := existing
+	updated.TunnelAddress = "10.0.0.2/24"
+
+	wg := &mockWgS2sWireGuard{
+		getTunnelsFn: func() []wgs2s.TunnelConfig { return []wgs2s.TunnelConfig{existing} },
+		updateTunnelFn: func(_ string, _ wgs2s.TunnelConfig) (*wgs2s.TunnelConfig, error) {
+			return &updated, nil
+		},
+	}
+
+	var wanCalls int
+	fw := &mockWgS2sFirewall{
+		closeWanPortFn: func(_ context.Context, _ int, _ string) { wanCalls++ },
+		openWanPortFn:  func(_ context.Context, _ int, _ string) { wanCalls++ },
+	}
+	svc := newTestWgS2sService(wg, func(s *WgS2sService) { s.fw = fw })
+
+	_, err := svc.UpdateTunnel(context.Background(), "t1", wgs2s.TunnelConfig{TunnelAddress: "10.0.0.2/24"})
+	require.NoError(t, err)
+	assert.Zero(t, wanCalls, "WAN policy must not be touched when port is unchanged")
+}
+
+func TestEnableTunnelFirewallPartial(t *testing.T) {
+	tunnel := wgs2s.TunnelConfig{
+		ID: "t1", Name: "test", InterfaceName: "wg-s2s0", Enabled: true,
+		ListenPort: 51820, AllowedIPs: []string{"10.0.0.0/24"},
+	}
+	svc := newTestWgS2sService(
+		&mockWgS2sWireGuard{
+			enableTunnelFn: func(string) error { return nil },
+			getTunnelsFn:   func() []wgs2s.TunnelConfig { return []wgs2s.TunnelConfig{tunnel} },
+		},
+		func(s *WgS2sService) {
+			s.fw = &mockWgS2sFirewall{
+				setupFirewallFn: func(context.Context, string, string, []string) error {
+					return fmt.Errorf("ipset failed")
+				},
+			}
+		},
+	)
+
+	resp, err := svc.EnableTunnel(context.Background(), "t1")
+	require.NoError(t, err)
+	assert.True(t, resp.OK)
+	assert.Equal(t, "partial", resp.SetupStatus)
+	require.NotNil(t, resp.Firewall)
+	assert.Contains(t, resp.Firewall.Errors[0], "ipset failed")
+}
+
+func TestGenerateKeypair(t *testing.T) {
+	svc := newTestWgS2sService(&mockWgS2sWireGuard{})
+	kp, err := svc.GenerateKeypair()
+	require.NoError(t, err)
+	assert.Len(t, kp.PublicKey, 44)
+	assert.Len(t, kp.PrivateKey, 44)
+}
+
+func TestListTunnels(t *testing.T) {
+	tunnels := []wgs2s.TunnelConfig{
+		{ID: "t1", Name: "tunnel-1", InterfaceName: "wg-s2s0"},
+		{ID: "t2", Name: "tunnel-2", InterfaceName: "wg-s2s1"},
+	}
+	svc := newTestWgS2sService(&mockWgS2sWireGuard{
+		getTunnelsFn:   func() []wgs2s.TunnelConfig { return tunnels },
+		getPublicKeyFn: func(id string) (string, error) { return "pk-" + id, nil },
+	})
+
+	result := svc.ListTunnels(context.Background())
+	require.Len(t, result, 2)
+	assert.Equal(t, "t1", result[0].ID)
+	assert.Equal(t, "pk-t1", result[0].PublicKey)
+}
+
+func TestSubnetConflictError(t *testing.T) {
+	svc := newTestWgS2sService(&mockWgS2sWireGuard{})
+	svc.validateSubnets = func(ips []string, _ ...string) ([]SubnetConflict, []SubnetConflict) {
+		return nil, []SubnetConflict{{CIDR: "10.0.0.0/24", Message: "overlaps with br0"}}
+	}
+
+	_, err := svc.CreateTunnel(context.Background(), &WgS2sCreateRequest{
+		TunnelConfig: wgs2s.TunnelConfig{
+			Name:          "test",
+			ListenPort:    51820,
+			TunnelAddress: "10.0.0.1/24",
+			PeerPublicKey: testBase64Key(t),
+			AllowedIPs:    []string{"10.0.0.0/24"},
+		},
+	})
+	require.Error(t, err)
+	var sce *SubnetConflictError
+	require.True(t, errors.As(err, &sce))
+	assert.Len(t, sce.Conflicts, 1)
+}
+
+func TestReconcileZonesCreatesDefault(t *testing.T) {
+	var setupCalls []string
+	svc := newTestWgS2sService(
+		&mockWgS2sWireGuard{
+			getTunnelsFn: func() []wgs2s.TunnelConfig {
+				return []wgs2s.TunnelConfig{{ID: "t1"}, {ID: "t2"}}
+			},
+		},
+		func(s *WgS2sService) {
+			s.fw = &mockWgS2sFirewall{
+				integrationReadyFn: func() bool { return true },
+				setupZoneFn: func(_ context.Context, tid, zid, zname string) *ZoneSetupResult {
+					setupCalls = append(setupCalls, tid)
+					return &ZoneSetupResult{ZoneCreated: true, PoliciesReady: true}
+				},
+			}
+		},
+	)
+	svc.ReconcileZones(context.Background())
+	assert.Equal(t, []string{"t1", "t2"}, setupCalls)
+}
+
+func TestReconcileZonesSkipsExisting(t *testing.T) {
+	var setupCalls []string
+	svc := newTestWgS2sService(
+		&mockWgS2sWireGuard{
+			getTunnelsFn: func() []wgs2s.TunnelConfig {
+				return []wgs2s.TunnelConfig{{ID: "t1"}, {ID: "t2"}}
+			},
+		},
+		func(s *WgS2sService) {
+			s.manifest = &mockWgS2sManifest{
+				getZoneFn: func(tid string) (ZoneInfo, bool) {
+					if tid == "t1" {
+						return ZoneInfo{ZoneID: "z1", ZoneName: "existing"}, true
+					}
+					return ZoneInfo{}, false
+				},
+			}
+			s.fw = &mockWgS2sFirewall{
+				integrationReadyFn: func() bool { return true },
+				setupZoneFn: func(_ context.Context, tid, zid, zname string) *ZoneSetupResult {
+					setupCalls = append(setupCalls, tid)
+					return &ZoneSetupResult{ZoneCreated: true, PoliciesReady: true}
+				},
+			}
+		},
+	)
+	svc.ReconcileZones(context.Background())
+	assert.Equal(t, []string{"t2"}, setupCalls)
+}
+
+func TestReconcileZonesNoopWithoutIntegration(t *testing.T) {
+	called := false
+	svc := newTestWgS2sService(
+		&mockWgS2sWireGuard{
+			getTunnelsFn: func() []wgs2s.TunnelConfig {
+				return []wgs2s.TunnelConfig{{ID: "t1"}}
+			},
+		},
+		func(s *WgS2sService) {
+			s.fw = &mockWgS2sFirewall{
+				integrationReadyFn: func() bool { return false },
+				setupZoneFn: func(context.Context, string, string, string) *ZoneSetupResult {
+					called = true
+					return nil
+				},
+			}
+		},
+	)
+	svc.ReconcileZones(context.Background())
+	assert.False(t, called)
+}
+
+func TestReconcileZonesReusesExistingZone(t *testing.T) {
+	var capturedZoneID string
+	svc := newTestWgS2sService(
+		&mockWgS2sWireGuard{
+			getTunnelsFn: func() []wgs2s.TunnelConfig {
+				return []wgs2s.TunnelConfig{{ID: "t1"}}
+			},
+		},
+		func(s *WgS2sService) {
+			s.manifest = &mockWgS2sManifest{
+				getZoneFn:  func(string) (ZoneInfo, bool) { return ZoneInfo{}, false },
+				getZonesFn: func() []WgS2sZoneEntry { return []WgS2sZoneEntry{{ZoneID: "z1", ZoneName: "existing"}} },
+			}
+			s.fw = &mockWgS2sFirewall{
+				integrationReadyFn: func() bool { return true },
+				setupZoneFn: func(_ context.Context, _, zid, _ string) *ZoneSetupResult {
+					capturedZoneID = zid
+					return &ZoneSetupResult{ZoneCreated: true, PoliciesReady: true}
+				},
+			}
+		},
+	)
+	svc.ReconcileZones(context.Background())
+	assert.Equal(t, "z1", capturedZoneID)
+}
+
+func TestSetupZoneForTunnelNotFound(t *testing.T) {
+	svc := newTestWgS2sService(&mockWgS2sWireGuard{
+		getTunnelsFn: func() []wgs2s.TunnelConfig { return nil },
+	})
+	_, err := svc.SetupZoneForTunnel(context.Background(), "nonexistent")
+	require.Error(t, err)
+	var se *Error
+	require.True(t, errors.As(err, &se))
+	assert.Equal(t, ErrNotFound, se.Kind)
+}
+
+func TestSetupZoneForTunnelAlreadyHasZone(t *testing.T) {
+	svc := newTestWgS2sService(
+		&mockWgS2sWireGuard{
+			getTunnelsFn: func() []wgs2s.TunnelConfig { return []wgs2s.TunnelConfig{{ID: "t1"}} },
+		},
+		func(s *WgS2sService) {
+			s.manifest = &mockWgS2sManifest{
+				getZoneFn: func(string) (ZoneInfo, bool) {
+					return ZoneInfo{ZoneID: "z1"}, true
+				},
+			}
+		},
+	)
+	result, err := svc.SetupZoneForTunnel(context.Background(), "t1")
+	require.NoError(t, err)
+	assert.True(t, result.ZoneCreated)
+	assert.True(t, result.PoliciesReady)
+}
+
+func TestSetupZoneForTunnelCreatesZone(t *testing.T) {
+	var setupTunnelID string
+	svc := newTestWgS2sService(
+		&mockWgS2sWireGuard{
+			getTunnelsFn: func() []wgs2s.TunnelConfig { return []wgs2s.TunnelConfig{{ID: "t1"}} },
+		},
+		func(s *WgS2sService) {
+			s.fw = &mockWgS2sFirewall{
+				integrationReadyFn: func() bool { return true },
+				setupZoneFn: func(_ context.Context, tid, _, _ string) *ZoneSetupResult {
+					setupTunnelID = tid
+					return &ZoneSetupResult{ZoneCreated: true, PoliciesReady: true}
+				},
+			}
+		},
+	)
+	result, err := svc.SetupZoneForTunnel(context.Background(), "t1")
+	require.NoError(t, err)
+	assert.True(t, result.ZoneCreated)
+	assert.Equal(t, "t1", setupTunnelID)
+}

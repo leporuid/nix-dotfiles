@@ -1,0 +1,497 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"strings"
+	"testing"
+	"time"
+
+	"unifi-tailscale/manager/config"
+	"unifi-tailscale/manager/domain"
+)
+
+// fakeFwTables backs the probe seams on FirewallManager: it records which
+// (chain, match) and (ipset, member) pairs are considered present.
+type fakeFwTables struct {
+	chainRules map[string]map[string]bool // chain → match → present
+	ipsets     map[string]map[string]bool // setName → cidr → present
+}
+
+func newFakeFwTables() *fakeFwTables {
+	return &fakeFwTables{
+		chainRules: map[string]map[string]bool{},
+		ipsets:     map[string]map[string]bool{},
+	}
+}
+
+func (f *fakeFwTables) installChainRule(chain, match string) {
+	if f.chainRules[chain] == nil {
+		f.chainRules[chain] = map[string]bool{}
+	}
+	f.chainRules[chain][match] = true
+}
+
+func (f *fakeFwTables) installIPSet(setName string, members []string) {
+	if f.ipsets[setName] == nil {
+		f.ipsets[setName] = map[string]bool{}
+	}
+	for _, m := range members {
+		f.ipsets[setName][m] = true
+	}
+}
+
+func (f *fakeFwTables) hasChainRule(chain, match string) bool {
+	return f.chainRules[chain][match]
+}
+
+// hasIPSetEntry mirrors the production probe: a textual substring check on
+// the ipset's listed members.
+func (f *fakeFwTables) hasIPSetEntry(setName, match string) bool {
+	for m := range f.ipsets[setName] {
+		if strings.Contains(m, match) {
+			return true
+		}
+	}
+	return false
+}
+
+func newFakeFirewallManager(t *testing.T) (*FirewallManager, *fakeFwTables) {
+	t.Helper()
+	fk := newFakeFwTables()
+	fm := &FirewallManager{
+		chainProbe: fk.hasChainRule,
+		ipsetProbe: fk.hasIPSetEntry,
+	}
+	return fm, fk
+}
+
+func TestCheckWgS2sRulesPresent_DetectsMissingIpsetEntry(t *testing.T) {
+	fm, fk := newFakeFirewallManager(t)
+	fk.installChainRule(config.ChainForwardInUser, "-i wg-s2s0")
+	fk.installChainRule(config.ChainInputUserHook, "-i wg-s2s0")
+	fk.installChainRule(config.ChainOutputUserHook, "-o wg-s2s0")
+	fk.installIPSet("UBIOS4VPN_S2S_A_subnets", []string{"10.20.0.0/24"})
+
+	got := fm.CheckWgS2sRulesPresent(context.Background(), []domain.WgS2sCheckSpec{{
+		InterfaceName: "wg-s2s0",
+		ChainPrefix:   "VPN_S2S_A",
+		Subnets:       []string{"10.20.0.0/24", "10.21.0.0/24"},
+	}})
+
+	if got["wg-s2s0"] {
+		t.Fatal("expected false: 10.21.0.0/24 missing from ipset")
+	}
+}
+
+func TestCheckWgS2sRulesPresent_PassesWhenAllPresent(t *testing.T) {
+	fm, fk := newFakeFirewallManager(t)
+	fk.installChainRule(config.ChainForwardInUser, "-i wg-s2s0")
+	fk.installChainRule(config.ChainInputUserHook, "-i wg-s2s0")
+	fk.installChainRule(config.ChainOutputUserHook, "-o wg-s2s0")
+	fk.installIPSet("UBIOS4VPN_S2S_A_subnets", []string{"10.20.0.0/24"})
+
+	got := fm.CheckWgS2sRulesPresent(context.Background(), []domain.WgS2sCheckSpec{{
+		InterfaceName: "wg-s2s0",
+		ChainPrefix:   "VPN_S2S_A",
+		Subnets:       []string{"10.20.0.0/24"},
+	}})
+
+	if !got["wg-s2s0"] {
+		t.Fatal("expected true: all chain rules + ipset entry installed")
+	}
+}
+
+func TestCheckWgS2sRulesPresent_NoChainPrefixSkipsIpset(t *testing.T) {
+	// Backwards-compatible: when the caller has no chain prefix (e.g. zone
+	// not yet provisioned) we still report chain-rule presence and skip
+	// ipset entirely.
+	fm, fk := newFakeFirewallManager(t)
+	fk.installChainRule(config.ChainForwardInUser, "-i wg-s2s0")
+	fk.installChainRule(config.ChainInputUserHook, "-i wg-s2s0")
+	fk.installChainRule(config.ChainOutputUserHook, "-o wg-s2s0")
+
+	got := fm.CheckWgS2sRulesPresent(context.Background(), []domain.WgS2sCheckSpec{{
+		InterfaceName: "wg-s2s0",
+		Subnets:       []string{"10.20.0.0/24"},
+	}})
+	if !got["wg-s2s0"] {
+		t.Fatal("expected true when ChainPrefix empty: chain rules alone suffice")
+	}
+}
+
+func TestCheckWgS2sRulesPresent_DetectsMissingChainRule(t *testing.T) {
+	fm, fk := newFakeFirewallManager(t)
+	// Forward chain rule missing — ipset side intentionally complete.
+	fk.installChainRule(config.ChainInputUserHook, "-i wg-s2s0")
+	fk.installChainRule(config.ChainOutputUserHook, "-o wg-s2s0")
+	fk.installIPSet("UBIOS4VPN_S2S_A_subnets", []string{"10.20.0.0/24"})
+
+	got := fm.CheckWgS2sRulesPresent(context.Background(), []domain.WgS2sCheckSpec{{
+		InterfaceName: "wg-s2s0",
+		ChainPrefix:   "VPN_S2S_A",
+		Subnets:       []string{"10.20.0.0/24"},
+	}})
+	if got["wg-s2s0"] {
+		t.Fatal("expected false: forward chain rule missing")
+	}
+}
+
+// fakeUDAPIOps records calls and optionally fails the ipset fill step.
+type fakeUDAPIOps struct {
+	addCalls      []string
+	removeCalls   []string
+	ensureCalls   []string
+	removeSubnet  []string
+	failIpsetFill bool
+}
+
+func (f *fakeUDAPIOps) install(fm *FirewallManager) {
+	fm.addInterfaceRules = func(_ context.Context, iface, marker, chainPrefix string) error {
+		f.addCalls = append(f.addCalls, iface+"/"+marker+"/"+chainPrefix)
+		return nil
+	}
+	fm.removeInterfaceRules = func(_ context.Context, iface, marker string) error {
+		f.removeCalls = append(f.removeCalls, iface+"/"+marker)
+		return nil
+	}
+	fm.ensureZoneSubnets = func(_ context.Context, setName string, cidrs []string) error {
+		f.ensureCalls = append(f.ensureCalls, setName+":"+strings.Join(cidrs, ","))
+		if f.failIpsetFill {
+			return fmt.Errorf("simulated ipset fill failure")
+		}
+		return nil
+	}
+	fm.removeZoneSubnet = func(_ context.Context, setName, cidr string) error {
+		f.removeSubnet = append(f.removeSubnet, setName+":"+cidr)
+		return nil
+	}
+}
+
+// stubManifest is the minimum ManifestStore the wg-s2s firewall path needs:
+// chain prefix lookup + zone lookup. Other methods panic if accidentally called.
+type stubManifest struct {
+	ManifestStore
+	chainPrefix string
+	zone        ZoneManifest
+	zoneOK      bool
+}
+
+func (s *stubManifest) GetWgS2sChainPrefix(string) string { return s.chainPrefix }
+func (s *stubManifest) GetWgS2sZone(string) (ZoneManifest, bool) {
+	return s.zone, s.zoneOK
+}
+
+// TestSetupWgS2sFirewall_ReportsIpsetFailure covers BUG-M4. When the ipset
+// fill step fails after the chain rules were already installed, the saga
+// must roll back the chain rules and report the error to the caller.
+func TestSetupWgS2sFirewall_ReportsIpsetFailure(t *testing.T) {
+	fm, _ := newFakeFirewallManager(t)
+	fm.manifest = &stubManifest{chainPrefix: "VPN_S2S_A"}
+	ops := &fakeUDAPIOps{failIpsetFill: true}
+	ops.install(fm)
+
+	err := fm.SetupWgS2sFirewall(context.Background(), "tunnel-A", "wg-s2s0", []string{"10.20.0.0/24"})
+	if err == nil {
+		t.Fatal("expected error when ipset fill fails")
+	}
+	if len(ops.addCalls) == 0 {
+		t.Fatal("chain rules should have been installed before ipset fill")
+	}
+	if len(ops.removeCalls) == 0 {
+		t.Fatal("chain rules must be rolled back on ipset failure")
+	}
+}
+
+// SEC-C15: ts-forward must run AFTER UBIOS_FORWARD_JUMP so UniFi zone
+// policies evaluate before Tailscale's fallback ACCEPT. The auditor must
+// recognise misplacement so the watcher can repair it.
+func TestAuditTsForwardOrder(t *testing.T) {
+	misplaced := `*filter
+:FORWARD ACCEPT [0:0]
+-A FORWARD -j ts-forward
+-A FORWARD -j UBIOS_FORWARD_JUMP
+COMMIT
+`
+	res := auditTsForwardOrder(misplaced)
+	if !res.Misplaced() {
+		t.Fatalf("expected Misplaced=true for %+v", res)
+	}
+	if res.TargetPos != 1 || res.UBIOSPos != 2 {
+		t.Fatalf("positions wrong: %+v", res)
+	}
+
+	correct := `*filter
+:FORWARD ACCEPT [0:0]
+-A FORWARD -j ts-mark
+-A FORWARD -j UBIOS_FORWARD_JUMP
+-A FORWARD -j ts-forward
+COMMIT
+`
+	res = auditTsForwardOrder(correct)
+	if res.Misplaced() {
+		t.Fatalf("expected Misplaced=false for %+v", res)
+	}
+	if res.TargetPos != 3 || res.UBIOSPos != 2 {
+		t.Fatalf("positions wrong: %+v", res)
+	}
+
+	tsOnly := `*filter
+-A FORWARD -j ts-forward
+COMMIT
+`
+	res = auditTsForwardOrder(tsOnly)
+	if res.Misplaced() {
+		t.Fatalf("ts-forward only must not be misplaced: %+v", res)
+	}
+
+	ubiosOnly := `*filter
+-A FORWARD -j UBIOS_FORWARD_JUMP
+COMMIT
+`
+	res = auditTsForwardOrder(ubiosOnly)
+	if res.Misplaced() {
+		t.Fatalf("UBIOS only must not be misplaced: %+v", res)
+	}
+}
+
+// SEC-C15: when ts-forward is misplaced, AuditAndFixTsForwardOrder must
+// (1) delete the misplaced rule and (2) re-insert it at the position
+// immediately following UBIOS_FORWARD_JUMP. This locks the exact iptables
+// command shape the patch contract requires.
+func TestAuditAndFixTsForwardOrder_DeletesAndReinsertsAtCorrectPosition(t *testing.T) {
+	misplaced := `*filter
+:FORWARD ACCEPT [0:0]
+-A FORWARD -j ts-forward
+-A FORWARD -j UBIOS_FORWARD_JUMP
+-A FORWARD -j SOME_OTHER
+COMMIT
+`
+	fm := &FirewallManager{}
+	fm.filterCache = misplaced
+	fm.filterTime = time.Now()
+
+	var calls [][]string
+	orig := iptablesRunHook
+	iptablesRunHook = func(_ context.Context, args ...string) error {
+		calls = append(calls, append([]string(nil), args...))
+		return nil
+	}
+	t.Cleanup(func() { iptablesRunHook = orig })
+
+	if err := fm.AuditAndFixTsForwardOrder(context.Background()); err != nil {
+		t.Fatalf("unexpected err: %v", err)
+	}
+
+	if len(calls) != 2 {
+		t.Fatalf("expected 2 iptables calls (delete then insert); got %d: %+v", len(calls), calls)
+	}
+	wantDel := []string{"-w", "2", "-t", "filter", "-D", "FORWARD", "-j", "ts-forward"}
+	if !equalArgs(calls[0], wantDel) {
+		t.Fatalf("delete args wrong:\nwant %q\ngot  %q", wantDel, calls[0])
+	}
+	// ts at 1, UBIOS at 2: after deletion UBIOS shifts to pos 1; new
+	// ts-forward slot is at UBIOSPos (original index 2). The original
+	// UBIOSPos is preserved in the result because UBIOS-after-delete
+	// occupies index 1 and inserting at 2 puts ts AFTER it.
+	wantIns := []string{"-w", "2", "-t", "filter", "-I", "FORWARD", "2", "-j", "ts-forward"}
+	if !equalArgs(calls[1], wantIns) {
+		t.Fatalf("insert args wrong:\nwant %q\ngot  %q", wantIns, calls[1])
+	}
+}
+
+// SEC-C15: when ordering is already correct, no iptables mutations must
+// run. Idempotency is what makes safely calling the audit on every
+// reconcile tick acceptable.
+func TestAuditAndFixTsForwardOrder_NoopWhenCorrect(t *testing.T) {
+	correct := `*filter
+-A FORWARD -j UBIOS_FORWARD_JUMP
+-A FORWARD -j ts-forward
+COMMIT
+`
+	fm := &FirewallManager{}
+	fm.filterCache = correct
+	fm.filterTime = time.Now()
+
+	var calls int
+	orig := iptablesRunHook
+	iptablesRunHook = func(_ context.Context, _ ...string) error {
+		calls++
+		return nil
+	}
+	t.Cleanup(func() { iptablesRunHook = orig })
+
+	if err := fm.AuditAndFixTsForwardOrder(context.Background()); err != nil {
+		t.Fatalf("unexpected err: %v", err)
+	}
+	if calls != 0 {
+		t.Fatalf("expected 0 iptables calls on correct ordering, got %d", calls)
+	}
+}
+
+// M5: ts-input must run AFTER UBIOS_INPUT_JUMP, otherwise its terminal
+// `-i tailscale0 -j ACCEPT` shadows the UniFi zone policies and a
+// "Tailscale -> Gateway = BLOCK" policy silently becomes a no-op.
+//
+// This test fails against the pre-fix code where the auditor only understood
+// the FORWARD chain: auditTsChainOrder(_, "INPUT", "ts-input") would scan for
+// `-A FORWARD ` lines, match nothing in an INPUT dump, and never flag the
+// misplacement (Misplaced()==false on the misplaced fixture below).
+//
+// It also pins the exact-token match: the ts-input-guard hook (which sits at
+// INPUT position 1 by design) must NOT be counted as the ts-input hook. A
+// naive strings.Contains(line, "-j ts-input") would match ts-input-guard at
+// position 1 and wrongly report the correct fixture as misplaced.
+func TestAuditTsInputOrder_M5(t *testing.T) {
+	misplaced := `*filter
+:INPUT ACCEPT [0:0]
+-A INPUT -j ts-input
+-A INPUT -j UBIOS_INPUT_JUMP
+COMMIT
+`
+	res := auditTsChainOrder(misplaced, "INPUT", "ts-input")
+	if !res.Misplaced() {
+		t.Fatalf("expected Misplaced=true for M5 fixture, got %+v", res)
+	}
+	if res.TargetPos != 1 || res.UBIOSPos != 2 {
+		t.Fatalf("positions wrong: %+v", res)
+	}
+
+	// Correct order with the guard chain present. Exact-token matching must
+	// skip ts-input-guard and locate ts-input at position 3 (after UBIOS).
+	correct := `*filter
+:INPUT ACCEPT [0:0]
+-A INPUT -j ts-input-guard
+-A INPUT -j UBIOS_INPUT_JUMP
+-A INPUT -j ts-input
+COMMIT
+`
+	res = auditTsChainOrder(correct, "INPUT", "ts-input")
+	if res.Misplaced() {
+		t.Fatalf("expected Misplaced=false for correct fixture, got %+v", res)
+	}
+	if res.TargetPos != 3 || res.UBIOSPos != 2 {
+		t.Fatalf("positions wrong (guard likely conflated with ts-input): %+v", res)
+	}
+}
+
+// M5: when ts-input is misplaced, AuditAndFixTsInputOrder must delete it and
+// re-insert it right after UBIOS_INPUT_JUMP, targeting the INPUT chain (not
+// FORWARD). Locks the exact iptables command shape.
+func TestAuditAndFixTsInputOrder_DeletesAndReinsertsAtCorrectPosition(t *testing.T) {
+	misplaced := `*filter
+:INPUT ACCEPT [0:0]
+-A INPUT -j ts-input-guard
+-A INPUT -j ts-input
+-A INPUT -j UBIOS_INPUT_JUMP
+-A INPUT -j SOME_OTHER
+COMMIT
+`
+	fm := &FirewallManager{}
+	fm.filterCache = misplaced
+	fm.filterTime = time.Now()
+
+	var calls [][]string
+	orig := iptablesRunHook
+	iptablesRunHook = func(_ context.Context, args ...string) error {
+		calls = append(calls, append([]string(nil), args...))
+		return nil
+	}
+	t.Cleanup(func() { iptablesRunHook = orig })
+
+	if err := fm.AuditAndFixTsInputOrder(context.Background()); err != nil {
+		t.Fatalf("unexpected err: %v", err)
+	}
+
+	if len(calls) != 2 {
+		t.Fatalf("expected 2 iptables calls (delete then insert); got %d: %+v", len(calls), calls)
+	}
+	wantDel := []string{"-w", "2", "-t", "filter", "-D", "INPUT", "-j", "ts-input"}
+	if !equalArgs(calls[0], wantDel) {
+		t.Fatalf("delete args wrong:\nwant %q\ngot  %q", wantDel, calls[0])
+	}
+	// guard=1, ts-input=2, UBIOS=3. After deleting ts-input, UBIOS shifts to
+	// position 2; inserting at UBIOSPos (3) puts ts-input right after it.
+	wantIns := []string{"-w", "2", "-t", "filter", "-I", "INPUT", "3", "-j", "ts-input"}
+	if !equalArgs(calls[1], wantIns) {
+		t.Fatalf("insert args wrong:\nwant %q\ngot  %q", wantIns, calls[1])
+	}
+}
+
+func equalArgs(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
+// BUG-M2: hasChainRuleIn anchored the chain via HasPrefix but matched the
+// interface token with strings.Contains. When only wg-s2s10's rule is present,
+// probing for "-i wg-s2s1" must report ABSENT — a substring scan of the line
+// "-A ... -i wg-s2s10 ..." would falsely report wg-s2s1 present, masking a
+// failed restore and never retrying it. Fails on the pre-fix code (returns
+// true for wg-s2s1).
+func TestHasChainRuleIn_InterfaceTokenNotSubstring(t *testing.T) {
+	rules := "*filter\n" +
+		":UBIOS_FORWARD_IN_USER - [0:0]\n" +
+		"-A UBIOS_FORWARD_IN_USER -i wg-s2s10 -j UBIOS_ZONE_IN\n" +
+		"COMMIT\n"
+
+	if hasChainRuleIn(rules, config.ChainForwardInUser, "-i wg-s2s1") {
+		t.Fatal("BUG-M2: -i wg-s2s1 must NOT match a line carrying only -i wg-s2s10")
+	}
+	if !hasChainRuleIn(rules, config.ChainForwardInUser, "-i wg-s2s10") {
+		t.Fatal("-i wg-s2s10 must match its own rule")
+	}
+}
+
+// BUG-M2 end-to-end through the production probe (fm.hasChainRule via the
+// cachedFilterRules seam) as wired into CheckWgS2sRulesPresent. wg-s2s1 has no
+// rules of its own; only wg-s2s10 is installed. wg-s2s1 must be reported
+// missing so the watcher retries it. Fails on pre-fix code where wg-s2s1 is
+// falsely present via substring shadowing.
+func TestCheckWgS2sRulesPresent_ProdProbeNoInterfaceShadowing(t *testing.T) {
+	fm := &FirewallManager{}
+	fm.chainProbe = fm.hasChainRule
+	fm.ipsetProbe = fm.hasIPSetEntry
+	fm.filterCache = "*filter\n" +
+		"-A UBIOS_FORWARD_IN_USER -i wg-s2s10 -j X\n" +
+		"-A UBIOS_INPUT_USER_HOOK -i wg-s2s10 -j X\n" +
+		"-A UBIOS_OUTPUT_USER_HOOK -o wg-s2s10 -j X\n" +
+		"COMMIT\n"
+	fm.filterTime = time.Now()
+
+	got := fm.CheckWgS2sRulesPresent(context.Background(), []domain.WgS2sCheckSpec{
+		{InterfaceName: "wg-s2s1"},
+		{InterfaceName: "wg-s2s10"},
+	})
+	if got["wg-s2s1"] {
+		t.Fatal("BUG-M2: wg-s2s1 falsely present due to substring shadowing by wg-s2s10")
+	}
+	if !got["wg-s2s10"] {
+		t.Fatal("wg-s2s10 rules are present and must be detected")
+	}
+}
+
+// BUG-M2 (ipset variant): hasIPSetEntry did a strings.Contains over the whole
+// ipset dump, so member "10.0.0.0/8" matched a listed "110.0.0.0/8". Probing
+// the cached branch for 10.0.0.0/8 when only 110.0.0.0/8 is present must
+// report ABSENT. Fails on pre-fix code (returns true).
+func TestHasIPSetEntry_CIDRNotSubstring(t *testing.T) {
+	fm := &FirewallManager{}
+	fm.ipsetSet = "UBIOS4VPN_subnets"
+	fm.ipsetCache = "Name: UBIOS4VPN_subnets\nType: hash:net\nHeader: family inet\nMembers:\n110.0.0.0/8\n"
+	fm.ipsetTime = time.Now()
+
+	if fm.hasIPSetEntry("UBIOS4VPN_subnets", "10.0.0.0/8") {
+		t.Fatal("BUG-M2: 10.0.0.0/8 must NOT match listed member 110.0.0.0/8")
+	}
+	if !fm.hasIPSetEntry("UBIOS4VPN_subnets", "110.0.0.0/8") {
+		t.Fatal("110.0.0.0/8 must match its own member")
+	}
+}
