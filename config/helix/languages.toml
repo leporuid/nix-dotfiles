@@ -5,6 +5,22 @@ formatter.command = "goimports"
 
 
 [[language]]
+name = "rust"
+auto-format = true
+language-servers = ["rust-analyzer"]
+
+
+[[language]]
+name = "toml"
+auto-format = true
+language-servers = ["taplo"]
+
+[language-server.taplo]
+command = "taplo"
+args = ["lsp", "stdio"]
+
+
+[[language]]
 name = "typescript"
 language-servers = ["vtsls"]
 

@@ -15,27 +15,27 @@ pkgs.stdenvNoCC.mkDerivation {
   };
 
   postPatch = ''
-    # Remove Package.resolved to avoid pulling remote dependencies
-    rm -f Package.resolved
+        # Remove Package.resolved to avoid pulling remote dependencies
+        rm -f Package.resolved
 
-    cat << 'EOF' > Package.swift
-// swift-tools-version: 6.2
-import PackageDescription
+        cat << 'EOF' > Package.swift
+    // swift-tools-version: 6.2
+    import PackageDescription
 
-let package = Package(
-  name: "AgeSecureEnclavePlugin",
-  platforms: [.macOS("26.0")],
-  dependencies: [],
-  targets: [
-    .executableTarget(
-      name: "age-plugin-se",
+    let package = Package(
+      name: "AgeSecureEnclavePlugin",
+      platforms: [.macOS("26.0")],
       dependencies: [],
-      path: "Sources",
-      exclude: ["SPEC.md", "SPEC-ARCHIVE.md"]
+      targets: [
+        .executableTarget(
+          name: "age-plugin-se",
+          dependencies: [],
+          path: "Sources",
+          exclude: ["SPEC.md", "SPEC-ARCHIVE.md"]
+        )
+      ]
     )
-  ]
-)
-EOF
+    EOF
   '';
 
   buildPhase = ''

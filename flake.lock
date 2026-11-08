@@ -987,6 +987,7 @@
         "nix-secrets": "nix-secrets",
         "nixcord": "nixcord",
         "nixpkgs": "nixpkgs_6",
+        "treefmt-nix": "treefmt-nix_6",
         "yt-ai": "yt-ai"
       }
     },
@@ -1168,6 +1169,26 @@
       "inputs": {
         "nixpkgs": [
           "nixcord",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791885023,
+        "narHash": "sha256-C3alQ2MEt0zVrUSho5NUDo3jmhbff72++bfwoqT9Omo=",
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "rev": "0d6d739a833ba9a9c93034862e4a7b061a062a1c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "treefmt-nix_6": {
+      "inputs": {
+        "nixpkgs": [
           "nixpkgs"
         ]
       },

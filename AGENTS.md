@@ -116,3 +116,35 @@ This repository collects project-specific expectations, tool contracts, and arch
      - Prefer specialized filesystem tools (`replace_file_content`, `write_to_file`, `view_file`) and `client:execute_mcp` for git operations instead of raw terminal commands.
      - Batch related filesystem and git operations into unified turns rather than prompting across fragmented micro-steps.
      - Reserve interactive user confirmation strictly for destructive, irreversible operations (such as force-pushing to remote or wiping uncommitted branches).
+
+---
+
+## 6. Available Skills & Agent Instructions
+
+Automated agents (`agy`, Claude, Gemini, Copilot, Cursor) operating on this repository have access to modular skills located in `.agents/skills/`, `.gemini/skills/`, and `~/.gemini/skills/`:
+
+| Skill | Path | Description & When to Load |
+| :--- | :--- | :--- |
+| `@fast-repo-reader` | `.agents/skills/fast-repo-reader/SKILL.md` | Non-intrusive remote inspection of external Git/GitHub repos without shell network prompts. |
+| `@nix-dotfiles-workflow` | `.agents/skills/nix-dotfiles-workflow/SKILL.md` | Core architecture guardrails (no `flake.lock` reading, single-tier module headers, out-of-store symlinks). |
+| `@tiered-agent-workflow` | `.agents/skills/tiered-agent-workflow/SKILL.md` | Two-tiered execution strategy: Pro-tier deep reasoning for planning -> Flash-tier surgical execution. |
+| `@get-more-perspectives` | `.agents/skills/get-more-perspectives/SKILL.md` | Simulated 5-role advisory panel (Operator, Skeptic, Visionary, Customer, Finance) for trade-offs. |
+
+Agents should consult the relevant `SKILL.md` before executing multi-repo analyses or structural modifications.
+
+---
+
+## 7. Operational Retrospectives & Triad Collaboration
+
+1. **Foreign Binary Packaging (Non-NixOS Target)**:
+   - When cross-compiling or packaging ELF binaries destined for non-NixOS systems (e.g., UniFi OS, Debian, OpenWrt), **always** invoke `patchelf --set-interpreter /lib/ld-linux-aarch64.so.1` (or the target dynamic loader). Never allow the ELF interpreter to point to a `/nix/store/...` path that does not exist on the target machine.
+2. **Push Secret Security Invariant**:
+   - Never decrypt or bake secrets into Nix derivations or tarballs (which leak into world-readable `/nix/store`).
+   - For non-NixOS hosts, decrypt secrets in-memory on the deployment controller (macOS) and pipe them directly into remote processes via SSH stdin (`read -r k; cmd --secret="$k"`).
+3. **Dependency Parity First (Avoid Trial-and-Error Loops)**:
+   - When a project uses Go `replace` directives or monorepo submodules (like `vpn-pack-manager` $\leftrightarrow$ `tailscale`), **never** guess dependency versions or iterate blindly against compiler errors.
+   - Always inspect the upstream `go.mod` / `Cargo.lock` first, synchronize all transitive dependencies in one batch, and update `vendorHash` once.
+4. **Triad Division of Labor**:
+   - **Gemini (Lead Architect)**: Project-wide planning, multi-file atomic in-place patching, Blueprint conformity, and AGENTS.md maintenance.
+   - **agy (Terminal Executor)**: Command execution in the active shell (`git add`, `nix fmt`, `run check-host`), live build inspection, and stderr capture.
+   - **GitHub Copilot (Exploratory Scout)**: Open-source repository exploration on the web and in-editor snippet completions.

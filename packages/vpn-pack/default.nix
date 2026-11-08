@@ -1,6 +1,5 @@
 {
   pkgs,
-  lib ? pkgs.lib,
   version ? "1.6.4",
   tailscaleVersion ? pkgs.tailscale.version,
   gitCommit ? "4549ba8",
@@ -64,9 +63,10 @@ let
     "ts_omit_webclient"
   ];
   targetPkgs =
-    if pkgs.stdenv.hostPlatform.isLinux && pkgs.stdenv.hostPlatform.isAarch64
-    then pkgs
-    else pkgs.pkgsCross.aarch64-multiplatform;
+    if pkgs.stdenv.hostPlatform.isLinux && pkgs.stdenv.hostPlatform.isAarch64 then
+      pkgs
+    else
+      pkgs.pkgsCross.aarch64-multiplatform;
 
   targetGo = targetPkgs.buildPackages.go_1_27;
   buildGoModule = targetPkgs.buildGoModule.override { go = targetGo; };
@@ -102,16 +102,23 @@ let
   };
 
   manager = pkgs.callPackage ./manager.nix {
-    inherit version tailscaleVersion gitCommit tailscalePatched buildGoModule;
+    inherit
+      version
+      tailscaleVersion
+      gitCommit
+      tailscalePatched
+      buildGoModule
+      ;
   };
 
   deploy = pkgs.callPackage ./deploy.nix {
     inherit version tailscaleVersion gitCommit;
     inherit tailscaleBin;
-    managerBin = manager.managerBin;
+    inherit (manager) managerBin;
   };
 in
-deploy // {
+deploy
+// {
   passthru = {
     inherit tailscalePatched tailscaleBin;
     inherit (manager) managerBin ui;

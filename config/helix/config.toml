@@ -7,11 +7,20 @@ completion-trigger-len = 1
 idle-timeout = 0
 line-number = "relative"
 true-color = true
+auto-save = { focus-lost = true }
+smart-tab = { enable = true }
 
 [editor.cursor-shape]
 insert = "bar"
 normal = "block"
 select = "underline"
+
+[editor.file-picker]
+hidden = false
+max-depth = 8
+
+[editor.search]
+smart-case = true
 
 [editor.indent-guides]
 character = "▏"
@@ -27,7 +36,21 @@ display-inlay-hints = true
 display-messages = true
 
 [editor.statusline]
-right = ["diagnostics", "selections", "position", "position-percentage", "file-encoding"]
+left = [
+  "mode",
+  "spinner",
+  "read-only-indicator",
+  "file-name",
+  "version-control",
+]
+center = []
+right = [
+  "diagnostics",
+  "selections",
+  "position",
+  "position-percentage",
+  "file-encoding",
+]
 
 [editor.whitespace.characters]
 newline = "↵"
@@ -130,4 +153,3 @@ up = "move_line_up"
 [keys.select.space]
 D = "hsplit"
 d = "vsplit"
-

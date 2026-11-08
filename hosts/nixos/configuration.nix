@@ -103,7 +103,12 @@ with inputs;
     firewall = {
       enable = true;
       checkReversePath = "loose";
-      allowedTCPPorts = [ 22 80 443 8090 ];
+      allowedTCPPorts = [
+        22
+        80
+        443
+        8090
+      ];
       allowedUDPPorts = [ 41641 ];
       trustedInterfaces = [ "tailscale0" ];
     };
@@ -197,7 +202,10 @@ with inputs;
     settings.Resolve = {
       DNSSEC = "false";
       Domains = [ "~." ];
-      FallbackDNS = [ "1.1.1.1" "8.8.8.8" ];
+      FallbackDNS = [
+        "1.1.1.1"
+        "8.8.8.8"
+      ];
     };
   };
 
@@ -246,7 +254,8 @@ with inputs;
   '';
 
   programs.ssh.knownHosts = {
-    "github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5A9WykxjBQj48tkmV";
+    "github.com".publicKey =
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5A9WykxjBQj48tkmV";
   };
   security.sudo.extraRules = [
     {
@@ -366,12 +375,15 @@ with inputs;
   environment.systemPackages = with pkgs; [
     age
     rage
-    ((agenix.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
-      ageBin = "${pkgs.rage}/bin/rage";
-    }).overrideAttrs (_: {
-      doCheck = false;
-      doInstallCheck = false;
-    }))
+    (
+      (agenix.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
+        ageBin = "${pkgs.rage}/bin/rage";
+      }).overrideAttrs
+        (_: {
+          doCheck = false;
+          doInstallCheck = false;
+        })
+    )
     ethtool
 
     # Observability & diagnostic tools

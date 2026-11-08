@@ -51,7 +51,7 @@ ssh_symbol = ""
 home_symbol = "⌂"
 #home_symbol = "󰋞"
 truncation_length = 2
-fish_style_pwd_dir_length = 1 # turn on fish directory truncation
+fish_style_pwd_dir_length = 1                                                                                                                                      # turn on fish directory truncation
 truncation_symbol = "□ "
 read_only = " ◈"
 use_os_path_sep = true
@@ -62,7 +62,7 @@ repo_root_format = '[$before_root_path]($before_repo_root_style)[$repo_root]($re
 
 [directory.substitutions]
 '/opt/homebrew' = ""
-'~'= "󰋞"
+'~' = "󰋞"
 "Documents" = "󰈙 "
 "Downloads" = " "
 "Music" = "󰝚 "
@@ -277,10 +277,10 @@ symbol = " "
 format = " spack [$symbol$environment]($style)"
 
 [profiles]
-transient="""($nix_shell$container$fill$git_metrics$cmd_duration)\n
+transient = """($nix_shell$container$fill$git_metrics$cmd_duration)\n
 $sudo\
 $character
 """
-path="""
+path = """
 $directory
 """

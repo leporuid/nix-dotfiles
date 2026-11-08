@@ -18,6 +18,10 @@ pkgs.mkShellNoCC {
     pkgs.taplo
     pkgs.age
     pkgs.deno
+    pkgs.statix
+    pkgs.deadnix
+    pkgs.actionlint
+    pkgs.shellcheck
   ]
   ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
     perSystem.nix-darwin.default

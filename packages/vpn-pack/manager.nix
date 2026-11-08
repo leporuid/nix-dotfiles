@@ -1,10 +1,11 @@
 {
   pkgs,
-  lib ? pkgs.lib,
   tailscalePatched,
-  buildGoModule ? (pkgs.pkgsCross.aarch64-multiplatform.buildGoModule.override {
-    go = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.go_1_27;
-  }),
+  buildGoModule ? (
+    pkgs.pkgsCross.aarch64-multiplatform.buildGoModule.override {
+      go = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.go_1_27;
+    }
+  ),
   version ? "1.6.4",
   tailscaleVersion ? "1.104.5",
   gitCommit ? "4549ba8",

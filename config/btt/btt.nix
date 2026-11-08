@@ -1,4 +1,4 @@
-{ user, ... }:
+_:
 
 {
   targets.darwin.defaults."com.hegenberg.BetterTouchTool" = {

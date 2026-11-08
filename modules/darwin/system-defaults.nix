@@ -27,8 +27,6 @@ with inputs;
     '';
   };
 
-
-
   environment.systemPackages = with pkgs; [
     fish
     pkg-config
@@ -83,7 +81,7 @@ with inputs;
       builder.state = "enabled";
     };
 
-    customSettings = vars.customSettings;
+    inherit (vars) customSettings;
   };
 
   launchd.daemons.determinate-nix-daemon.serviceConfig = {
@@ -192,6 +190,7 @@ with inputs;
           type = "png";
           "show-thumbnail" = false;
           target = "clipboard";
+          "disable-shadow" = true;
         };
       };
     };

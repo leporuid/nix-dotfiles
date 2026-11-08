@@ -17,10 +17,18 @@ alias reload = exec nu
 alias ks = ktoolbox sync_creator
 alias cat = bat
 alias find = fd
-alias git = hub
 
 source ($nu.default-config-dir | path join 'env.nu') 
 mkdir ($nu.default-config-dir | path join 'vendor/autoload')
-atuin init nu | save -f ($nu.default-config-dir | path join 'vendor/autoload/atuin.nu')
-starship init nu | save -f ($nu.default-config-dir | path join 'vendor/autoload/starship.nu')
-zoxide init nushell | save -f ($nu.default-config-dir | path join 'vendor/autoload/.zoxide.nu') 
+
+if not ($nu.default-config-dir | path join 'vendor/autoload/atuin.nu' | path exists) {
+    atuin init nu | save -f ($nu.default-config-dir | path join 'vendor/autoload/atuin.nu')
+}
+
+if not ($nu.default-config-dir | path join 'vendor/autoload/starship.nu' | path exists) {
+    starship init nu | save -f ($nu.default-config-dir | path join 'vendor/autoload/starship.nu')
+}
+
+if not ($nu.default-config-dir | path join 'vendor/autoload/.zoxide.nu' | path exists) {
+    zoxide init nushell | save -f ($nu.default-config-dir | path join 'vendor/autoload/.zoxide.nu')
+} 

@@ -32,5 +32,5 @@
       rm -rf src/N_m3u8DL-RE.Tests
     '';
 
-    postFixup = (old.postFixup or "") + (pkgs.callPackage ./m3u8dl-protocol { }).injectHook;
+    postFixup = (old.postFixup or "") + (pkgs.callPackage ../m3u8dl-protocol { }).injectHook;
   })

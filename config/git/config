@@ -4,8 +4,15 @@
 [push]
     autoSetupRemote = true
 
+[pull]
+    rebase = true
+
+[rerere]
+    enabled = true
+    autoupdate = true
+
 [user]
-    email = "leporuid@icloid.com"
+    email = "leporuid@icloud.com"
     name = "leporuid"
 
 [alias]

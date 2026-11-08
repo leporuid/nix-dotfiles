@@ -143,13 +143,7 @@ in
 
     source = lib.mkOption {
       default = { };
-      type =
-        with types;
-        attrsOf (
-          nullOr (
-            either (either str path) (attrsOf anything)
-          )
-        );
+      type = with types; attrsOf (nullOr (either (either str path) (attrsOf anything)));
       description = ''
         Mapping from system path to:
         - Relative path string: creates out-of-store symlink to the repo file.
@@ -160,13 +154,7 @@ in
 
     text = lib.mkOption {
       default = { };
-      type =
-        with types;
-        attrsOf (
-          nullOr (
-            either lines (attrsOf anything)
-          )
-        );
+      type = with types; attrsOf (nullOr (either lines (attrsOf anything)));
       description = ''
         Mapping from system path to direct string content or structured attribute set.
         Structured attribute sets natively support Nix merging (lib.mkMerge, //, lib.mkForce)
@@ -186,13 +174,13 @@ in
       let
         nonNullSource = lib.filterAttrs (_: v: v != null) cfg.source;
         sourceFiles = lib.mapAttrs (
-          path: val: (renderConfigContent path val) // { force = cfg.force; }
+          path: val: (renderConfigContent path val) // { inherit (cfg) force; }
         ) nonNullSource;
 
         nonNullText = lib.filterAttrs (_: v: v != null) cfg.text;
         textFiles = builtins.mapAttrs (_: v: {
           text = renderConfigText v;
-          force = cfg.force;
+          inherit (cfg) force;
         }) nonNullText;
       in
       sourceFiles // textFiles;

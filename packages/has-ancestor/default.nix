@@ -1,4 +1,4 @@
-{ pkgs, pname, ... }:
+{ pkgs, ... }:
 
 pkgs.stdenv.mkDerivation {
   pname = "has-ancestor";

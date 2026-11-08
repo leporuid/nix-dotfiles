@@ -2,7 +2,6 @@
   pkgs,
   perSystem,
   config,
-  inputs,
   ...
 }:
 {
@@ -35,7 +34,9 @@
   };
 
   home.packages = [
-    (pkgs.atuin.overrideAttrs (_: { doCheck = false; }))
+    (pkgs.atuin.overrideAttrs (_: {
+      doCheck = false;
+    }))
     pkgs.ffmpeg
     pkgs.mas
     pkgs.qpdf

@@ -1,6 +1,5 @@
 {
   pkgs,
-  pkgs',
   perSystem,
   inputs,
   config,
@@ -65,12 +64,14 @@ in
     pkgs.just
     pkgs.lazygit
     pkgs.mise
+    pkgs.nil
     pkgs.nix-direnv
     pkgs.nixfmt
     pkgs.nix-output-monitor
     pkgs.nushell
     pkgs.ripgrep
     pkgs.starship
+    pkgs.taplo
     pkgs.tealdeer
     pkgs.tmux
     pkgs.tree
@@ -85,8 +86,6 @@ in
 
   fonts.fontconfig.enable = !pkgs.stdenv.hostPlatform.isDarwin;
 
-
-
   my.config.source = {
     ".config/atuin" = "config/atuin";
     ".config/direnv/direnv.toml" = "config/direnv/direnv.toml";
@@ -97,6 +96,7 @@ in
     ".config/git" = "config/git";
     ".config/helix" = "config/helix";
     ".config/mise" = "config/mise";
+    ".config/nushell" = "config/nushell";
     ".config/nvim" = "config/nvim";
     ".config/starship.toml" = "config/starship.toml";
     ".config/tmux" = "config/tmux";

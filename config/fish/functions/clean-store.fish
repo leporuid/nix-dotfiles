@@ -1,5 +1,5 @@
 function clean-store -d "Clean old system/user profile generations and collect garbage using modern nix commands"
-    argparse 'd/days=' 'a/all' 'h/help' -- $argv
+    argparse 'd/days=' a/all h/help -- $argv
     or return 1
 
     if set -q _flag_help
@@ -19,7 +19,7 @@ function clean-store -d "Clean old system/user profile generations and collect g
 
     set -l filter_args
     if not set -q _flag_all
-        set -l duration "7d"
+        set -l duration 7d
         if set -q _flag_days
             set duration $_flag_days
             if string match -qr '^\d+$' -- $duration

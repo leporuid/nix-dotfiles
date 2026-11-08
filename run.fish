@@ -48,8 +48,6 @@ function dry -d "Dry-run a function (replaces _run with _pretty_print)"
     $argv
 end
 
-
-
 function check-applied -d "Check if the currently applied configuration needs to be updated"
     set last_commit_timestamp (git log -1 --format=%at)
     set current_commit_pretty (set_color --dim --italics)$NIX_CONFIG_REV(set_color normal)
@@ -116,7 +114,7 @@ function deploy-vpnpack -d "Build and deploy vpn-pack to UniFi Cloud Gateway via
     set -l reauth false
     set -l nix_build_args
     for arg in $argv[2..]
-        if test $arg = "--reauth"
+        if test $arg = --reauth
             set reauth true
         else
             set --append nix_build_args $arg
@@ -151,8 +149,8 @@ function deploy-vpnpack -d "Build and deploy vpn-pack to UniFi Cloud Gateway via
         set -l identity ""
         if test -f "$HOME/.ssh/id_ed25519"
             set identity "$HOME/.ssh/id_ed25519"
-        else if test -f "/etc/ssh/ssh_host_ed25519_key"
-            set identity "/etc/ssh/ssh_host_ed25519_key"
+        else if test -f /etc/ssh/ssh_host_ed25519_key
+            set identity /etc/ssh/ssh_host_ed25519_key
         end
 
         set -l authkey ""
@@ -220,17 +218,18 @@ function nixos -a verb
     _run $maybe_sudo nixos-rebuild $target_verb --flake .#nixos $rebuild_args $argv[2..]
 end
 
-
 function MacBook-Pro -a verb
     set maybe_sudo
     if test $verb = switch
         set maybe_sudo sudo
+    else if test $verb = check
+        # Pure evaluation/build check without requiring root activation
+        _run nix build .#darwinConfigurations.MacBook-Pro.config.system.build.toplevel --no-link $argv[2..]
+        return $status
     end
 
     _run $maybe_sudo darwin-rebuild $verb --flake .#MacBook-Pro $argv[2..]
 end
-
-
 
 # The logic below defines the commands used to build/switch configurations for
 # the hosts above. This requires some amount of metaprogramming, which Fish has

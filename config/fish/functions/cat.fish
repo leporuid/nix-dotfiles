@@ -2,6 +2,6 @@
 # When given options or used in a command substitution, delegates to system ls.
 
 function cat
- command bat $argv
-        return
-    end
+    command bat $argv
+    return
+end

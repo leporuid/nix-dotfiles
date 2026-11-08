@@ -7,11 +7,14 @@
 }:
 let
   # Precompile bat themes into the Nix store at build time.
-  batCache = pkgs.runCommand "bat-cache" {
-    nativeBuildInputs = [ pkgs.bat ];
-  } ''
-    bat cache --build --source "${flake}/config/bat" --target "$out"
-  '';
+  batCache =
+    pkgs.runCommand "bat-cache"
+      {
+        nativeBuildInputs = [ pkgs.bat ];
+      }
+      ''
+        bat cache --build --source "${flake}/config/bat" --target "$out"
+      '';
 in
 {
   # =========================================================================

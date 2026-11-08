@@ -74,6 +74,11 @@
     nixcord.url = "github:4evy/nixcord";
     nixcord.inputs.nixpkgs.follows = "nixpkgs";
 
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nix-secrets = {
       url = "git+ssh://git@github.com/leporuid/nix-secrets.git";
       flake = false;

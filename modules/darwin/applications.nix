@@ -72,7 +72,9 @@ in
       rm -rf "/Applications/Nix Apps"
 
       # Physically copy M3U8DLProtocol.app to /Applications via APFS clone without symlinks
-      m3u8App="${inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re}/Applications/M3U8DLProtocol.app"
+      m3u8App="${
+        inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re
+      }/Applications/M3U8DLProtocol.app"
       if [ -d "$m3u8App" ]; then
         rm -rf /Applications/M3U8DLProtocol.app
         /bin/cp -cR "$m3u8App" /Applications/M3U8DLProtocol.app 2>/dev/null || /bin/cp -R "$m3u8App" /Applications/M3U8DLProtocol.app
@@ -115,9 +117,10 @@ in
       ];
     };
 
-    taps = map (name: { inherit name; trusted = true; }) (
-      lib.unique (extraTaps ++ builtins.attrNames config.nix-homebrew.taps)
-    );
+    taps = map (name: {
+      inherit name;
+      trusted = true;
+    }) (lib.unique (extraTaps ++ builtins.attrNames config.nix-homebrew.taps));
 
     casks = [
       "adguard-vpn"

@@ -24,7 +24,7 @@ let
   ) { } cfg.packages;
 
   pluginType = lib.types.submodule (
-    { ... }:
+    _:
     {
       options = {
         name = lib.mkOption {

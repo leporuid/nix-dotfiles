@@ -26,7 +26,7 @@
   system.stateVersion = 6;
 
   users.users.${vars.username} = {
-    description = vars.description;
+    inherit (vars) description;
     home = vars.homeDirectory;
     shell = pkgs.fish;
     openssh.authorizedKeys = {
