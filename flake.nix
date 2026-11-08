@@ -84,10 +84,7 @@
       flake = false;
     };
 
-    nix-secrets = {
-      url = "git+ssh://git@github.com/leporuid/nix-secrets.git";
-      flake = false;
-    };
+    nix-secrets.url = "git+ssh://git@github.com/leporuid/nix-secrets.git";
   };
 
   outputs =
