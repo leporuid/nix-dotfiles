@@ -250,9 +250,11 @@ function MacBook-Pro -a verb
     if test $verb = switch
         set maybe_sudo sudo
     else if test $verb = check
-        # Pure evaluation/build check without requiring root activation
-        _run nix build .#darwinConfigurations.MacBook-Pro.config.system.build.toplevel --no-link $argv[2..]
-        return $status
+        # Fast pure evaluation check (instantiates derivation without building packages or closures)
+        _run nix eval --raw .#darwinConfigurations.MacBook-Pro.config.system.build.toplevel.drvPath $argv[2..]
+        or return $status
+        echo
+        return 0
     end
 
     _run $maybe_sudo darwin-rebuild $verb --flake .#MacBook-Pro $argv[2..]

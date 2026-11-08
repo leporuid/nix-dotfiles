@@ -14,7 +14,10 @@
   networking.useDHCP = true;
 
   boot.loader.grub.device = "nodev";
-  boot.kernelParams = [ "console=ttyS0,115200n8" ];
+  boot.kernelParams = [
+    "console=ttyAMA0,115200n8"
+    "console=ttyS0,115200n8"
+  ];
 
   fileSystems."/" = {
     device = "/dev/disk/by-label/nixos";
