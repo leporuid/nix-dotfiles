@@ -12,7 +12,7 @@ background-blur-radius = 20
 link-url = true
 cursor-style = "underline"
 auto-update-channel = stable
-theme = "Catppuccin Macchiato"
+theme = "Glass"
 shell-integration-features = no-cursor
 
 

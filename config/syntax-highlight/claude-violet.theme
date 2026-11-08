@@ -1,0 +1,24 @@
+-- Claude Violet Theme for Andre Simon Highlight / SourceCodeSyntaxHighlight
+-- Matches Ghostty & Helix (Catppuccin Macchiato / Claude Violet)
+
+Description = "Claude Violet"
+
+Canvas = { Colour = "#24212a" }
+Default = { Colour = "#d6d0dd" }
+Number = { Colour = "#e5c07b" }
+Operator = { Colour = "#c084fc" }
+String = { Colour = "#a6c8a1" }
+Escape = { Colour = "#cba6f7" }
+StringPreProc = Escape
+Interpolation = { Colour = "#cba6f7" }
+LineComment = { Colour = "#625b6b", Italic = true }
+BlockComment = { Colour = "#625b6b", Italic = true }
+LineNum = { Colour = "#585b70" }
+PreProcessor = { Colour = "#c084fc" }
+
+Keywords = {
+  { Id=1, Colour="#cba6f7", Bold=true },   -- keywords / fn / control flow
+  { Id=2, Colour="#8fb8d8", Bold=false },  -- types / classes
+  { Id=3, Colour="#c084fc", Bold=false },  -- constants / strong accent
+  { Id=4, Colour="#ec6a88", Bold=false },  -- special / warnings
+}
