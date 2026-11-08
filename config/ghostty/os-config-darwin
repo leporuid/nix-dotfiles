@@ -46,8 +46,8 @@ keybind = command+equal=equalize_splits
 # Some things are implemented by the GUI toolkit, e.g. control+tab
 # ---
 keybind = command+t=new_tab
-keybind = command+shift+open_bracket=previous_tab
-keybind = command+shift+close_bracket=next_tab
+keybind = command+shift+bracket_left=previous_tab
+keybind = command+shift+bracket_right=next_tab
 keybind = command+shift+option+left=move_tab:-1
 keybind = command+shift+option+right=move_tab:1
 keybind = command+n=new_window
