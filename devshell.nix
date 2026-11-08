@@ -4,6 +4,7 @@
 }:
 pkgs.mkShellNoCC {
   packages = [
+    perSystem.llm-agents.copilot-cli
     perSystem.llm-agents.antigravity-cli
     perSystem.llm-agents.default
     perSystem.home-manager.default
