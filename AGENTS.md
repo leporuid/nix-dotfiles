@@ -52,6 +52,7 @@ This repository collects project-specific expectations, tool contracts, and arch
     - **Never Mask Exit Codes**: Never pipe verification commands directly into `tail` or `head` without preserving pipeline status (`set -o pipefail` in Bash/Zsh, `$pipestatus` in Fish). Evaluate success strictly by the process exit status (`$? == 0`), never by the presence of terminal output lines.
 - **Secrets Management**:
   - Encrypted files and keys live in the private repository `~/Developer/nix-secrets`.
+  - Recipient rules are defined in `agenix-rules.nix` (migrated from deprecated `secrets.nix`; explicit fallback via `AGENIX_RULES`).
   - macOS uses `age-plugin-se` (Touch ID / Secure Enclave) alongside SSH keys.
   - `devshell.nix` overrides `agenix` with `pkgs.age` (`ageBin = "${pkgs.age}/bin/age"`) because standard `rage` lacks plugin support.
 

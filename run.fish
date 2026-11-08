@@ -80,11 +80,21 @@ function edit-age -d "Edit the encrypted files stored in nix-secrets"
         set file (fd --type file --glob '*.age' . $secrets_dir | fzf --height=40% --layout=reverse)
         or return
         pushd $secrets_dir
+        if test -f agenix-rules.nix
+            set -lx AGENIX_RULES "$PWD/agenix-rules.nix"
+        else if test -f secrets.nix
+            set -lx AGENIX_RULES "$PWD/secrets.nix"
+        end
         agenix -e (path resolve $file) $argv
         popd
     else
         set file (fd --type file --glob '*.age' | fzf --height=40% --layout=reverse)
         or return
+        if test -f agenix-rules.nix
+            set -lx AGENIX_RULES "$PWD/agenix-rules.nix"
+        else if test -f secrets.nix
+            set -lx AGENIX_RULES "$PWD/secrets.nix"
+        end
         agenix -e $file $argv
     end
 end
