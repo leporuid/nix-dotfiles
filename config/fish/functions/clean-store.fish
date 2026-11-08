@@ -14,7 +14,7 @@ function clean-store -d "Clean old system/user profile generations and collect g
 
     set maybe_sudo
     if test (id -u) -ne 0
-        set maybe_sudo sudo
+        set maybe_sudo sudo -H
     end
 
     set -l filter_args
