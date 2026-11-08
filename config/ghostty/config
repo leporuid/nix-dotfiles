@@ -22,7 +22,6 @@ config-file = os-config
 window-padding-x = 14
 window-padding-y = 10
 window-padding-balance = true
-window-decoration = none
 
 # Keybind for Claude Code
 keybind = shift+enter=text:\n
