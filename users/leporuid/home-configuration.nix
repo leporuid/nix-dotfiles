@@ -9,8 +9,6 @@
     ./cloud-configuration.nix
   ];
 
-  home.stateVersion = "26.11";
-
   home.sessionVariables = {
     IS_DARWIN = "";
     SWIFTLY_HOME_DIR = "${config.home.homeDirectory}/.swiftly";
