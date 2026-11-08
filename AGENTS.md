@@ -39,10 +39,17 @@ This repository collects project-specific expectations, tool contracts, and arch
   run switch-MacBook-Pro   # Apply nix-darwin + Home Manager unified configuration on macOS (requires sudo)
   run switch-host          # Shortcut for current host (e.g. switch-MacBook-Pro on macOS)
   run build-host           # Build current host toplevel closure without activating (outputs ./result)
-  run check-host           # Fast evaluation check without creating ./result or building closures
+  run check-host           # Builds current host toplevel closure with --no-link (no activation, no root required)
   run switch-nixos         # Build and deploy remote NixOS configuration to Oracle Cloud
   run edit-age             # Interactively select and edit encrypted secrets with fzf + agenix
   ```
+  - **Verification Matrix & Exit Status Invariant**:
+    | Changed Paths | Required Verification Before Commit / Push |
+    | :--- | :--- |
+    | `*.nix`, `flake.lock`, `modules/`, `hosts/`, `users/`, `packages/`, `devshell.nix` | `run check-MacBook-Pro` (+ NixOS eval if `hosts/nixos` or cloud profile modified) |
+    | Only `config/**` (raw dotfiles not consumed by Nix expressions) | May skip Nix build; add `no-nix-check` to commit body |
+    | Newly added / deleted files referenced by Nix expressions | Must run `git add` before evaluating (`nix build` requires files tracked by git) |
+    - **Never Mask Exit Codes**: Never pipe verification commands directly into `tail` or `head` without preserving pipeline status (`set -o pipefail` in Bash/Zsh, `$pipestatus` in Fish). Evaluate success strictly by the process exit status (`$? == 0`), never by the presence of terminal output lines.
 - **Secrets Management**:
   - Encrypted files and keys live in the private repository `~/Developer/nix-secrets`.
   - macOS uses `age-plugin-se` (Touch ID / Secure Enclave) alongside SSH keys.
@@ -103,9 +110,12 @@ This repository collects project-specific expectations, tool contracts, and arch
    - Conversation responses to the user should be in concise Traditional Chinese (Taiwan usage).
 4. **Cache & Git Hygiene**:
    - **Purge Stale Direnv Cache**: When modifying Flake inputs, toolchains, or local build derivations that encounter persistent build or locking failures, purge the stale cache with `rm -rf .direnv` before rebuilding.
-   - **Flake Input Updates**: Always use `nix flake update --flake ~/Developer/nix-dotfiles && cd ~/Developer/nix-dotfiles` when updating flake inputs (instead of `cd ~/Developer/nix-dotfiles && nix flake lock --update-input blueprint`).
+   - **Flake Input Updates**: Always use `nix flake update <input> --flake ~/Developer/nix-dotfiles` when updating flake inputs (instead of `nix flake lock --update-input`). If a user-supplied command conflicts with this specification, follow `AGENTS.md` and state the substitution in a single concise line.
    - **Git Staging Guardrail**: Flakes evaluate only files tracked by Git. Always stage newly added files (`git add`) before running `nix flake check` or evaluations.
-   - For all Git version control operations, use `client:execute_mcp` with the `git` MCP server.
+   - **Git Tooling Split & Safe Execution**:
+     - IDE / Gemini sessions with the `git` MCP server must use `client:execute_mcp`.
+     - Terminal `agy` sessions without MCP execute native `git` CLI directly in the shell.
+     - Destructive operations (`--force`, `reset --hard`, `clean -fd`, branch deletions) strictly require explicit user confirmation.
 5. **Tiered Execution Strategy (Architect vs. Executor)**:
    - **Architect Mode (Pro Tier Reasoning)**: Prioritize deep, structured analysis when comparing external repositories, evaluating architecture trade-offs, or planning complex refactors before modifying code.
    - **Executor Mode (Flash Tier Efficiency)**: Once the plan is established, transition to token-minimal, surgical execution—apply targeted in-place patches, stage specific files (`git add <files>`), and commit with concise conventional commit messages without dumping full files.
@@ -116,6 +126,16 @@ This repository collects project-specific expectations, tool contracts, and arch
      - Prefer specialized filesystem tools (`replace_file_content`, `write_to_file`, `view_file`) and `client:execute_mcp` for git operations instead of raw terminal commands.
      - Batch related filesystem and git operations into unified turns rather than prompting across fragmented micro-steps.
      - Reserve interactive user confirmation strictly for destructive, irreversible operations (such as force-pushing to remote or wiping uncommitted branches).
+7. **Staging & Commit Protocol**:
+   - **Pre-Commit Index Audit**: Before committing, inspect `git status --short` and compare against intended targets. Proactively alert on unexpected staged entries (especially file deletions `D ` or untracked sensitive files) before executing `git commit`.
+   - **Tracked vs. Untracked (`git add -u`)**: Remember that `git add -u` strictly stages tracked modifications and skips untracked files (`??`). After `git add -u`, always check `git status --short` for untracked files that were intended to be included.
+   - **Flake Lock Invariant**: When running `nix flake update <input>`, always stage `flake.lock` in the exact same commit as the `flake.nix` modification that required it (`git add flake.nix flake.lock`).
+   - **Format Isolation**: Run `nix fmt` as a standalone style commit (`style: nix fmt`), never bundled into feature or bugfix commits.
+   - **Accurate Scope & Multi-Agent Concurrency**: Commit messages must accurately describe only the files present in that commit. When collaborating across multiple active agents, run `git status` immediately before committing; if git reports `nothing to commit`, inspect `git log -3 --stat` to verify whether a concurrent agent already committed those changes.
+8. **Terminal Tool Contract (`agy`)**:
+   - Tool nomenclature varies by client runtime: `agy` uses `read_file` / `edit_file` / `write_file` / `run_command`, which correspond conceptually to `view_file` / `replace_file_content` / `write_to_file`.
+   - In interactive Zsh environments, always quote wildcards and globs (e.g. `--include="*.nix"`).
+   - Fish-specific commands must be invoked inside the devshell: `nix develop --command fish -c "run <verb>-<host>"`.
 
 ---
 
@@ -148,3 +168,24 @@ Agents should consult the relevant `SKILL.md` before executing multi-repo analys
    - **Gemini (Lead Architect)**: Project-wide planning, multi-file atomic in-place patching, Blueprint conformity, and AGENTS.md maintenance.
    - **agy (Terminal Executor)**: Command execution in the active shell (`git add`, `nix fmt`, `run check-host`), live build inspection, and stderr capture.
    - **GitHub Copilot (Exploratory Scout)**: Open-source repository exploration on the web and in-editor snippet completions.
+5. **Secret-Handling Wrapper Scripts**:
+   - Scripts that serve purely as execution wrappers delegating secret decryption to `run.fish` must declare self-certification on line 2:
+     `# agents: wrapper-only -- delegates to run.fish; no secret handling in this file`
+   - Agents shall not re-audit annotated wrappers for secrets, but must immediately reject any script containing `age -d`, `agenix`, private key paths, or inline plaintext credentials.
+   - Secret decryption and SSH-stdin transmission stay strictly encapsulated within `run.fish` memory.
+
+---
+
+## 8. Application Configuration Pitfalls & Verified Patterns
+
+- **Ghostty Keybind Names (W3C Standard)**:
+  - Ghostty keybind specifications follow W3C naming standards: use `bracket_left` and `bracket_right` (e.g. `super+bracket_left`), never `open_bracket` or `close_bracket` (which produce `keybind: unknown error error.InvalidFormat`).
+- **Ghostty Window Decoration & macOS Native Tabs**:
+  - Setting `window-decoration = none` in `config/ghostty/config` strips the macOS native window titlebar that hosts tabs.
+  - When utilizing `macos-titlebar-style = tabs`, do not set `window-decoration = none`.
+- **Helix Language Server Definitions**:
+  - In `languages.toml`, every entry in `language-servers = [...]` requires a corresponding `[language-server.<name>]` definition block and a verified Nix-provided binary in `PATH` (e.g. `pkgs.taplo`, `pkgs.nil`).
+- **GitHub Actions Runner Matrix**:
+  - Never evaluate or build `darwinConfigurations` closures on Linux runners (`ubuntu-latest`). Darwin configurations require a macOS runner or pure evaluation modes (`nix eval`).
+- **External Snippet Verification**:
+  - Before applying configurations discovered from external repositories or LLM suggestions, cross-reference option names and schemas against the pinned `nixpkgs` and package release versions.

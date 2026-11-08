@@ -1,4 +1,5 @@
 #!/usr/bin/env fish
+# agents: wrapper-only -- delegates to run.fish; no secret handling in this file
 # Required parameters:
 # @raycast.schemaVersion 1
 # @raycast.title Deploy vpn-pack to UDR
