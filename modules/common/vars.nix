@@ -62,7 +62,15 @@ in
           "nix-command"
           "flakes"
         ];
-      };
+      }
+      // (lib.optionalAttrs isDarwin {
+        builders = [
+          "ssh://leporuid@nixos aarch64-linux - 4 1 kvm,benchmark,big-parallel"
+        ];
+        extra-platforms = [
+          "aarch64-linux"
+        ];
+      });
 
       sshKeys = [
         # My iPhone, blink terminal
