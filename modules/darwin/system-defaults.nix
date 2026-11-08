@@ -83,16 +83,7 @@ with inputs;
       builder.state = "enabled";
     };
 
-    customSettings = vars.customSettings // {
-      nix-path = [
-        "nixpkgs=${nixpkgs}"
-        "home-manager=${home-manager}"
-      ];
-      eval-cores = 0;
-      keep-derivations = true;
-      keep-outputs = true;
-      lazy-trees = true;
-    };
+    customSettings = vars.customSettings;
   };
 
   launchd.daemons.determinate-nix-daemon.serviceConfig = {

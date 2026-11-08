@@ -45,6 +45,8 @@ in
         fallback = true;
         http-connections = 50;
         keep-going = true;
+        keep-derivations = true;
+        keep-outputs = true;
         log-lines = 25;
         max-free = 3221225472;
         max-jobs = "auto";
@@ -57,8 +59,8 @@ in
           username
         ];
         extra-experimental-features = [
-          "parallel-eval"
-          "provenance"
+          "nix-command"
+          "flakes"
         ];
       };
 

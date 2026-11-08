@@ -475,7 +475,7 @@ with inputs;
   };
 
   nix.channel.enable = false;
-  nix.nixPath = [ "nixpkgs=${nixpkgs}" ];
+  nix.nixPath = [ ];
   nix.registry.nixpkgs.flake = nixpkgs;
   nix.registry.self.flake = flake;
 
