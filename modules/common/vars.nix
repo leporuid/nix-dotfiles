@@ -38,7 +38,7 @@ in
       customSettings = {
         inherit (caches) extra-substituters extra-trusted-public-keys;
         
-        extra-trusted-users = [
+        extra-trusted-users = if !isDarwin thenn[
           "root"
           username
         ];
@@ -60,9 +60,8 @@ in
         stalled-download-timeout = 20;
         warn-dirty = false;
       }
-      // (lib.optionalAttrs isDarwin {
+      // (lib.optionalAttrs isDarwin {     
         trusted-users = ["@admin" username];
-       };
         builders = [
           "ssh://leporuid@nixos aarch64-linux - 4 1 kvm,benchmark,big-parallel"
         ];
