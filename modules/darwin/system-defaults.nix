@@ -69,8 +69,8 @@ with inputs;
   # =========================================================================
 
   programs.nix-index-database.comma.enable = true;
-  programs.zsh.enable = false;
-  programs.fish = lib.mkMerge {
+  programs.zsh.enable = true;
+  programs.fish = {
      enable = true;
      useBabelfish = true;
      promptInit = with pkgs; ''
@@ -81,7 +81,6 @@ with inputs;
         function postexec_test --on-event fish_postexec
           echo
         end
-        fish_add_path ${binDir}
         ${starship}/bin/starship init fish | source
       '';
     };  
