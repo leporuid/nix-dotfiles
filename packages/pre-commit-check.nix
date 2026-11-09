@@ -37,8 +37,8 @@ let
     };
   };
 in
-preCommitCheck.overrideAttrs (old: {
-  passthru = (old.passthru or { }) // {
+preCommitCheck // {
+  passthru = (preCommitCheck.passthru or { }) // {
     treefmt = treefmtEval.config.build.wrapper;
   };
-})
+}

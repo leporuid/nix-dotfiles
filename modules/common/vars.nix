@@ -52,11 +52,11 @@ in
         stalled-download-timeout = 20;
         warn-dirty = false;
 
-        trusted-users = [
+        extra--trusted-users = [
           "root"
           username
         ];
-        experimental-features = "nix-command flakes";
+        extra--experimental-features = "nix-command flakes";
       }
       // (lib.optionalAttrs isDarwin {
         builders = [

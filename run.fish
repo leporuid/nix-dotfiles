@@ -282,3 +282,41 @@ for host in $hosts
         test $this_host = $host; and alias $verb-host $verb-$host
     end
 end
+
+function update-m3u8dl -d "自動查詢 GitHub 最新 Actions 產物 ID 並更新 pin.json"
+    _require gh jq
+    echo (set_color cyan)"==> 正在向 GitHub 查詢 nilaoda/N_m3u8DL-RE 最新成功的 Actions Run..."(set_color normal)
+
+    set -l run_id $argv[1]
+    if test -z "$run_id"
+        set run_id (gh run list -R nilaoda/N_m3u8DL-RE -s success -L 1 --json databaseId -q '.[0].databaseId')
+    end
+
+    if test -z "$run_id"
+        echo (set_color red)"[!] 找不到成功的 Actions Run"(set_color normal)
+        return 1
+    end
+
+    set -l artifact_id (gh api "repos/nilaoda/N_m3u8DL-RE/actions/runs/$run_id/artifacts" \
+        | jq -r '.artifacts[] | select(.name | test("osx-arm64|mac|darwin")).id')
+
+    if test -z "$artifact_id"
+        echo (set_color red)"[!] 在 Run $run_id 中找不到合適的 macOS ARM64 產物"(set_color normal)
+        return 1
+    end
+
+    echo (set_color green)"✓ 找到最新 Artifact ID: $artifact_id (來自 Run #$run_id)"(set_color normal)
+    set -l url "https://nightly.link/nilaoda/N_m3u8DL-RE/actions/artifacts/$artifact_id.zip"
+
+    echo (set_color cyan)"==> 正在預抓取並計算新 Hash..."(set_color normal)
+    set -l raw_hash (nix-prefetch-url --unpack $url 2>/dev/null)
+    set -l sri_hash ""
+    if test -n "$raw_hash"
+        set sri_hash (nix hash to-sri --type sha256 $raw_hash 2>/dev/null)
+        test -z "$sri_hash"; and set sri_hash $raw_hash
+    end
+
+    set -l pin_file "packages/n-m3u8dl-re/pin.json"
+    echo "{\"runId\": \"$run_id\", \"artifactId\": \"$artifact_id\", \"hash\": \"$sri_hash\"}" | jq . > $pin_file
+    echo (set_color green --bold)"✓ 已自動更新 $pin_file 至最新版本！"(set_color normal)
+end
