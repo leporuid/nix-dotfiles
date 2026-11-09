@@ -65,9 +65,6 @@
     yt-ai.url = "github:CrimsonGlory/yt-ai";
     yt-ai.flake = false;
 
-    n-m3u8dl-re.url = "github:nilaoda/N_m3u8DL-RE/main";
-    n-m3u8dl-re.flake = false;
-
     agenix.url = "github:ryantm/agenix";
     agenix.inputs.nixpkgs.follows = "nixpkgs";
 
