@@ -41,27 +41,22 @@ in
         accept-flake-config = true;
         auto-optimise-store = !isDarwin;
         builders-use-substitutes = true;
-        connect-timeout = 5;
+        connect-timeout = 10;
         fallback = true;
-        http-connections = 50;
         keep-going = true;
         keep-derivations = true;
         keep-outputs = true;
         log-lines = 25;
         max-free = 3221225472;
-        max-jobs = "auto";
         min-free = 1073741824;
         stalled-download-timeout = 20;
         warn-dirty = false;
 
-        extra-trusted-users = [
+        trusted-users = [
           "root"
           username
         ];
-        extra-experimental-features = [
-          "nix-command"
-          "flakes"
-        ];
+        experimental-features = "nix-command flakes";
       }
       // (lib.optionalAttrs isDarwin {
         builders = [

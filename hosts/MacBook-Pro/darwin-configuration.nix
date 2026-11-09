@@ -28,15 +28,11 @@
   users.users.${vars.username} = {
     inherit (vars) description;
     home = vars.homeDirectory;
-    shell = pkgs.fish;
     openssh.authorizedKeys = {
       keys = vars.sshKeys;
       keyFiles = vars.sshKeyFiles;
     };
   };
-
-  programs.zsh.enable = true;
-  programs.fish.enable = true;
 
   services.openssh.enable = true;
   security.pam.services.sudo_local.touchIdAuth = true;

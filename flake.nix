@@ -30,6 +30,7 @@
 
     llm-agents.url = "github:numtide/llm-agents.nix";
     llm-agents.inputs.nixpkgs.follows = "nixpkgs";
+    llm-agents.inputs.treefmt-nix.follows = "treefmt-nix";
 
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
 
@@ -39,6 +40,7 @@
     direnv-instant = {
       url = "github:Mic92/direnv-instant";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.treefmt-nix.follows = "treefmt-nix";
     };
 
     multiverse.url = "github:fzakaria/nixpkgs-multiverse";
@@ -46,6 +48,7 @@
     mac-app-util = {
       url = "github:hraban/mac-app-util";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.treefmt-nix.follows = "treefmt-nix";
     };
 
     nix-index-database = {
@@ -73,9 +76,15 @@
 
     nixcord.url = "github:4evy/nixcord";
     nixcord.inputs.nixpkgs.follows = "nixpkgs";
+    nixcord.inputs.treefmt-nix.follows = "treefmt-nix";
 
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    git-hooks = {
+      url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

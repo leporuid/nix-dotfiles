@@ -69,7 +69,11 @@ with inputs;
   # =========================================================================
 
   programs.nix-index-database.comma.enable = true;
-
+  programs.zsh.enable = true;
+  programs.fish = {
+     enable = true;
+     useBabelfish = true;
+    };  
   documentation.doc.enable = false;
   home-manager.backupFileExtension = "hm-backup";
 
@@ -194,14 +198,5 @@ with inputs;
         };
       };
     };
-  };
-
-  # =========================================================================
-  # 5. User Account Specifications (nixelium style)
-  # =========================================================================
-  users.users.root = {
-    home = "/var/root";
-    shell = "/bin/zsh";
-    uid = 0;
   };
 }

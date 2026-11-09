@@ -110,9 +110,9 @@ in
 
     # Agent configurations & skill mappings
     ".claude/settings.json" = "config/claude/settings.json";
-    ".agents/skills" = ".agents/skills";
-    ".claude/skills" = ".agents/skills";
-    ".gemini/skills" = ".agents/skills";
+    ".agents/skills" = "config/agents/skills";
+    ".claude/skills" = "config/agents/skills";
+    ".gemini/skills" = "config/gemini/skills";
   };
 
   # Ensure session variables are in a known path for both standalone HM and system modules.
@@ -133,6 +133,7 @@ in
   home.sessionVariables = {
     ATUIN_NOBIND = "true";
     JJ_CONFIG = "${config.home.homeDirectory}/${platformConfig}/jj/config.toml";
+    STARSHIP_CONFIG =" ${config.home.homeDirectory}/${platformConfig}/starship.toml";
     ZDOTDIR = "$HOME/.config/zsh";
     NIX_CONFIG_REV = flake.rev or flake.dirtyRev;
     NIX_CONFIG_DIR = config.my.config.directory;

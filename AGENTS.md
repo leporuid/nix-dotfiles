@@ -142,14 +142,14 @@ This repository collects project-specific expectations, tool contracts, and arch
 
 ## 6. Available Skills & Agent Instructions
 
-Automated agents (`agy`, Claude, Gemini, Copilot, Cursor) operating on this repository have access to modular skills located in `.agents/skills/`, `.gemini/skills/`, and `~/.gemini/skills/`:
+Automated agents (`agy`, Claude, Gemini, Copilot, Cursor) operating on this repository have access to modular skills located in `config/agents/skills/` (symlinked from `.agents/skills/`, `.gemini/skills/`, and `~/.gemini/skills/`):
 
 | Skill | Path | Description & When to Load |
 | :--- | :--- | :--- |
-| `@fast-repo-reader` | `.agents/skills/fast-repo-reader/SKILL.md` | Non-intrusive remote inspection of external Git/GitHub repos without shell network prompts. |
-| `@nix-dotfiles-workflow` | `.agents/skills/nix-dotfiles-workflow/SKILL.md` | Core architecture guardrails (no `flake.lock` reading, single-tier module headers, out-of-store symlinks). |
-| `@tiered-agent-workflow` | `.agents/skills/tiered-agent-workflow/SKILL.md` | Two-tiered execution strategy: Pro-tier deep reasoning for planning -> Flash-tier surgical execution. |
-| `@get-more-perspectives` | `.agents/skills/get-more-perspectives/SKILL.md` | Simulated 5-role advisory panel (Operator, Skeptic, Visionary, Customer, Finance) for trade-offs. |
+| `@fast-repo-reader` | `config/agents/skills/fast-repo-reader/SKILL.md` | Non-intrusive remote inspection of external Git/GitHub repos without shell network prompts. |
+| `@nix-dotfiles-workflow` | `config/agents/skills/nix-dotfiles-workflow/SKILL.md` | Core architecture guardrails (no `flake.lock` reading, single-tier module headers, out-of-store symlinks). |
+| `@tiered-agent-workflow` | `config/agents/skills/tiered-agent-workflow/SKILL.md` | Two-tiered execution strategy: Pro-tier deep reasoning for planning -> Flash-tier surgical execution. |
+| `@get-more-perspectives` | `config/agents/skills/get-more-perspectives/SKILL.md` | Simulated 5-role advisory panel (Operator, Skeptic, Visionary, Customer, Finance) for trade-offs. |
 
 Agents should consult the relevant `SKILL.md` before executing multi-repo analyses or structural modifications.
 
@@ -190,3 +190,7 @@ Agents should consult the relevant `SKILL.md` before executing multi-repo analys
   - Never evaluate or build `darwinConfigurations` closures on Linux runners (`ubuntu-latest`). Darwin configurations require a macOS runner or pure evaluation modes (`nix eval`).
 - **External Snippet Verification**:
   - Before applying configurations discovered from external repositories or LLM suggestions, cross-reference option names and schemas against the pinned `nixpkgs` and package release versions.
+- **Keyboard, Mouse & Input Device Policy**:
+  - The user exclusively manages all keyboard shortcuts, gestures, mouse buttons, window snapping, and hyper keys using **BetterTouchTool (BTT)**.
+  - **Strict Invariant**: NEVER configure, remap, or override keyboard or mouse settings via `system.keyboard.*` (e.g. `remapCapsLockToControl`, `enableKeyMapping`), `hidutil`, Karabiner-Elements, or custom launchd plists.
+  - System-level adjustments must strictly be limited to standard `system.defaults.*` (e.g. `NSGlobalDomain`, `dock`, `finder`). Do not introduce keyboard remapping options that conflict with or circumvent BTT.

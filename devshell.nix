@@ -4,6 +4,7 @@
 }:
 pkgs.mkShellNoCC {
   packages = [
+    perSystem.self.pre-commit-check.passthru.treefmt
     perSystem.llm-agents.copilot-cli
     perSystem.llm-agents.antigravity-cli
     perSystem.llm-agents.default
@@ -30,6 +31,7 @@ pkgs.mkShellNoCC {
   ];
 
   shellHook = ''
+    ${perSystem.self.pre-commit-check.shellHook}
     export IN_NIX_CONFIG_DEVSHELL=1
   '';
 }

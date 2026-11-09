@@ -16,6 +16,8 @@ jobs:
         include:
           - name: flake-check
             command: nix flake check
+          - name: static-analysis
+            command: nix run nixpkgs#statix -- check . && nix run nixpkgs#deadnix -- --fail .
           - name: darwin-eval
             command: nix eval --raw .#darwinConfigurations.MacBook-Pro.config.system.build.toplevel.drvPath
           - name: nixos-eval
