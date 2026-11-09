@@ -100,6 +100,7 @@ in
     ".config/nushell" = "config/nushell";
     ".config/nvim" = "config/nvim";
     ".config/starship.toml" = "config/starship.toml";
+    "${platformConfig}/starship.toml" = ".config/starship.toml";
     ".config/syntax-highlight" = "config/syntax-highlight";
     ".config/tmux" = "config/tmux";
     ".config/zellij" = "config/zellij";
