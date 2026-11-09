@@ -72,6 +72,7 @@ with inputs;
   programs.zsh.enable = false;
   programs.fish = lib.mkMerge {
      enable = true;
+     useBabelfish = true;
      promptInit = with pkgs; ''
         set fish_greeting
         function fish_mode_prompt; end
@@ -83,7 +84,6 @@ with inputs;
         fish_add_path ${binDir}
         ${starship}/bin/starship init fish | source
       '';
-     useBabelfish = true;
     };  
   users.users.${config.system.primaryUser}.shell = pkgs.fish;
   documentation.doc.enable = false;
