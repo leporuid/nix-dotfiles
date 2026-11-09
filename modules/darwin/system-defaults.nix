@@ -71,19 +71,19 @@ with inputs;
   programs.nix-index-database.comma.enable = true;
   programs.zsh.enable = true;
   programs.fish = {
-     enable = true;
-     useBabelfish = true;
-     promptInit = with pkgs;(lib.mkMerge ''
-        set fish_greeting
-        function fish_mode_prompt; end
-        function fish_prompt; end
+    enable = true;
+    useBabelfish = true;
+    promptInit = ''
+      set fish_greeting
+      function fish_mode_prompt; end
+      function fish_prompt; end
 
-        function postexec_test --on-event fish_postexec
-          echo
-        end
-        ${starship}/bin/starship init fish | source
-      '';)
-    };  
+      function postexec_test --on-event fish_postexec
+        echo
+      end
+      ${pkgs.starship}/bin/starship init fish | source
+    '';
+  };
   users.users.${config.system.primaryUser}.shell = pkgs.fish;
   documentation.doc.enable = false;
   home-manager.backupFileExtension = "hm-backup";
