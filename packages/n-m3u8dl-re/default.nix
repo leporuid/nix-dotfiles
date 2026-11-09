@@ -15,7 +15,16 @@ pkgs.stdenv.mkDerivation {
 
   installPhase = ''
     mkdir -p "$out/bin"
-    find . -type f -name "N_m3u8DL-RE*" -exec cp {} "$out/bin/N_m3u8DL-RE" \;
+    tarFile=$(find . -maxdepth 2 -type f \( -name "*.tar" -o -name "*.tar.gz" -o -name "*.tgz" \) | head -n 1)
+    if [ -n "$tarFile" ]; then
+      tar -xf "$tarFile"
+    fi
+    bin=$(find . -maxdepth 2 -type f ! -name "*.tar*" ! -name "*.zip" -name "*N_m3u8DL-RE*" | head -n 1)
+    if [ -z "$bin" ]; then
+      echo "Error: N_m3u8DL-RE binary not found after unpacking" >&2
+      exit 1
+    fi
+    cp "$bin" "$out/bin/N_m3u8DL-RE"
     chmod +x "$out/bin/N_m3u8DL-RE"
   '';
 
