@@ -73,7 +73,7 @@ with inputs;
   programs.fish = {
      enable = true;
      useBabelfish = true;
-     promptInit = with pkgs; ''
+     promptInit = with pkgs;(lib.mkMerge ''
         set fish_greeting
         function fish_mode_prompt; end
         function fish_prompt; end
@@ -82,7 +82,7 @@ with inputs;
           echo
         end
         ${starship}/bin/starship init fish | source
-      '';
+      '';)
     };  
   users.users.${config.system.primaryUser}.shell = pkgs.fish;
   documentation.doc.enable = false;
