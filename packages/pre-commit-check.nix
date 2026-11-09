@@ -24,27 +24,42 @@ let
   };
 
   treefmtEval = inputs.treefmt-nix.lib.evalModule pkgs treefmtConfig;
-
-  preCommitCheck = inputs.git-hooks.lib.${pkgs.stdenv.hostPlatform.system}.run {
-    src = inputs.self;
-    package = pkgs.pre-commit.overrideAttrs (_: {
-      doCheck = false;
-      doInstallCheck = false;
-      nativeCheckInputs = [ ];
-      checkInputs = [ ];
-    });
-    hooks = {
-      statix.enable = true;
-      deadnix.enable = true;
-      treefmt = {
-        enable = true;
-        package = treefmtEval.config.build.wrapper;
-      };
-    };
-  };
+  treefmtWrapper = treefmtEval.config.build.wrapper;
 in
-preCommitCheck // {
-  passthru = (preCommitCheck.passthru or { }) // {
-    treefmt = treefmtEval.config.build.wrapper;
+pkgs.stdenvNoCC.mkDerivation {
+  name = "pre-commit-check";
+  src = inputs.self;
+
+  nativeBuildInputs = [
+    treefmtWrapper
+  ];
+
+  phases = [
+    "unpackPhase"
+    "checkPhase"
+    "installPhase"
+  ];
+
+  doCheck = true;
+  checkPhase = ''
+    ${treefmtWrapper}/bin/treefmt --fail-on-change
+  '';
+
+  installPhase = ''
+    touch $out
+  '';
+
+  passthru = {
+    treefmt = treefmtWrapper;
+    shellHook = ''
+      if [ -d .git ] && [ ! -f .git/hooks/pre-commit ]; then
+        mkdir -p .git/hooks
+        cat << 'EOF' > .git/hooks/pre-commit
+#!/usr/bin/env sh
+exec ${treefmtWrapper}/bin/treefmt --fail-on-change
+EOF
+        chmod +x .git/hooks/pre-commit
+      fi
+    '';
   };
 }

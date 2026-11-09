@@ -29,6 +29,7 @@ with inputs;
 
   environment.systemPackages = with pkgs; [
     fish
+    nushell
     pkg-config
     ghostty-bin.terminfo
 
