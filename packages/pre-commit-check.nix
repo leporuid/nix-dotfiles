@@ -30,6 +30,8 @@ let
     package = pkgs.pre-commit.overrideAttrs (_: {
       doCheck = false;
       doInstallCheck = false;
+      nativeCheckInputs = [ ];
+      checkInputs = [ ];
     });
     hooks = {
       statix.enable = true;
