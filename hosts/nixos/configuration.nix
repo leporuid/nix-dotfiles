@@ -195,7 +195,7 @@ with inputs;
   };
 
   services.timesyncd = {
-    enable = true;
+    enable = lib.mkForce true;
     servers = [ "169.254.169.254" ];
     fallbackServers = [ "pool.ntp.org" ];
   };
