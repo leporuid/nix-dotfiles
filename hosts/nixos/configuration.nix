@@ -82,6 +82,12 @@ with inputs;
 
   systemd.targets.multi-user.enable = true;
 
+  # Mask phantom PL011 UART devices on Oracle Cloud ARM A1 (prevents 90s boot timeout)
+  systemd.maskedUnits = [
+    "serial-getty@ttyAMA0.service"
+    "dev-ttyAMA0.device"
+  ];
+
   # Memory & Process Resilience (ZRAM swap & OOMD from junghan0611)
   zramSwap = {
     enable = true;
