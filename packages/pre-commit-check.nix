@@ -27,6 +27,10 @@ let
 
   preCommitCheck = inputs.git-hooks.lib.${pkgs.stdenv.hostPlatform.system}.run {
     src = inputs.self;
+    package = pkgs.pre-commit.overrideAttrs (_: {
+      doCheck = false;
+      doInstallCheck = false;
+    });
     hooks = {
       statix.enable = true;
       deadnix.enable = true;
