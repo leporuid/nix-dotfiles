@@ -37,7 +37,15 @@ in
       # Centralized Determinate Nix core performance, daemon, and cache settings
       customSettings = {
         inherit (caches) extra-substituters extra-trusted-public-keys;
-
+        
+        extra-trusted-users = [
+          "root"
+          username
+        ];
+        extra-experimental-features  = [
+          "nix-command"
+          "flakes"
+        ];
         accept-flake-config = true;
         auto-optimise-store = !isDarwin;
         builders-use-substitutes = true;
@@ -51,12 +59,6 @@ in
         min-free = 1073741824;
         stalled-download-timeout = 20;
         warn-dirty = false;
-
-        extra-trusted-users = [
-          "root"
-          username
-        ];
-        extra-experimental-features = "nix-command flakes";
       }
       // (lib.optionalAttrs isDarwin {
         builders = [
