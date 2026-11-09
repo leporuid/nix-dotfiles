@@ -75,21 +75,21 @@ with inputs;
     enable = true;
     useBabelfish = true;
     promptInit = ''
-      set fish_greeting
-      function fish_mode_prompt; end
-      function fish_prompt; end
-      function starship_transient_prompt_func
-        ${pkgs.starship}/bin/starship module character
-    end
-      
-    
-      function postexec_test --on-event fish_postexec
-        echo
+        set fish_greeting
+        function fish_mode_prompt; end
+        function fish_prompt; end
+        function starship_transient_prompt_func
+          ${pkgs.starship}/bin/starship module character
       end
-      ${pkgs.starship}/bin/starship init fish | source
-       if not test -n "$FISH_SIMPLE_TERM"
-        enable_transience
-    end
+        
+
+        function postexec_test --on-event fish_postexec
+          echo
+        end
+        ${pkgs.starship}/bin/starship init fish | source
+         if not test -n "$FISH_SIMPLE_TERM"
+          enable_transience
+      end
     '';
   };
   users.users.${config.system.primaryUser}.shell = pkgs.fish;

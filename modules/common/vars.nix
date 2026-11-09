@@ -37,12 +37,12 @@ in
       # Centralized Determinate Nix core performance, daemon, and cache settings
       customSettings = {
         inherit (caches) extra-substituters extra-trusted-public-keys;
-        
-        extra-trusted-users =  [
+
+        extra-trusted-users = [
           "root"
           username
         ];
-        extra-experimental-features  = [
+        extra-experimental-features = [
           "nix-command"
           "flakes"
         ];
@@ -60,8 +60,11 @@ in
         stalled-download-timeout = 20;
         warn-dirty = false;
       }
-      // (lib.optionalAttrs isDarwin {     
-        trusted-users = ["@admin" username];
+      // (lib.optionalAttrs isDarwin {
+        trusted-users = [
+          "@admin"
+          username
+        ];
         builders = [
           "ssh://leporuid@nixos aarch64-linux - 4 1 kvm,benchmark,big-parallel"
         ];

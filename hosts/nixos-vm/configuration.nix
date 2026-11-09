@@ -20,8 +20,8 @@
   ];
 
   systemd.services."serial-getty@ttyAMA0".enable = false;
-  
-fileSystems."/" = {
+
+  fileSystems."/" = {
     device = "/dev/disk/by-label/nixos";
     fsType = "ext4";
   };

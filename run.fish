@@ -317,6 +317,6 @@ function update-m3u8dl -d "自動查詢 GitHub 最新 Actions 產物 ID 並更�
     end
 
     set -l pin_file "packages/n-m3u8dl-re/pin.json"
-    echo "{\"runId\": \"$run_id\", \"artifactId\": \"$artifact_id\", \"hash\": \"$sri_hash\"}" | jq . > $pin_file
+    echo "{\"runId\": \"$run_id\", \"artifactId\": \"$artifact_id\", \"hash\": \"$sri_hash\"}" | jq . >$pin_file
     echo (set_color green --bold)"✓ 已自動更新 $pin_file 至最新版本！"(set_color normal)
 end

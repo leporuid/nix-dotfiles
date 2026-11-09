@@ -23,27 +23,24 @@ let
     lib.foldl' (acc2: pl: acc2 // mkPluginLink group pl) acc plugins
   ) { } cfg.packages;
 
-  pluginType = lib.types.submodule (
-    _:
-    {
-      options = {
-        name = lib.mkOption {
-          type = lib.types.str;
-        };
-        src = lib.mkOption {
-          type = lib.types.path;
-        };
-        start = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-        };
-        recursive = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-        };
+  pluginType = lib.types.submodule (_: {
+    options = {
+      name = lib.mkOption {
+        type = lib.types.str;
       };
-    }
-  );
+      src = lib.mkOption {
+        type = lib.types.path;
+      };
+      start = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+      };
+      recursive = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+      };
+    };
+  });
 in
 {
   options.my.programs.neovim = with lib; {

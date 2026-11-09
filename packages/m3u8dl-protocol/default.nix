@@ -38,30 +38,30 @@ pkgs.stdenv.mkDerivation (finalAttrs: {
   '';
 
   passthru.injectHook = pkgs.lib.optionalString pkgs.stdenv.hostPlatform.isDarwin ''
-    mkdir -p "$out/bin" "$out/Applications"
-    cp -R "${finalAttrs.finalPackage}/Applications/M3U8DLProtocol.app" "$out/Applications/"
-    ln -sf ../Applications/M3U8DLProtocol.app/Contents/MacOS/M3U8DLProtocol "$out/bin/m3u8dl-handler"
+        mkdir -p "$out/bin" "$out/Applications"
+        cp -R "${finalAttrs.finalPackage}/Applications/M3U8DLProtocol.app" "$out/Applications/"
+        ln -sf ../Applications/M3U8DLProtocol.app/Contents/MacOS/M3U8DLProtocol "$out/bin/m3u8dl-handler"
 
-    if [ -f "$out/bin/N_m3u8DL-RE" ]; then
-      mv "$out/bin/N_m3u8DL-RE" "$out/bin/.N_m3u8DL-RE-bin"
-      cat << 'WRAPPER_EOF' > "$out/bin/N_m3u8DL-RE"
-#!/bin/sh
-STAMP="$HOME/.cache/n-m3u8dl-re/registered_path"
-APP="@APP_PATH@"
-LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
-if [ -f "$LSREGISTER" ] && [ -d "$APP" ]; then
-  if [ ! -f "$STAMP" ] || [ "$(cat "$STAMP" 2>/dev/null)" != "$APP" ]; then
-    mkdir -p "$(dirname "$STAMP")" 2>/dev/null
-    ("$LSREGISTER" -f "$APP" >/dev/null 2>&1 && echo "$APP" > "$STAMP" 2>/dev/null) &
-  fi
-fi
-exec "@BIN_PATH@" "$@"
-WRAPPER_EOF
-      substituteInPlace "$out/bin/N_m3u8DL-RE" \
-        --replace-fail "@APP_PATH@" "$out/Applications/M3U8DLProtocol.app" \
-        --replace-fail "@BIN_PATH@" "$out/bin/.N_m3u8DL-RE-bin"
-      chmod +x "$out/bin/N_m3u8DL-RE"
+        if [ -f "$out/bin/N_m3u8DL-RE" ]; then
+          mv "$out/bin/N_m3u8DL-RE" "$out/bin/.N_m3u8DL-RE-bin"
+          cat << 'WRAPPER_EOF' > "$out/bin/N_m3u8DL-RE"
+    #!/bin/sh
+    STAMP="$HOME/.cache/n-m3u8dl-re/registered_path"
+    APP="@APP_PATH@"
+    LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+    if [ -f "$LSREGISTER" ] && [ -d "$APP" ]; then
+      if [ ! -f "$STAMP" ] || [ "$(cat "$STAMP" 2>/dev/null)" != "$APP" ]; then
+        mkdir -p "$(dirname "$STAMP")" 2>/dev/null
+        ("$LSREGISTER" -f "$APP" >/dev/null 2>&1 && echo "$APP" > "$STAMP" 2>/dev/null) &
+      fi
     fi
+    exec "@BIN_PATH@" "$@"
+    WRAPPER_EOF
+          substituteInPlace "$out/bin/N_m3u8DL-RE" \
+            --replace-fail "@APP_PATH@" "$out/Applications/M3U8DLProtocol.app" \
+            --replace-fail "@BIN_PATH@" "$out/bin/.N_m3u8DL-RE-bin"
+          chmod +x "$out/bin/N_m3u8DL-RE"
+        fi
   '';
 
   meta = with pkgs.lib; {

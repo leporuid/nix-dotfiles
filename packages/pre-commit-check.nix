@@ -52,14 +52,14 @@ pkgs.stdenvNoCC.mkDerivation {
   passthru = {
     treefmt = treefmtWrapper;
     shellHook = ''
-      if [ -d .git ] && [ ! -f .git/hooks/pre-commit ]; then
-        mkdir -p .git/hooks
-        cat << 'EOF' > .git/hooks/pre-commit
-#!/usr/bin/env sh
-exec ${treefmtWrapper}/bin/treefmt --fail-on-change
-EOF
-        chmod +x .git/hooks/pre-commit
-      fi
+            if [ -d .git ] && [ ! -f .git/hooks/pre-commit ]; then
+              mkdir -p .git/hooks
+              cat << 'EOF' > .git/hooks/pre-commit
+      #!/usr/bin/env sh
+      exec ${treefmtWrapper}/bin/treefmt --fail-on-change
+      EOF
+              chmod +x .git/hooks/pre-commit
+            fi
     '';
   };
 }

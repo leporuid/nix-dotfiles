@@ -9,7 +9,6 @@ jobs:
     permissions:
       contents: read
       id-token: write
-
     strategy:
       fail-fast: false
       matrix:
@@ -22,7 +21,6 @@ jobs:
             command: nix eval --raw .#darwinConfigurations.MacBook-Pro.config.system.build.toplevel.drvPath
           - name: nixos-eval
             command: nix eval --raw .#nixosConfigurations.nixos.config.system.build.toplevel.drvPath
-
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/determinate-nix-action@main
