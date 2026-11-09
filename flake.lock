@@ -648,23 +648,6 @@
         "type": "github"
       }
     },
-    "n-m3u8dl-re": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1793789705,
-        "narHash": "sha256-Cc/wp3m4nnzLe8YiCl6+5MguB0/w636Vqgp2/xftXSE=",
-        "owner": "nilaoda",
-        "repo": "N_m3u8DL-RE",
-        "rev": "7849be8437148b33324d5ba298804d49d3add3d8",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nilaoda",
-        "ref": "main",
-        "repo": "N_m3u8DL-RE",
-        "type": "github"
-      }
-    },
     "nix": {
       "inputs": {
         "bdwgc": "bdwgc",
@@ -1045,7 +1028,6 @@
         "llm-agents": "llm-agents",
         "mac-app-util": "mac-app-util",
         "multiverse": "multiverse",
-        "n-m3u8dl-re": "n-m3u8dl-re",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
         "nix-index-database": "nix-index-database",
