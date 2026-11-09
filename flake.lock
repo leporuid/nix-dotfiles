@@ -403,11 +403,11 @@
     "gallery-ai": {
       "flake": false,
       "locked": {
-        "lastModified": 1794115699,
-        "narHash": "sha256-h8YvIzdpk0GHPKvleArYjqxOFMn1A9VT7UqPtJ/hBx8=",
+        "lastModified": 1794200748,
+        "narHash": "sha256-LLh2b83Aewuy3yGHo57LET64o2O4JuOru6oOGQnCfm4=",
         "owner": "CrimsonGlory",
         "repo": "gallery-ai",
-        "rev": "f8a336f36bdd5e5122e5225739b30a765e046fe9",
+        "rev": "ea3b827b132c9d0d583f0dc8943083a4d2efc8f7",
         "type": "github"
       },
       "original": {
@@ -593,11 +593,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794178147,
-        "narHash": "sha256-RDWuueNfF5JxlTDQUpZfDmpsiG2kXvTW4Cw8COvKJmQ=",
+        "lastModified": 1794201582,
+        "narHash": "sha256-ejT2Q+iCRP2/oL+58pb5/UGZ53cWVLqU5ob58EucyZk=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "e7ec2cef4fda261e0f92e65ea55ac54948ca3a40",
+        "rev": "3327b7d82f31f2444533e935f06caf1a1b4da18c",
         "type": "github"
       },
       "original": {
