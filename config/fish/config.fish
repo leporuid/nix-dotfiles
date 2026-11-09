@@ -5,9 +5,6 @@ if status is-interactive; and type -q starship
         starship module character
     end
 
-    # Initialize Starship normally
-    starship init fish | source
-
     # Enable Starship's native transience (skip in simple terminals)
     if not test -n "$FISH_SIMPLE_TERM"
         enable_transience

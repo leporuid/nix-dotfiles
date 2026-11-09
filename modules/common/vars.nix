@@ -38,7 +38,7 @@ in
       customSettings = {
         inherit (caches) extra-substituters extra-trusted-public-keys;
         
-        extra-trusted-users = pkgs.stdenv.hostPlatform.is!Darwin [
+        extra-trusted-users =  [
           "root"
           username
         ];
