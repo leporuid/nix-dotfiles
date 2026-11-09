@@ -61,6 +61,8 @@ in
         warn-dirty = false;
       }
       // (lib.optionalAttrs isDarwin {
+        trusted-users = ["@admin" username];
+       };
         builders = [
           "ssh://leporuid@nixos aarch64-linux - 4 1 kvm,benchmark,big-parallel"
         ];
