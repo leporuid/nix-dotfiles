@@ -64,7 +64,7 @@ with inputs;
     };
 
     # APFS case-hack collision workaround for ncurses terminfo in initrd
-    initrd.extraFiles."/etc/terminfo/l/linux".source = lib.mkForce (
+    initrd.systemd.contents."/etc/terminfo/l/linux".source = lib.mkForce (
       pkgs.runCommand "initrd-terminfo-linux" { } ''
         if [ -f "${pkgs.ncurses}/share/terminfo/l/linux" ]; then
           cp "${pkgs.ncurses}/share/terminfo/l/linux" "$out"
