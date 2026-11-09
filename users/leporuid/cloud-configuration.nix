@@ -133,7 +133,7 @@ in
   home.sessionVariables = {
     ATUIN_NOBIND = "true";
     JJ_CONFIG = "${config.home.homeDirectory}/${platformConfig}/jj/config.toml";
-    STARSHIP_CONFIG = "${config.home.homeDirectory}/.config/starship.toml";
+    STARSHIP_CONFIG = "$HOME/.config/starship.toml";
     ZDOTDIR = "$HOME/.config/zsh";
     NIX_CONFIG_REV = flake.rev or flake.dirtyRev;
     NIX_CONFIG_DIR = config.my.config.directory;
