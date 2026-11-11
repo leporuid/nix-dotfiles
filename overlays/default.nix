@@ -17,14 +17,14 @@ in
   # Ensure tools calling `nix` (comma, nix-update, nixpkgs-review) use Determinate Nix
   # instead of pulling upstream nixpkgs nix closure.
   (
-    final: prev:
+    _final: prev:
     let
       system = prev.stdenv.hostPlatform.system;
       determinateNix =
         if inputs != null then
           (inputs.determinate.inputs.nix.packages.${system}.default
-            or inputs.determinate.packages.${system}.default
-            or null)
+            or inputs.determinate.packages.${system}.default or null
+          )
         else
           null;
     in
@@ -47,18 +47,16 @@ in
   # dylibs in nixpkgs, and fixes every consumer at once rather than patching
   # each one to carry an rpath.
   (
-    final: prev:
+    _final: prev:
     prev.lib.optionalAttrs prev.stdenv.hostPlatform.isDarwin {
       curl-impersonate = prev.curl-impersonate.overrideAttrs (old: {
-        postFixup =
-          (old.postFixup or "")
-          + ''
-            for f in "$out"/lib/libcurl-impersonate*.dylib; do
-              # lib/ also holds version symlinks (libcurl-impersonate.4.dylib ->
-              # libcurl-impersonate.4.8.0.dylib); only the real Mach-O has an id.
-              [ -L "$f" ] || install_name_tool -id "$f" "$f"
-            done
-          '';
+        postFixup = (old.postFixup or "") + ''
+          for f in "$out"/lib/libcurl-impersonate*.dylib; do
+            # lib/ also holds version symlinks (libcurl-impersonate.4.dylib ->
+            # libcurl-impersonate.4.8.0.dylib); only the real Mach-O has an id.
+            [ -L "$f" ] || install_name_tool -id "$f" "$f"
+          done
+        '';
       });
     }
   )
@@ -76,19 +74,17 @@ in
   # past pythonImportsCheck. Upstream already disables a batch of similar
   # network/TLS-sensitive tests in this derivation; this extends that list.
   (
-    final: prev:
+    _final: prev:
     prev.lib.optionalAttrs prev.stdenv.hostPlatform.isDarwin {
       pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
-        (
-          pyfinal: pyprev: {
-            curl-cffi = pyprev.curl-cffi.overrideAttrs (old: {
-              disabledTests = (old.disabledTests or [ ]) ++ [
-                "test_verify"
-                "test_delete_cookies"
-              ];
-            });
-          }
-        )
+        (_pyfinal: pyprev: {
+          curl-cffi = pyprev.curl-cffi.overrideAttrs (old: {
+            disabledTests = (old.disabledTests or [ ]) ++ [
+              "test_verify"
+              "test_delete_cookies"
+            ];
+          });
+        })
       ];
     }
   )

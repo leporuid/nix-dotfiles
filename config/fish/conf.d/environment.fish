@@ -39,8 +39,7 @@ if not set -q __DOTFILES_ENV_INITIALIZED
         set -gx HOMEBREW_REPOSITORY /opt/homebrew/Library/.homebrew-is-managed-by-nix
         test -n "$MANPATH[1]"; and set -gx MANPATH "" $MANPATH
         contains /opt/homebrew/share/info $INFOPATH; or set -gx INFOPATH /opt/homebrew/share/info $INFOPATH
-        contains /opt/homebrew/share/fish/vendor_completions.d $fish_complete_path; or \
-          set -ga fish_complete_path /opt/homebrew/share/fish/vendor_completions.d
+        contains /opt/homebrew/share/fish/vendor_completions.d $fish_complete_path; or set -ga fish_complete_path /opt/homebrew/share/fish/vendor_completions.d
         if test -d /opt/homebrew/bin; and not contains -- /opt/homebrew/bin $PATH
             set --append PATH /opt/homebrew/bin /opt/homebrew/sbin
         end

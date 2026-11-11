@@ -10,7 +10,6 @@ if status is-interactive
     __source direnv hook fish
     __source fzf --fish
 
-
     functions -e __source
 
     if type -q starship

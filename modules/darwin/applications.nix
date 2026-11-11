@@ -82,7 +82,10 @@ in
       fi
 
       # Physically copy Vencord-patched Discord.app to /Applications via APFS clone
-      discordPkg="${config.programs.nixcord.discord.finalPackage or config.programs.nixcord.finalPackage.discord or config.programs.nixcord.discord.package}"
+      discordPkg="${
+        config.programs.nixcord.discord.finalPackage or config.programs.nixcord.finalPackage.discord
+          or config.programs.nixcord.discord.package
+      }"
       if [ -d "$discordPkg/Applications/Discord.app" ]; then
         rm -rf /Applications/Discord.app
         /bin/cp -cR "$discordPkg/Applications/Discord.app" /Applications/Discord.app 2>/dev/null || /bin/cp -R "$discordPkg/Applications/Discord.app" /Applications/Discord.app

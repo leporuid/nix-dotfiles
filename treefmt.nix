@@ -1,6 +1,6 @@
 # treefmt.nix
 # Unified code formatter and linter configuration powered by treefmt-nix.
-{ ... }:
+_:
 {
   projectRootFile = "flake.nix";
 
