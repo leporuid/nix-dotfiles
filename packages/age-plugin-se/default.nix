@@ -14,29 +14,18 @@ pkgs.stdenvNoCC.mkDerivation {
     hash = "sha256-+tiZZDr9gr/Dsi+ujaf4LAf8Ar9Bn4zpe2EAgWSxpxY=";
   };
 
+  # Ported from ink-splatters/dev:
+  # Strip swift-crypto via patch so SwiftPM never touches the network on Darwin,
+  # while preserving upstream Package.swift target structure and excludes.
+  patches = [ ./darwin-no-swift-crypto.patch ];
+
   postPatch = ''
-        # Remove Package.resolved to avoid pulling remote dependencies
-        rm -f Package.resolved
-
-        cat << 'EOF' > Package.swift
-    // swift-tools-version: 6.2
-    import PackageDescription
-
-    let package = Package(
-      name: "AgeSecureEnclavePlugin",
-      platforms: [.macOS("26.0")],
-      dependencies: [],
-      targets: [
-        .executableTarget(
-          name: "age-plugin-se",
-          dependencies: [],
-          path: "Sources",
-          exclude: ["SPEC.md", "SPEC-ARCHIVE.md"]
-        )
-      ]
-    )
-    EOF
+    # Remove Package.resolved to avoid pulling remote dependencies
+    rm -f Package.resolved
   '';
+
+  enableParallelBuilding = true;
+  NIX_ENFORCE_NO_NATIVE = 0;
 
   buildPhase = ''
     runHook preBuild
@@ -57,9 +46,14 @@ pkgs.stdenvNoCC.mkDerivation {
     export DEVELOPER_DIR="$_XCODE_DEV"
     export SDKROOT="$(/usr/bin/xcrun --sdk macosx --show-sdk-path)"
 
+    # Ported from ink-splatters/dev:
+    # Optimized build with -O3 and cross-module optimization,
+    # alongside availability checking bypass for macOS 26 APIs.
     /usr/bin/xcrun swift build \
       -c release \
       --disable-sandbox \
+      -Xcc -O3 \
+      -Xswiftc -cross-module-optimization \
       -Xswiftc -Xfrontend -Xswiftc -disable-availability-checking
 
     runHook postBuild
