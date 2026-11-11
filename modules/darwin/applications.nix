@@ -161,6 +161,9 @@ in
     user = config.system.primaryUser;
     autoMigrate = true;
     mutableTaps = true;
+    enableFishIntegration = false;
+    enableZshIntegration = false;
+    enableBashIntegration = false;
     taps = {
       "aninsomniacy/homebrew-rayburst" = inputs.homebrew-rayburst;
     };

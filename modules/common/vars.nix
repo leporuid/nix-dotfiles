@@ -42,10 +42,6 @@ in
           "root"
           username
         ];
-        extra-experimental-features = [
-          "nix-command"
-          "flakes"
-        ];
         accept-flake-config = true;
         auto-optimise-store = !isDarwin;
         builders-use-substitutes = true;
@@ -62,7 +58,7 @@ in
       }
       // (lib.optionalAttrs isDarwin {
         builders = [
-          "ssh://leporuid@nixos aarch64-linux - 4 1 kvm,benchmark,big-parallel"
+          "ssh://leporuid@nixos aarch64-linux - 2 1 kvm,benchmark,big-parallel"
         ];
         extra-platforms = [
           "aarch64-linux"

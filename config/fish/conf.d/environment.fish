@@ -31,10 +31,19 @@ if not set -q __DOTFILES_ENV_INITIALIZED
         set --append PATH $HOME/.local/bin
     end
 
-    # Homebrew should be available, but I don't want anything installed by
-    # it to take precendence over anything installed by Nix.
-    if test -d /opt/homebrew/bin; and not contains -- /opt/homebrew/bin $PATH
-        set --append PATH /opt/homebrew/bin
+    # Homebrew environment inlined to avoid ~100ms eval (brew shellenv) overhead.
+    # Appended to PATH so Nix packages always take precedence.
+    if test -d /opt/homebrew
+        set -gx HOMEBREW_PREFIX /opt/homebrew
+        set -gx HOMEBREW_CELLAR /opt/homebrew/Cellar
+        set -gx HOMEBREW_REPOSITORY /opt/homebrew/Library/.homebrew-is-managed-by-nix
+        test -n "$MANPATH[1]"; and set -gx MANPATH "" $MANPATH
+        contains /opt/homebrew/share/info $INFOPATH; or set -gx INFOPATH /opt/homebrew/share/info $INFOPATH
+        contains /opt/homebrew/share/fish/vendor_completions.d $fish_complete_path; or \
+          set -ga fish_complete_path /opt/homebrew/share/fish/vendor_completions.d
+        if test -d /opt/homebrew/bin; and not contains -- /opt/homebrew/bin $PATH
+            set --append PATH /opt/homebrew/bin /opt/homebrew/sbin
+        end
     end
 
     # If deno is installing binaries to its own directory, include that in the path

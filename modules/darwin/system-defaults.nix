@@ -66,19 +66,21 @@ with inputs;
     "/Applications"
   ];
 
+  environment.extraInit =
+          if pkgs.stdenv.hostPlatform.isx86_64 then
+            "eval \"$(/usr/local/bin/brew shellenv)\""
+          else
+            "eval \"$(/opt/homebrew/bin/brew shellenv)\"";
+
   # =========================================================================
   # 3. Nix Core and Determinate Installer Integration
   # =========================================================================
 
   programs.nix-index-database.comma.enable = true;
   programs.zsh = {
-    enable = true;
-    shellInit = ''
-      # Expose Homebrew binaries (e.g. gh) to GUI-launched non-interactive shells
-      if [ -x /opt/homebrew/bin/brew ]; then
-        eval "$(/opt/homebrew/bin/brew shellenv)"
-      fi
-    '';
+    promptInit = ""; # remember to do ''autoload -Uz compinit && compinit -u'' per user
+    enableGlobalCompInit = false;
+    enableBashCompletion = false;
   };
   programs.fish = {
     enable = true;
@@ -129,7 +131,7 @@ with inputs;
   # =========================================================================
   system = {
     tools.darwin-uninstaller.enable = false;
-    configurationRevision = flake.rev or flake.dirtyRev or null;
+    configurationRevision = inputs.self.sourceInfo.shortRev or inputs.self.dirtyShortRev or null;
 
     activationScripts = {
       postActivation.text = ''
