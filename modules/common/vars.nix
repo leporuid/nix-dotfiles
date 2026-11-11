@@ -71,7 +71,7 @@ in
       sshKeyFiles = [
         "${flake}/hosts/MacBook-Pro/users/leporuid/id_ed25519.pub"
         "${flake}/hosts/MacBook-Pro/id_ed25519.pub"
-        "${flake}/hosts/nixos/users/leporuid/id_ed25519.pub"
+        "${flake}/hosts/id_ed25519.pub"
       ];
     };
   };
