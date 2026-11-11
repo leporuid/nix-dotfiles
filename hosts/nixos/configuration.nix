@@ -339,6 +339,7 @@ with inputs;
 
   programs.fish = {
     enable = true;
+    useBabelfish = true;
     interactiveShellInit = builtins.readFile "${flake}/config/fish/config.fish";
   };
 
@@ -469,11 +470,7 @@ with inputs;
 
   services.getty.autologinUser = null;
 
-  documentation = {
-    enable = false;
-    man.enable = false;
-    nixos.enable = false;
-  };
+  documentation.man.cache.enable = false;
 
   nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
   system.stateVersion = "26.11";

@@ -9,6 +9,7 @@ if status is-interactive
     __source zoxide init fish
     __source direnv hook fish
     __source fzf --fish
+    __source starship init fish
 
     functions -e __source
 
