@@ -124,7 +124,7 @@ in
 
     programs.man.generateCaches = lib.mkIf (
       enableGeneratedCompletions && config.programs.man.package != null
-    ) (lib.mkDefault true);
+    ) (lib.mkForce false);
 
     xdg.dataFile."fish/generated_completions" = lib.mkIf enableGeneratedCompletions {
       source =

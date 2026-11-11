@@ -49,11 +49,4 @@
     perSystem.self.unxip
     perSystem.self.yt-dlp
   ];
-
-  # Build performance optimizations (from jake-edmonstone)
-  manual.manpages.enable = false;
-  programs.man.generateCaches = false;
-
-  # Enforce clean standard XDG directory structure
-  xdg.enable = true;
 }
