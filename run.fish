@@ -320,3 +320,10 @@ function update-m3u8dl -d "自動查詢 GitHub 最新 Actions 產物 ID 並更�
     echo "{\"runId\": \"$run_id\", \"artifactId\": \"$artifact_id\", \"hash\": \"$sri_hash\"}" | jq . >$pin_file
     echo (set_color green --bold)"✓ 已自動更新 $pin_file 至最新版本！"(set_color normal)
 end
+
+function fetch-facter -d "遠端自 Oracle NixOS 擷取最新硬體報告 facter.json"
+    echo (set_color cyan)"==> 正在自 nixos 擷取硬體規格並生成 facter.json..."(set_color normal)
+    ssh leporuid@nixos "sudo nixos-facter -o /tmp/facter.json"
+    and scp leporuid@nixos:/tmp/facter.json hosts/nixos/facter.json
+    and echo (set_color green)"✓ 成功更新 hosts/nixos/facter.json！"(set_color normal)
+end

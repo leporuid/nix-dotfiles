@@ -45,7 +45,7 @@ let
     inherit version;
     src = managerSrc;
     proxyVendor = true;
-    vendorHash = "sha256-lBfXmvBw11Y4W9J5FysIAhGbYSGuj/9OXTZinnrO8Yk=";
+    vendorHash = "sha256-n328hWEKKeJbZY/NmhrFqbE6BdzlG5mb1VIw/W8u32k=";
 
     postPatch = ''
       mkdir -p ui/dist

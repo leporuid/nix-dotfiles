@@ -23,7 +23,12 @@ with inputs;
 
     self.modules.common.vars
     "${nixpkgs}/nixos/modules/virtualisation/oci-image.nix"
-  ];
+  ]
+  ++ lib.optional (inputs ? nixos-facter-modules) inputs.nixos-facter-modules.nixosModules.facter;
+
+  hardware.facter.reportPath = lib.mkIf (
+    (inputs ? nixos-facter-modules) && builtins.pathExists ./facter.json
+  ) ./facter.json;
 
   # =========================================================================
   # 2. Boot, Kernel & OCI Architecture (BBR & Jumbo Frames)
@@ -192,6 +197,24 @@ with inputs;
         ethtool -K "$IFACE" rx-udp-gro-forwarding on rx-gro-list off || true
       fi
     '';
+  };
+
+  # Clan-inspired NAT-traversing out-of-band P2P SSH access via Iroh
+  systemd.services.iroh-ssh = {
+    description = "Iroh P2P SSH Server (NAT-traversing backup access)";
+    after = [
+      "network-online.target"
+      "sshd.service"
+    ];
+    wants = [ "network-online.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.iroh-ssh}/bin/iroh-ssh server --persist --key-dir /var/lib/iroh-ssh";
+      Restart = "always";
+      RestartSec = "10s";
+      StateDirectory = "iroh-ssh";
+      WorkingDirectory = "/var/lib/iroh-ssh";
+    };
   };
 
   services.timesyncd = {
@@ -401,6 +424,8 @@ with inputs;
     bashInteractive
     fish
     starship
+    iroh-ssh
+    nixos-facter
     direnv
     nix-direnv
     zoxide
