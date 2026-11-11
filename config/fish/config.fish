@@ -1,12 +1,27 @@
-if status is-interactive; and type -q starship
-    # Define what the prompt looks like after pressing Enter
-    set -g fish_greeting ""
-    function starship_transient_prompt_func
-        starship module character
+if status is-interactive
+    # Source interactive integrations
+    function __source
+        if type -q $argv[1]
+            $argv | source
+        end
     end
 
-    # Enable Starship's native transience (skip in simple terminals)
-    if not test -n "$FISH_SIMPLE_TERM"
-        enable_transience
+    __source zoxide init fish
+    __source direnv hook fish
+    __source fzf --fish
+
+    functions -e __source
+
+    if type -q starship
+        # Define what the prompt looks like after pressing Enter
+        set -g fish_greeting ""
+        function starship_transient_prompt_func
+            starship module character
+        end
+
+        # Enable Starship's native transience (skip in simple terminals)
+        if not test -n "$FISH_SIMPLE_TERM"
+            enable_transience
+        end
     end
 end

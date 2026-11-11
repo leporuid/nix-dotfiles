@@ -1,3 +1,6 @@
+# Guard: only define interactive abbreviations when in an interactive shell
+status is-interactive; or return
+
 # General shell helpers.
 # These are commands that I type enough that I need them
 # to be faster to type.

@@ -15,14 +15,24 @@ if set -q IS_DARWIN; and not set -q __NIX_PROFILES_HAVE_BEEN_MOVED
             set -g PATH $path/bin $PATH
         end
     end
-    set -gx __NIX_PROFILES_HAVE_BEEN_MOVED
-end
 
-# Deduplicate PATH because it might contain dupes after the handoff from ZSH.
-set -l new_path
-for path in $PATH
-    if not contains -- $path $new_path
-        set new_path $new_path $path
+    # Repair PATH if nix-darwin's system profile was somehow skipped
+    if not contains -- /run/current-system/sw/bin $PATH
+        for fallback_bin in $HOME/.nix-profile/bin /run/current-system/sw/bin /nix/var/nix/profiles/default/bin
+            if test -d $fallback_bin; and not contains -- $fallback_bin $PATH
+                set -g PATH $fallback_bin $PATH
+            end
+        end
     end
+
+    # Deduplicate PATH because it might contain dupes after the handoff from ZSH.
+    set -l new_path
+    for path in $PATH
+        if not contains -- $path $new_path
+            set new_path $new_path $path
+        end
+    end
+    set -gx PATH $new_path
+
+    set -gx __NIX_PROFILES_HAVE_BEEN_MOVED 1
 end
-set -gx PATH $new_path

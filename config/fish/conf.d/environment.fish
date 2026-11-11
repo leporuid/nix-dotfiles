@@ -16,39 +16,43 @@ end
 # Setting this to an empty string makes direnv silent
 set -x DIRENV_LOG_FORMAT
 
-# SQLite and Postgres both store their history files in a stupid location
-# by default, so this moves the histories to the data dir where they belong.
-set -x PSQL_HISTORY $HOME/.local/share/psql/psql_history
-set -l psql_history_dir (path dirname $PSQL_HISTORY)
-test -d $psql_history_dir; or mkdir -p $psql_history_dir
+if not set -q __DOTFILES_ENV_INITIALIZED
+    # SQLite and Postgres both store their history files in a stupid location
+    # by default, so this moves the histories to the data dir where they belong.
+    set -x PSQL_HISTORY $HOME/.local/share/psql/psql_history
+    set -l psql_history_dir (path dirname $PSQL_HISTORY)
+    test -d $psql_history_dir; or mkdir -p $psql_history_dir
 
-set -x SQLITE_HISTORY $HOME/.local/share/sqlite3/sqlite_history
-set -l sqlite_history_dir (path dirname $SQLITE_HISTORY)
-test -d $sqlite_history_dir; or mkdir -p $sqlite_history_dir
+    set -x SQLITE_HISTORY $HOME/.local/share/sqlite3/sqlite_history
+    set -l sqlite_history_dir (path dirname $SQLITE_HISTORY)
+    test -d $sqlite_history_dir; or mkdir -p $sqlite_history_dir
 
-if test -d $HOME/.local/bin; and not contains -- $HOME/.local/bin $PATH
-    set --append PATH $HOME/.local/bin
-end
+    if test -d $HOME/.local/bin; and not contains -- $HOME/.local/bin $PATH
+        set --append PATH $HOME/.local/bin
+    end
 
-# Homebrew should be available, but I don't want anything installed by
-# it to take precendence over anything installed by Nix.
-if test -d /opt/homebrew/bin; and not contains -- /opt/homebrew/bin $PATH
-    set --append PATH /opt/homebrew/bin
-end
+    # Homebrew should be available, but I don't want anything installed by
+    # it to take precendence over anything installed by Nix.
+    if test -d /opt/homebrew/bin; and not contains -- /opt/homebrew/bin $PATH
+        set --append PATH /opt/homebrew/bin
+    end
 
-# If deno is installing binaries to its own directory, include that in the path
-if test -d $HOME/.deno/bin; and not contains -- $HOME/.deno/bin $PATH
-    set --prepend PATH $HOME/.deno/bin
-end
+    # If deno is installing binaries to its own directory, include that in the path
+    if test -d $HOME/.deno/bin; and not contains -- $HOME/.deno/bin $PATH
+        set --prepend PATH $HOME/.deno/bin
+    end
 
-# If bun is installing binaries to its own directory, include that in the path
-if test -d $HOME/.bun/bin; and not contains -- $HOME/.bun/bin $PATH
-    set --prepend PATH $HOME/.bun/bin
-end
+    # If bun is installing binaries to its own directory, include that in the path
+    if test -d $HOME/.bun/bin; and not contains -- $HOME/.bun/bin $PATH
+        set --prepend PATH $HOME/.bun/bin
+    end
 
-# Mise needs to be at the front of the PATH
-if test -d $HOME/.local/share/mise/shims; and not contains -- $HOME/.local/share/mise/shims $PATH
-    set --prepend PATH $HOME/.local/share/mise/shims
+    # Mise needs to be at the front of the PATH
+    if test -d $HOME/.local/share/mise/shims; and not contains -- $HOME/.local/share/mise/shims $PATH
+        set --prepend PATH $HOME/.local/share/mise/shims
+    end
+
+    set -gx __DOTFILES_ENV_INITIALIZED 1
 end
 
 # Fish comes with some builtin aliases for ls, which we don't want.
