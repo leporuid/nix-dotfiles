@@ -32,11 +32,6 @@ with inputs;
 
   environment.systemPackages = with pkgs; [
     fish
-    nushell
-    iroh-ssh
-    pkg-config
-    ghostty-bin.terminfo
-
     (writeShellApplication {
       name = "tailscale";
       text = ''
