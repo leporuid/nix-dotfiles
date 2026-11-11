@@ -8,7 +8,6 @@
 {
   imports = [
     inputs.self.darwinModules.system-defaults
-    inputs.self.darwinModules.fish-environment
     inputs.self.darwinModules.applications
   ];
 
@@ -38,7 +37,9 @@
   security.pam.services.sudo_local.touchIdAuth = true;
   security.pam.services.sudo_local.reattach = true;
 
-  nix.enable = !config.determinateNix.enable;
+  # Determinate Nix owns the daemon and nix.conf; disable nix-darwin's Nix management
+  # completely to prevent both from competing over /etc/nix/nix.conf and launchd.
+  nix.enable = false;
   nix.channel.enable = false;
   nix.nixPath = lib.mkForce [ ];
 }
