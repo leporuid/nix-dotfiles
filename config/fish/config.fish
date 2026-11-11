@@ -5,11 +5,11 @@ if status is-interactive
             $argv | source
         end
     end
-
+    __source starship init fish
     __source zoxide init fish
     __source direnv hook fish
     __source fzf --fish
-    __source starship init fish
+
 
     functions -e __source
 
