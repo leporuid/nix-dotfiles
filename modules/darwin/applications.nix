@@ -102,6 +102,11 @@ in
   # =========================================================================
   # 4. Homebrew & Casks Declarative Management
   # =========================================================================
+  # Prepend set +e so individual brew cask failures do not abort darwin-rebuild
+  system.activationScripts.homebrew.text = lib.mkBefore ''
+    set +e
+  '';
+
   environment.variables = {
     HOMEBREW_NO_AUTO_UPDATE = "1";
     HOMEBREW_NO_ENV_HINTS = "1";

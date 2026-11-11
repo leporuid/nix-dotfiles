@@ -25,6 +25,9 @@ with inputs;
     "resolver/ts.net".text = ''
       nameserver 100.100.100.100
     '';
+
+    # Clear Determinate CLI Sentry endpoint to eliminate telemetry leakage (from jake-edmonstone)
+    "nix/sentry-endpoint".text = "";
   };
 
   environment.systemPackages = with pkgs; [
@@ -66,19 +69,12 @@ with inputs;
     "/Applications"
   ];
 
-  environment.extraInit =
-          if pkgs.stdenv.hostPlatform.isx86_64 then
-            "eval \"$(/usr/local/bin/brew shellenv)\""
-          else
-            "eval \"$(/opt/homebrew/bin/brew shellenv)\"";
-
   # =========================================================================
   # 3. Nix Core and Determinate Installer Integration
   # =========================================================================
-
   programs.nix-index-database.comma.enable = true;
   programs.zsh = {
-    promptInit = ""; # remember to do ''autoload -Uz compinit && compinit -u'' per user
+    promptInit = "";
     enableGlobalCompInit = false;
     enableBashCompletion = false;
   };
@@ -96,6 +92,7 @@ with inputs;
     determinateNixd = {
       garbageCollector.strategy = "automatic";
       builder.state = "enabled";
+      telemetry.sentry.endpoint = null;
     };
 
     inherit (vars) customSettings;
@@ -104,6 +101,17 @@ with inputs;
   launchd.daemons.determinate-nix-daemon.serviceConfig = {
     SoftResourceLimits.NumberOfFiles = 1048576;
     HardResourceLimits.NumberOfFiles = 1048576;
+  };
+
+  # macOS default kern.tty.ptmx_max is 511. Heavy developer/Electron tools (VS Code, Cursor, Ghostty)
+  # leak PTYs over long sessions, leading to `posix_openpt: Device not configured (ENXIO)`.
+  # Raise to XNU's safe upper ceiling (999).
+  launchd.daemons.sysctl-ptmx = {
+    script = "/usr/sbin/sysctl -w kern.tty.ptmx_max=999 || true";
+    serviceConfig = {
+      RunAtLoad = true;
+      KeepAlive = false;
+    };
   };
 
   # Weekly automated APFS purgeable space and local snapshot reclamation (Plan 2)
@@ -134,9 +142,13 @@ with inputs;
     configurationRevision = inputs.self.sourceInfo.shortRev or inputs.self.dirtyShortRev or null;
 
     activationScripts = {
+      # Session-aware settings activation without requiring user logout
       postActivation.text = ''
-        sudo -u ${config.system.primaryUser} \
-          /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
+        _uid=$(id -u ${config.system.primaryUser})
+        if [ -n "$_uid" ]; then
+          launchctl asuser "$_uid" sudo --user=${config.system.primaryUser} -- \
+            /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u || true
+        fi
       '';
     };
 
@@ -150,43 +162,80 @@ with inputs;
         AppleShowAllExtensions = true;
         ShowPathbar = true;
         ShowStatusBar = true;
-        FXDefaultSearchScope = "SCcf";
-        FXPreferredViewStyle = "clmv";
+        FXDefaultSearchScope = "SCcf"; # Search current folder by default
+        FXPreferredViewStyle = "clmv"; # Column view
         FXEnableExtensionChangeWarning = false;
+        NewWindowTarget = "Home";
         QuitMenuItem = true;
+        ShowExternalHardDrivesOnDesktop = true;
+        ShowHardDrivesOnDesktop = false;
+        ShowRemovableMediaOnDesktop = true;
+        _FXShowPosixPathInTitle = true; # Show full POSIX path in title bar
         _FXSortFoldersFirst = true;
       };
 
       dock = {
         autohide = true;
         autohide-delay = 0.0;
-        autohide-time-modifier = 0.15;
+        autohide-time-modifier = 0.0; # Instant slide animation (0.0s)
+        expose-animation-duration = 0.1; # Faster Mission Control
+        launchanim = false;
+        mineffect = "scale"; # Snappier than genie
+        mru-spaces = false;
+        show-process-indicators = true;
         show-recents = false;
         showhidden = true;
-        mru-spaces = false;
-        launchanim = false;
       };
 
       trackpad = {
         Clicking = true;
         Dragging = true;
+        TrackpadThreeFingerDrag = true;
       };
 
       NSGlobalDomain = {
         AppleKeyboardUIMode = 3;
-        ApplePressAndHoldEnabled = true;
+        ApplePressAndHoldEnabled = false; # Allow rapid key repeat
         AppleShowAllExtensions = true;
+        NSAutomaticCapitalizationEnabled = false;
         NSAutomaticDashSubstitutionEnabled = false;
+        NSAutomaticPeriodSubstitutionEnabled = false;
         NSAutomaticQuoteSubstitutionEnabled = false;
         NSAutomaticSpellingCorrectionEnabled = false;
         NSAutomaticWindowAnimationsEnabled = false;
         NSNavPanelExpandedStateForSaveMode = true;
+        NSNavPanelExpandedStateForSaveMode2 = true;
         NSWindowResizeTime = 0.001;
         NSWindowShouldDragOnGesture = true;
         InitialKeyRepeat = 15;
         KeyRepeat = 2;
         "com.apple.sound.beep.feedback" = 0;
       };
+
+      # macOS Sequoia native window tiling management
+      WindowManager = {
+        EnableTiledWindowMargins = false;
+        EnableTilingByEdgeDrag = true;
+        EnableTilingOptionAccelerator = false;
+        EnableTopTilingByEdgeDrag = true;
+        HideDesktop = true;
+        StageManagerHideWidgets = false;
+        StandardHideWidgets = false;
+      };
+
+      controlcenter = {
+        BatteryShowPercentage = true;
+        Sound = true;
+        NowPlaying = true;
+      };
+
+      screensaver = {
+        askForPassword = true;
+        askForPasswordDelay = 0; # Lock immediately
+      };
+
+      hitoolbox.AppleFnUsageType = "Do Nothing";
+      SoftwareUpdate.AutomaticallyInstallMacOSUpdates = false;
 
       CustomUserPreferences = {
         "NSGlobalDomain" = {

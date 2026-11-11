@@ -40,6 +40,7 @@
     pkgs.ffmpeg
     pkgs.mas
     pkgs.qpdf
+    pkgs.gnused
     perSystem.ktoolbox.default
     perSystem.self.age-plugin-se
     perSystem.self.gallery-dl
@@ -48,4 +49,11 @@
     perSystem.self.unxip
     perSystem.self.yt-dlp
   ];
+
+  # Build performance optimizations (from jake-edmonstone)
+  manual.manpages.enable = false;
+  programs.man.generateCaches = false;
+
+  # Enforce clean standard XDG directory structure
+  xdg.enable = true;
 }
