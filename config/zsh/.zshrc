@@ -49,6 +49,17 @@ if [[ -d "$HOME/.local/share/mise/shims" ]]; then
   path=("$HOME/.local/share/mise/shims" $path)
 fi
 
+## Sheldon fast cached plugin initialization (from azukit-dev/dotfiles)
+sheldon_cache="${XDG_CACHE_HOME:-$HOME/.cache}/sheldon.zsh"
+sheldon_toml="${XDG_CONFIG_HOME:-$HOME/.config}/sheldon/plugins.toml"
+if [[ ! -r "$sheldon_cache" || "$sheldon_toml" -nt "$sheldon_cache" ]]; then
+  if type sheldon >/dev/null 2>&1; then
+    sheldon source > "$sheldon_cache"
+  fi
+fi
+[[ -r "$sheldon_cache" ]] && source "$sheldon_cache"
+unset sheldon_cache sheldon_toml
+
 eval "$(starship init zsh)"
 
 HISTFILE=$HOME/.local/share/zsh/.zsh_history

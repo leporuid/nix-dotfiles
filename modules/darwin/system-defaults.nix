@@ -75,6 +75,17 @@ with inputs;
   programs.fish = {
     enable = true;
     useBabelfish = true;
+    interactiveShellInit = ''
+      if test "$TERM" = "dumb"
+        function fish_prompt
+          echo "\$ "
+        end
+
+        function fish_right_prompt; end
+        function fish_greeting; end
+        function fish_title; end
+      end
+    '';
   };
   users.users.${config.system.primaryUser}.shell = pkgs.fish;
   documentation.doc.enable = false;

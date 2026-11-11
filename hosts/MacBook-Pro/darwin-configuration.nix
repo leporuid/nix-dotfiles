@@ -21,8 +21,8 @@
   nixpkgs.hostPlatform = "aarch64-darwin";
 
   system.primaryUser = vars.username;
-  system.stateVersion = 5;
-  ids.gids.nixbld = 30000;
+  system.stateVersion = 6;
+  ids.gids.nixbld = 350;
 
   users.users.${vars.username} = {
     inherit (vars) description;

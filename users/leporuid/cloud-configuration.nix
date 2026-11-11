@@ -70,6 +70,7 @@ in
     pkgs.nix-output-monitor
     pkgs.nushell
     pkgs.ripgrep
+    pkgs.sheldon
     pkgs.starship
     pkgs.taplo
     pkgs.tealdeer
@@ -99,6 +100,7 @@ in
     ".config/mise" = "config/mise";
     ".config/nushell" = "config/nushell";
     ".config/nvim" = "config/nvim";
+    ".config/sheldon" = "config/sheldon";
     ".config/starship.toml" = "config/starship.toml";
     ".config/syntax-highlight" = "config/syntax-highlight";
     ".config/tmux" = "config/tmux";
