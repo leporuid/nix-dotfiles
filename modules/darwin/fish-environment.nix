@@ -17,14 +17,17 @@ in
   environment.etc."fish/nixos-env-preinit.fish".text = ''
     set -l __inherited_path $PATH
 
-    if test -z "$__NIX_DARWIN_SET_ENVIRONMENT_DONE" -a -f /etc/fish/setEnvironment.fish
-      source /etc/fish/setEnvironment.fish
-      set -g __NIX_DARWIN_SET_ENVIRONMENT_DONE 1
-    end
+    if test -z "$__NIX_DARWIN_SET_ENVIRONMENT_DONE"
+      if test -f /etc/fish/setEnvironment.fish
+        source /etc/fish/setEnvironment.fish
+      end
 
-    # Ensure Determinate / Nix daemon environment is reliably sourced in preinit
-    if test -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish'
-      source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish'
+      # Ensure Determinate / Nix daemon environment is reliably sourced in preinit
+      if test -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish
+        source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish
+      end
+
+      set -gx __NIX_DARWIN_SET_ENVIRONMENT_DONE 1
     end
 
     # Restore inherited terminal PATH entries at the tail to preserve parent tools
