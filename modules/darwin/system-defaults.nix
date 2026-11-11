@@ -162,25 +162,21 @@ with inputs;
         AppleShowAllExtensions = true;
         ShowPathbar = true;
         ShowStatusBar = true;
-        FXDefaultSearchScope = "SCcf"; # Search current folder by default
-        FXPreferredViewStyle = "clmv"; # Column view
+        FXDefaultSearchScope = "SCcf";
+        FXPreferredViewStyle = "clmv";
         FXEnableExtensionChangeWarning = false;
         NewWindowTarget = "Home";
         QuitMenuItem = true;
-        ShowExternalHardDrivesOnDesktop = true;
-        ShowHardDrivesOnDesktop = false;
-        ShowRemovableMediaOnDesktop = true;
-        _FXShowPosixPathInTitle = true; # Show full POSIX path in title bar
         _FXSortFoldersFirst = true;
       };
 
       dock = {
         autohide = true;
         autohide-delay = 0.0;
-        autohide-time-modifier = 0.0; # Instant slide animation (0.0s)
-        expose-animation-duration = 0.1; # Faster Mission Control
+        autohide-time-modifier = 0.0;
+        expose-animation-duration = 0.1;
         launchanim = false;
-        mineffect = "scale"; # Snappier than genie
+        mineffect = "scale";
         mru-spaces = false;
         show-process-indicators = true;
         show-recents = false;
@@ -190,52 +186,23 @@ with inputs;
       trackpad = {
         Clicking = true;
         Dragging = true;
-        TrackpadThreeFingerDrag = true;
       };
 
       NSGlobalDomain = {
         AppleKeyboardUIMode = 3;
-        ApplePressAndHoldEnabled = false; # Allow rapid key repeat
+        ApplePressAndHoldEnabled = true;
         AppleShowAllExtensions = true;
-        NSAutomaticCapitalizationEnabled = false;
         NSAutomaticDashSubstitutionEnabled = false;
-        NSAutomaticPeriodSubstitutionEnabled = false;
         NSAutomaticQuoteSubstitutionEnabled = false;
         NSAutomaticSpellingCorrectionEnabled = false;
         NSAutomaticWindowAnimationsEnabled = false;
         NSNavPanelExpandedStateForSaveMode = true;
-        NSNavPanelExpandedStateForSaveMode2 = true;
         NSWindowResizeTime = 0.001;
         NSWindowShouldDragOnGesture = true;
         InitialKeyRepeat = 15;
         KeyRepeat = 2;
         "com.apple.sound.beep.feedback" = 0;
       };
-
-      # macOS Sequoia native window tiling management
-      WindowManager = {
-        EnableTiledWindowMargins = false;
-        EnableTilingByEdgeDrag = true;
-        EnableTilingOptionAccelerator = false;
-        EnableTopTilingByEdgeDrag = true;
-        HideDesktop = true;
-        StageManagerHideWidgets = false;
-        StandardHideWidgets = false;
-      };
-
-      controlcenter = {
-        BatteryShowPercentage = true;
-        Sound = true;
-        NowPlaying = true;
-      };
-
-      screensaver = {
-        askForPassword = true;
-        askForPasswordDelay = 0; # Lock immediately
-      };
-
-      hitoolbox.AppleFnUsageType = "Do Nothing";
-      SoftwareUpdate.AutomaticallyInstallMacOSUpdates = false;
 
       CustomUserPreferences = {
         "NSGlobalDomain" = {
