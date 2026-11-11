@@ -99,7 +99,7 @@
       inherit inputs;
       nixpkgs = {
         config.allowUnfree = true;
-        overlays = import ./overlays;
+        overlays = import ./overlays inputs;
       };
     };
 }

@@ -2,11 +2,39 @@
 #
 # This is a list of standard `final: prev:` overlays, consumed by flake.nix
 # (via blueprint's nixpkgs.overlays) to apply workarounds across all hosts, packages, and devshells.
-#
-# Everything here is a workaround for a bug in nixpkgs-unstable. Each entry
-# says what broke and when it can go — recheck them after `nix flake update`
-# and delete the ones upstream has fixed.
+inputsOrArgs:
+let
+  inputs =
+    if builtins.isAttrs inputsOrArgs && inputsOrArgs ? inputs then
+      inputsOrArgs.inputs
+    else if builtins.isAttrs inputsOrArgs && inputsOrArgs ? determinate then
+      inputsOrArgs
+    else
+      null;
+in
 [
+  # Determinate Nix overrides (from malob/nix-config):
+  # Ensure tools calling `nix` (comma, nix-update, nixpkgs-review) use Determinate Nix
+  # instead of pulling upstream nixpkgs nix closure.
+  (
+    final: prev:
+    let
+      system = prev.stdenv.hostPlatform.system;
+      determinateNix =
+        if inputs != null then
+          (inputs.determinate.inputs.nix.packages.${system}.default
+            or inputs.determinate.packages.${system}.default
+            or null)
+        else
+          null;
+    in
+    prev.lib.optionalAttrs (determinateNix != null) {
+      comma = prev.comma.override { nix = determinateNix; };
+      nix-update = prev.nix-update.override { nix = determinateNix; };
+      nixpkgs-review = prev.nixpkgs-review.override { nix = determinateNix; };
+    }
+  )
+
   # curl-impersonate 2.1.0 sets its macOS dylib install_name to the relative
   # `@rpath/libcurl-impersonate.4.dylib` rather than the absolute store path.
   # Nothing in the build adds a matching -rpath, so consumers that link it —
