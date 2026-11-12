@@ -10,34 +10,25 @@ let
   isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
 
   # Base directory for Vencord on macOS vs Linux
-  vencordDir =
-    if isDarwin then
-      "Library/Application Support/Vencord"
-    else
-      ".config/Vencord";
+  vencordDir = if isDarwin then "Library/Application Support/Vencord" else ".config/Vencord";
 
   # Base directory for Vesktop on macOS vs Linux
-  vesktopDir =
-    if isDarwin then
-      "Library/Application Support/vesktop"
-    else
-      ".config/vesktop";
+  vesktopDir = if isDarwin then "Library/Application Support/vesktop" else ".config/vesktop";
 
   # Synthesize Vencord settings JSON
-  vencordSettings =
-    {
-      notifyAboutUpdates = false;
-      autoUpdate = false;
-      autoUpdateNotification = false;
-      useQuickCss = cfg.config.useQuickCss;
-      themeLinks = cfg.config.themeLinks;
-      enabledThemes = cfg.config.enabledThemes;
-      enableReactDevtools = false;
-      frameless = false;
-      transparent = false;
-      plugins = cfg.config.plugins;
-    }
-    // cfg.config.extraConfig;
+  vencordSettings = {
+    notifyAboutUpdates = false;
+    autoUpdate = false;
+    autoUpdateNotification = false;
+    useQuickCss = cfg.config.useQuickCss;
+    themeLinks = cfg.config.themeLinks;
+    enabledThemes = cfg.config.enabledThemes;
+    enableReactDevtools = false;
+    frameless = false;
+    transparent = false;
+    plugins = cfg.config.plugins;
+  }
+  // cfg.config.extraConfig;
 
   settingsJson = (pkgs.formats.json { }).generate "vencord-settings.json" vencordSettings;
 

@@ -1,5 +1,8 @@
 # lib/hjem.nix — Hjem & Hjem-Rum program factory helpers
-{ lib ? null, ... }:
+{
+  lib ? null,
+  ...
+}:
 {
   # Factory to construct a moni-dz / hjem-rum style typed program module
   mkProgramModule =

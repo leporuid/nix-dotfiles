@@ -22,13 +22,15 @@
           networking.hostName = lib.mkDefault hostName;
           nixpkgs.hostPlatform = lib.mkDefault system;
         }
-      ] ++ modules;
+      ]
+      ++ modules;
       specialArgs = {
         inherit inputs hostName;
         isDarwin = true;
         isNixOS = false;
         class = "nix-darwin";
-      } // specialArgs;
+      }
+      // specialArgs;
     };
 
   # Build a NixOS host system with complete platform wiring
@@ -47,12 +49,14 @@
           networking.hostName = lib.mkDefault hostName;
           nixpkgs.hostPlatform = lib.mkDefault system;
         }
-      ] ++ modules;
+      ]
+      ++ modules;
       specialArgs = {
         inherit inputs hostName;
         isDarwin = false;
         isNixOS = true;
         class = "nixos";
-      } // specialArgs;
+      }
+      // specialArgs;
     };
 }

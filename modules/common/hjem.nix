@@ -30,13 +30,9 @@ let
     else
       null;
 
-  allUserNames = lib.unique (
-    (lib.attrNames hostUserEntries) ++ (lib.attrNames genericUserEntries)
-  );
+  allUserNames = lib.unique ((lib.attrNames hostUserEntries) ++ (lib.attrNames genericUserEntries));
 
-  validUsers = lib.filterAttrs (_name: path: path != null) (
-    lib.genAttrs allUserNames getUserConfig
-  );
+  validUsers = lib.filterAttrs (_name: path: path != null) (lib.genAttrs allUserNames getUserConfig);
 in
 {
   hjem = {
