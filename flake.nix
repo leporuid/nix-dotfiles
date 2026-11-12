@@ -32,7 +32,7 @@
       inputs.hjem.follows = "";
     };
 
-    nix-darwin.url = "github:nix-darwin/nix-darwin";
+    nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
 
     treefmt.url = "github:numtide/treefmt-nix";
