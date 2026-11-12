@@ -2,8 +2,11 @@
 {
   imports = [
     inputs.hjem.nixosModules.default
-    inputs.hjem-rum.nixosModules.default
     ../../modules/nixos/host-shared.nix
+  ];
+
+  hjem.extraModules = [
+    inputs.hjem-rum.hjemModules.default
   ];
 
   nixpkgs.hostPlatform = "aarch64-linux";

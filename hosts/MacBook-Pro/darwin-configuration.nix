@@ -2,8 +2,11 @@
 {
   imports = [
     inputs.hjem.darwinModules.default
-    inputs.hjem-rum.darwinModules.default
     ../../modules/nixos/host-shared.nix
+  ];
+
+  hjem.extraModules = [
+    inputs.hjem-rum.hjemModules.default
   ];
 
   nixpkgs.hostPlatform = "aarch64-darwin";
