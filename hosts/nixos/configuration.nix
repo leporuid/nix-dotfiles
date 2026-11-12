@@ -6,7 +6,7 @@
     ../../modules/nixos/host-shared.nix
   ];
 
-  determinateNix.enable = true;
+  determinate.enable = true;
 
   hjem = {
     clobberByDefault = true;
