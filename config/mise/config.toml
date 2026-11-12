@@ -1,0 +1,9 @@
+[settings]
+idiomatic_version_file_enable_tools = ["node"]
+experimental = true
+pipx_uvx = true
+
+[tools]
+#go = "latest"
+#node = "latest"
+#rust = "latest"

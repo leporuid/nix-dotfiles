@@ -1,0 +1,24 @@
+"$schema" = "https://jj-vcs.github.io/jj/latest/config-schema.json"
+
+[user]
+name = "leporuid"
+email = "leporuid@icloud.com"
+
+[ui]
+default-command = "log"
+paginate = "auto"
+relative-timestamps = true
+editor = "hx"
+
+[git]
+sign-on-push = true
+push-branch-prefix = "push-"
+
+[remotes.origin]
+auto-track-bookmarks = "*"
+
+[aliases]
+st = ["status"]
+amend = ["describe", "--edit"]
+sync = ["git", "fetch", "--all-remotes"]
+wip = ["describe", "-m", "WIP"]
