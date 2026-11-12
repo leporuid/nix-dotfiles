@@ -5,9 +5,12 @@
     ../../modules/nixos/host-shared.nix
   ];
 
-  hjem.extraModules = [
-    inputs.hjem-rum.hjemModules.default
-  ];
+  hjem = {
+    clobberByDefault = true;
+    extraModules = [
+      inputs.hjem-rum.hjemModules.default
+    ];
+  };
 
   nixpkgs.hostPlatform = "aarch64-darwin";
 
@@ -16,6 +19,7 @@
   hjem.users.leporuid =
     { ... }:
     {
+      directory = "/Users/leporuid";
       imports = [ ../../users/leporuid/home-configuration.nix ];
     };
 

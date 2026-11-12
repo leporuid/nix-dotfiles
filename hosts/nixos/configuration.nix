@@ -5,9 +5,12 @@
     ../../modules/nixos/host-shared.nix
   ];
 
-  hjem.extraModules = [
-    inputs.hjem-rum.hjemModules.default
-  ];
+  hjem = {
+    clobberByDefault = true;
+    extraModules = [
+      inputs.hjem-rum.hjemModules.default
+    ];
+  };
 
   nixpkgs.hostPlatform = "aarch64-linux";
 
