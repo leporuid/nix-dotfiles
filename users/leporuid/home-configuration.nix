@@ -8,8 +8,8 @@
     '';
   };
 
-  # 2. Hjem-Rum module ecosystem (replaces Home Manager programs.*)
-  programs = {
+  # 2. Hjem-Rum module ecosystem (under rum.programs.*)
+  rum.programs = {
     git = {
       enable = true;
       userName = "Yu-Min Peng";
