@@ -9,6 +9,7 @@
     clobberByDefault = true;
     extraModules = [
       inputs.hjem-rum.hjemModules.default
+      inputs.hjem-impure.hjemModules.default
     ];
   };
 

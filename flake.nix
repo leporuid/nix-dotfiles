@@ -22,6 +22,13 @@
     hjem-rum.inputs.nixpkgs.follows = "nixpkgs";
     hjem-rum.inputs.hjem.follows = "hjem";
 
+    # Hjem-Impure: out-of-store symlinking for live dotfile editing without rebuilds
+    hjem-impure = {
+      url = "github:Rexcrazy804/hjem-impure";
+      inputs.nixpkgs.follows = "";
+      inputs.hjem.follows = "";
+    };
+
     nix-darwin.url = "github:nix-darwin/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
 
