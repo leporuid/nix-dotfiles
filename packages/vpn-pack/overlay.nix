@@ -1,6 +1,9 @@
 # packages/vpn-pack/overlay.nix
 # Dedicated overlay for UniFi OS aarch64-linux target environment and Tailscale patches.
-{ vpnPackSrc ? null, ... }:
+{
+  vpnPackSrc ? null,
+  ...
+}:
 final: prev:
 let
   tailscaleVersion = prev.tailscale.version;

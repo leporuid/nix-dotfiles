@@ -189,6 +189,6 @@ pkgs.stdenv.mkDerivation {
     description = "Tailscale and web management pack for Ubiquiti Cloud Gateways";
     homepage = "https://github.com/eds-ch/vpn-pack";
     license = licenses.bsd3;
-    platforms = platforms.unix;
+    platforms = [ "aarch64-linux" ];
   };
 }
