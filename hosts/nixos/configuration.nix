@@ -296,7 +296,7 @@ with inputs;
   ];
 
   # =========================================================================
-  # 5. User & Interactive Shells (Bash Login -> Fish Interactive)
+  # 5. User & Interactive Shells (Bash Login -> Nushell Interactive)
   # =========================================================================
   time.timeZone = vars.timezone;
   i18n.defaultLocale = vars.locale;
@@ -351,10 +351,10 @@ with inputs;
       add_to_path "$HOME/.local/bin"
       export PATH
 
-      if [[ $(${pkgs.procps}/bin/ps --no-header --pid=$PPID --format=comm) != "fish" && -z ''${BASH_EXECUTION_STRING:-} ]] && tty -s; then
-        if command -v fish >/dev/null 2>&1; then
+      if [[ $(${pkgs.procps}/bin/ps --no-header --pid=$PPID --format=comm) != "nu" && -z ''${BASH_EXECUTION_STRING:-} ]] && tty -s; then
+        if command -v nu >/dev/null 2>&1; then
           shopt -q login_shell && LOGIN_OPTION="--login" || LOGIN_OPTION=""
-          exec "${pkgs.fish}/bin/fish" $LOGIN_OPTION
+          exec "${pkgs.nushell}/bin/nu" $LOGIN_OPTION
         fi
       fi
     '';
@@ -375,6 +375,8 @@ with inputs;
     "fish/completions".source = "${flake}/config/fish/completions";
     "fish/conf.d".source = "${flake}/config/fish/conf.d";
     "fish/functions".source = "${flake}/config/fish/functions";
+    "nushell/config.nu".source = "${flake}/config/nushell/config.nu";
+    "nushell/env.nu".source = "${flake}/config/nushell/env.nu";
     "jj/config.toml".source = "${flake}/config/jj/config.toml";
     "starship.toml".source = "${flake}/config/starship.toml";
     "configuration-revision".text = flake.rev or flake.dirtyRev;
@@ -385,6 +387,7 @@ with inputs;
       /run/current-system/sw/bin/sh
       /run/current-system/sw/bin/bash
       /run/current-system/sw/bin/fish
+      /run/current-system/sw/bin/nu
     '';
   };
 
@@ -454,6 +457,7 @@ with inputs;
     uv
     bun
     nushell
+    carapace
     helix
     vim
     neovim

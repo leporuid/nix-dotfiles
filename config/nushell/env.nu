@@ -3,11 +3,8 @@ $env.__NIX_DARWIN_SET_ENVIRONMENT_DONE = 1
 # Set theme for bat
 $env.BAT_THEME = "Catppuccin Macchiato"
 
-$env.config.show_banner = false
-
-
-
 $env.config = {
+  show_banner: false
   hooks: {
     pre_prompt: [{ ||
       if (which direnv | is-empty) {
@@ -41,7 +38,9 @@ def --env cx [arg] {
 
 
 # To load from a custom file you can use:
- source ($nu.default-config-dir | path join 'vendor/autoload/atuin.nu')
+if ($nu.default-config-dir | path join 'vendor/autoload/atuin.nu' | path exists) {
+    source ($nu.default-config-dir | path join 'vendor/autoload/atuin.nu')
+}
 
 
 
