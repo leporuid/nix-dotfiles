@@ -22,7 +22,7 @@
 
     red-tape = {
       url = "path:../otavio-red-tape";
-      inputs.adios-flake.follows = "github:Mic92/adios-flake";
+      inputs.adios-flake.url = "github:Mic92/adios-flake";
     };
 
 
