@@ -1,12 +1,25 @@
 {
   pkgs,
+  inputs,
   version ? "1.6.4",
   gitCommit ? "4549ba8",
   ...
 }:
 
 let
-  vpnPackOverlay = import ./overlay.nix;
+  upstreamSrc = inputs.vpn-pack-src;
+
+  vpnPackPatchedSrc = pkgs.applyPatches {
+    name = "vpn-pack-src-${version}";
+    src = upstreamSrc;
+    patches = [
+      ./0001-unifi-nix-packaging.patch
+    ];
+  };
+
+  vpnPackOverlay = import ./overlay.nix {
+    vpnPackSrc = vpnPackPatchedSrc;
+  };
 
   baseTargetPkgs =
     if pkgs.stdenv.hostPlatform.isLinux && pkgs.stdenv.hostPlatform.isAarch64 then
@@ -27,6 +40,7 @@ let
       gitCommit
       tailscalePatched
       ;
+    vpnPackSrc = vpnPackPatchedSrc;
     buildGoModule = targetPkgs.buildGoModule.override {
       go = targetPkgs.buildPackages.go_1_27;
     };
@@ -36,6 +50,7 @@ let
     inherit version tailscaleVersion gitCommit;
     inherit tailscaleBin;
     inherit (manager) managerBin;
+    vpnPackSrc = vpnPackPatchedSrc;
   };
 in
 deploy
@@ -44,5 +59,6 @@ deploy
     inherit tailscalePatched tailscaleBin;
     inherit (manager) managerBin ui;
     overlay = vpnPackOverlay;
+    src = vpnPackPatchedSrc;
   };
 }

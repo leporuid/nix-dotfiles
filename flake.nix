@@ -90,6 +90,11 @@
       flake = false;
     };
 
+    vpn-pack-src = {
+      url = "github:eds-ch/vpn-pack/v1.6.4";
+      flake = false;
+    };
+
     nix-secrets.url = "git+ssh://git@github.com/leporuid/nix-secrets.git";
   };
 

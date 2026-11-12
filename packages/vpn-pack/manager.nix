@@ -1,6 +1,7 @@
 {
   pkgs,
   tailscalePatched,
+  vpnPackSrc,
   buildGoModule ? (
     pkgs.pkgsCross.aarch64-multiplatform.buildGoModule.override {
       go = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.go_1_27;
@@ -16,7 +17,7 @@ let
   ui = pkgs.stdenv.mkDerivation {
     pname = "vpn-pack-ui";
     inherit version;
-    src = ./manager/ui;
+    src = "${vpnPackSrc}/manager/ui";
     nativeBuildInputs = [ pkgs.bun ];
 
     buildPhase = ''
@@ -35,7 +36,7 @@ let
   };
 
   managerSrc = pkgs.runCommand "manager-src" { } ''
-    cp -r ${./manager} $out
+    cp -r ${vpnPackSrc}/manager $out
     chmod -R u+w $out
     substituteInPlace $out/go.mod --replace-fail "../reference/tailscale" "${tailscalePatched}"
   '';

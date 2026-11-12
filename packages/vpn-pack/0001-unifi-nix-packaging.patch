@@ -1,0 +1,665 @@
+--- a/install.sh	2026-11-12 10:05:09
++++ b/install.sh	2026-11-12 10:05:09
+@@ -1,85 +1,23 @@
+-#!/bin/sh
+-# vpn-pack installer for UniFi Cloud Gateway devices
++#!/bin/bash
+ #
+-# Usage:
+-#   curl -fsSL https://raw.githubusercontent.com/eds-ch/vpn-pack/main/install.sh | sh
++# vpn-pack — installer for Ubiquiti Cloud Gateway devices
++# Installs Tailscale + Manager to /persistent/vpn-pack/
+ #
+-# Pin specific version:
+-#   VERSION_PIN=v1.0.0 curl -fsSL https://raw.githubusercontent.com/eds-ch/vpn-pack/main/install.sh | sh
+-#
+-# Phase decomposition (Task 8.12) lets scripts/test-installers.sh
+-# exercise vp_download_and_verify against a tampered bundle without
+-# satisfying the on-device preflight. Each vp_* function preserves
+-# the same user-visible output and ordering as the pre-refactor
+-# script (locked by scripts/test-installer-characterization.sh).
+-#
+-set -eu
++set -euo pipefail
+ 
+-REPO="eds-ch/vpn-pack"
+-GITHUB_API="https://api.github.com/repos/${REPO}/releases/latest"
++INSTALL_DIR="/persistent/vpn-pack"
++BIN_DIR="${INSTALL_DIR}/bin"
++STATE_DIR="${INSTALL_DIR}/state"
++CONFIG_DIR="${INSTALL_DIR}/config"
++SYSTEMD_UNIT="/etc/systemd/system/tailscaled.service"
++MANAGER_UNIT="/etc/systemd/system/vpn-pack-manager.service"
++MANAGER_SOCKET_UNIT="/etc/systemd/system/vpn-pack-manager.socket"
++NGINX_SRC="${CONFIG_DIR}/nginx-vpnpack.conf"
++NGINX_DEST="/data/unifi-core/config/http/shared-runnable-vpnpack.conf"
++NGINX_TOKEN_FILE="${CONFIG_DIR}/nginx-token"
++NGINX_TOKEN_PLACEHOLDER="__VPNPACK_NGINX_TOKEN__"
++SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ 
+-# Releases are signed in GitHub Actions via keyless OIDC. The
+-# certificate identity is the workflow URL @ tag ref; the OIDC issuer
+-# is GitHub's Actions token endpoint. No override flag — verification
+-# either succeeds against these pins or the install aborts.
+-COSIGN_IDENTITY_REGEXP='^https://github\.com/eds-ch/vpn-pack/\.github/workflows/release\.yml@refs/tags/v[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.]+)?$'
+-COSIGN_OIDC_ISSUER="https://token.actions.githubusercontent.com"
+-
+-# Pinned cosign for bootstrap. Refreshing this pin: download the new
+-# cosign-linux-arm64 from
+-# https://github.com/sigstore/cosign/releases/download/<ver>/cosign-linux-arm64,
+-# verify its sha256 against the upstream cosign_checksums.txt at the
+-# same release, then update both lines.
+-COSIGN_VERSION="v2.4.1"
+-COSIGN_SHA256_ARM64="3b2e2e3854d0356c45fe6607047526ccd04742d20bd44afb5be91fa2a6e7cb4a"
+-
+-# COSIGN_BIN is set by ensure_cosign and used by verify_signature.
+-COSIGN_BIN=""
+-
+-ensure_cosign() {
+-    if command -v cosign >/dev/null 2>&1; then
+-        COSIGN_BIN=$(command -v cosign)
+-        return 0
+-    fi
+-    if [ "$(uname -m)" != "aarch64" ]; then
+-        printf 'FATAL: cosign bootstrap is currently arm64-only; install cosign manually.\n' >&2
+-        exit 1
+-    fi
+-    cosign_dir=${INSTALL_TMP:-${TMPDIR:-/tmp}}
+-    cosign_tmp="${cosign_dir}/cosign"
+-    cosign_url="https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign-linux-arm64"
+-    info "Bootstrapping cosign ${COSIGN_VERSION} (no persistent install)..."
+-    if ! curl -fsSL -o "$cosign_tmp" "$cosign_url"; then
+-        printf 'FATAL: failed to download cosign from %s\n' "$cosign_url" >&2
+-        exit 1
+-    fi
+-    got=$(sha256sum "$cosign_tmp" | awk '{print $1}')
+-    if [ "$got" != "$COSIGN_SHA256_ARM64" ]; then
+-        printf 'FATAL: cosign sha256 mismatch (got %s, want %s); refusing to use untrusted binary\n' \
+-            "$got" "$COSIGN_SHA256_ARM64" >&2
+-        exit 1
+-    fi
+-    chmod 0700 "$cosign_tmp"
+-    COSIGN_BIN="$cosign_tmp"
+-}
+-
+-verify_signature() {
+-    file=$1
+-    bundle=$2
+-    if [ -z "$COSIGN_BIN" ]; then
+-        printf 'FATAL: ensure_cosign must run before verify_signature\n' >&2
+-        exit 1
+-    fi
+-    if ! "$COSIGN_BIN" verify-blob \
+-        --certificate-identity-regexp "$COSIGN_IDENTITY_REGEXP" \
+-        --certificate-oidc-issuer "$COSIGN_OIDC_ISSUER" \
+-        --bundle "$bundle" \
+-        "$file" >/dev/null 2>&1; then
+-        printf 'FATAL: signature verification failed for %s\n' "$file" >&2
+-        exit 1
+-    fi
+-}
+-
+ # Colors (if terminal supports them)
+ if [ -t 1 ]; then
+     RED='\033[0;31m'
+@@ -91,221 +29,318 @@
+     RED='' GREEN='' YELLOW='' BOLD='' NC=''
+ fi
+ 
+-info()  { printf "${GREEN}[+]${NC} %s\n" "$*"; }
+-warn()  { printf "${YELLOW}[!]${NC} %s\n" "$*"; }
+-error() { printf "${RED}[x]${NC} %s\n" "$*"; }
++info()  { echo -e "${GREEN}[+]${NC} $*"; }
++warn()  { echo -e "${YELLOW}[!]${NC} $*"; }
++error() { echo -e "${RED}[x]${NC} $*"; }
+ die()   { error "$*"; exit 1; }
+ 
+-vp_preflight() {
+-    info "vpn-pack installer for UniFi Cloud Gateway"
+-    echo ""
+-
+-    if [ "$(id -u)" -ne 0 ]; then
+-        die "Must be run as root"
++# safe_install writes $src to $dst at $mode atomically. If $dst exists
++# and is a symlink, the install aborts — this prevents an attacker who
++# can pre-create a symlink at a known config path from steering writes
++# to an arbitrary file. Staging happens in the same directory as $dst
++# so the final mv is an atomic rename on the same filesystem.
++safe_install() {
++    local src=$1 dst=$2 mode=$3
++    if [[ -L "$dst" ]]; then
++        echo "FATAL: refusing to write through symlink at $dst" >&2
++        exit 1
+     fi
++    local dir tmp
++    dir=$(dirname "$dst")
++    tmp=$(mktemp "${dir}/.install.XXXXXX")
++    chmod "$mode" "$tmp"
++    cp -f --no-dereference "$src" "$tmp"
++    mv -f "$tmp" "$dst"
++}
+ 
+-    ARCH=$(uname -m)
+-    if [ "$ARCH" != "aarch64" ]; then
+-        die "Unsupported architecture: $ARCH (need aarch64)"
++# ensure_nginx_token provisions the per-install shared secret used for the
++# X-VpnPack-Token app-layer factor (M1). Idempotent: an existing non-empty
++# token file is preserved across upgrades so the running nginx config and
++# the manager stay in agreement. The token is hex (sed-safe for later
++# substitution) with 256 bits of entropy. Perms are 0640 root:nginx so the
++# nginx worker can read it to inject the header while other local uids
++# cannot. Writes atomically via a temp file in the same dir.
++ensure_nginx_token() {
++    if [ -f "${NGINX_TOKEN_FILE}" ] && [ -s "${NGINX_TOKEN_FILE}" ]; then
++        info "Reusing existing nginx token (upgrade)"
++        return
+     fi
+-
+-    if ! command -v ubnt-device-info >/dev/null 2>&1; then
+-        die "Not a UniFi device (ubnt-device-info not found)"
++    info "Generating per-install nginx token..."
++    local tok tmp
++    if command -v openssl >/dev/null 2>&1; then
++        tok="$(openssl rand -hex 32)"
++    else
++        tok="$(head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n')"
+     fi
++    [ -n "$tok" ] || die "failed to generate nginx token"
++    tmp="$(mktemp "${CONFIG_DIR}/.nginx-token.XXXXXX")"
++    printf '%s\n' "$tok" > "$tmp"
++    chmod 0640 "$tmp"
++    chown root:nginx "$tmp" 2>/dev/null || warn "could not chown token to root:nginx (nginx group missing?) — token factor may not reach nginx"
++    mv -f "$tmp" "${NGINX_TOKEN_FILE}"
++}
+ 
+-    # Hard block — devices without a controller are not supported.
+-    if ! systemctl is-active --quiet unifi-core 2>/dev/null; then
+-        die "unifi-core is not running. This device needs a working UniFi OS controller."
++check_network_version() {
++    local raw major minor rest pkg
++    raw=$(dpkg-query -W -f='${Version}' unifi 2>/dev/null) || true
++    pkg="unifi"
++    if [ -z "$raw" ]; then
++        raw=$(dpkg-query -W -f='${Version}' unifi-native 2>/dev/null) || true
++        pkg="unifi-native"
+     fi
+-
+-    if ! command -v systemctl >/dev/null 2>&1; then
+-        die "systemd not found"
++    if [ -z "$raw" ]; then
++        die "UniFi Network Application not found. A working UniFi Network 10.1+ installation is required."
+     fi
+-
+-    if [ ! -d /persistent ]; then
+-        die "/persistent/ not found"
++    major="${raw%%.*}"
++    rest="${raw#*.}"
++    minor="${rest%%.*}"
++    if ! [ "$major" -eq "$major" ] 2>/dev/null || ! [ "$minor" -eq "$minor" ] 2>/dev/null; then
++        die "Cannot parse UniFi Network version: ${raw}"
+     fi
+-    if [ ! -w /persistent ]; then
+-        die "/persistent/ is not writable"
++    if [ "$major" -gt 10 ] || { [ "$major" -eq 10 ] && [ "$minor" -ge 1 ]; }; then
++        info "UniFi Network: ${BOLD}${major}.${minor}${NC} (${pkg} ${raw})"
++        return 0
+     fi
++    die "UniFi Network 10.1 or later is required (found: ${major}.${minor}). Please update via Settings > System > Updates in the UniFi console."
++}
+ 
+-    for cmd in iptables ip curl tar; do
+-        if ! command -v "$cmd" >/dev/null 2>&1; then
+-            die "Required command not found: $cmd"
+-        fi
+-    done
++# ── Stage 1: Environment checks ───────────────────────────────────
+ 
+-    if [ ! -e /dev/net/tun ]; then
+-        die "/dev/net/tun not found (required for Tailscale)"
+-    fi
++info "vpn-pack installer"
++echo ""
+ 
+-    DEVICE_MODEL=$(ubnt-device-info model_short 2>/dev/null || echo "unknown")
+-    DEVICE_FULL=$(ubnt-device-info model 2>/dev/null || echo "unknown")
+-    FIRMWARE=$(ubnt-device-info firmware 2>/dev/null || echo "unknown")
++# Root check
++[ "$(id -u)" -eq 0 ] || die "Must be run as root"
+ 
+-    case "$DEVICE_MODEL" in
+-        UDM-SE|UDM-Pro|UDM-Pro-Max|UDM|UCG-Ultra|UDR-SE)
+-            ;;
+-        *)
+-            warn "Unknown device model: $DEVICE_MODEL ($DEVICE_FULL)"
+-            warn "This device has not been tested. Proceeding anyway."
+-            ;;
+-    esac
++# Architecture check
++ARCH="$(uname -m)"
++[ "$ARCH" = "aarch64" ] || die "Unsupported architecture: $ARCH (need aarch64)"
+ 
+-    info "Device: ${BOLD}${DEVICE_FULL}${NC} (${DEVICE_MODEL})"
+-    info "Firmware: ${FIRMWARE}"
++# UniFi device check
++[ -x /usr/bin/ubnt-device-info ] || die "Not a UniFi device (/usr/bin/ubnt-device-info not found)"
+ 
+-    AVAIL_KB=$(df -k /persistent | awk 'NR==2 {print $4}')
+-    AVAIL_MB=$((AVAIL_KB / 1024))
+-    if [ "$AVAIL_MB" -lt 100 ]; then
+-        die "/persistent/ has only ${AVAIL_MB}MB free (need at least 100MB)"
+-    fi
+-    info "/persistent/ has ${AVAIL_MB}MB free"
++DEVICE_MODEL="$(ubnt-device-info model_short 2>/dev/null || echo 'unknown')"
++DEVICE_FULL="$(ubnt-device-info model 2>/dev/null || echo 'unknown')"
++FIRMWARE="$(ubnt-device-info firmware 2>/dev/null || echo 'unknown')"
++info "Device: ${BOLD}${DEVICE_FULL}${NC} (${DEVICE_MODEL})"
++info "Firmware: ${FIRMWARE}"
+ 
+-    echo ""
+-}
++# UniFi controller check
++if ! systemctl is-active --quiet unifi-core 2>/dev/null; then
++    die "unifi-core is not running. A working UniFi OS controller is required."
++fi
+ 
+-vp_resolve_release() {
+-    if [ -n "${VERSION_PIN:-}" ]; then
+-        RELEASE_URL="https://api.github.com/repos/${REPO}/releases/tags/${VERSION_PIN}"
+-        info "Pinned version: ${VERSION_PIN}"
+-    else
+-        RELEASE_URL="$GITHUB_API"
+-    fi
++check_network_version
+ 
+-    info "Fetching release info from GitHub..."
+-    RELEASE_JSON=$(curl -fsSL "$RELEASE_URL") || die "Failed to fetch release info from GitHub. Check internet connectivity."
++# Version info
++if [ -f "${SCRIPT_DIR}/VERSION" ]; then
++    VERSION="$(head -1 "${SCRIPT_DIR}/VERSION")"
++    info "Package version: ${VERSION}"
++fi
+ 
+-    TAG_NAME=$(echo "$RELEASE_JSON" | grep '"tag_name"' | head -1 | sed 's/.*"tag_name"[[:space:]]*:[[:space:]]*"//' | sed 's/".*//')
+-    if [ -z "$TAG_NAME" ]; then
+-        die "Could not parse release tag from GitHub response"
+-    fi
++echo ""
+ 
+-    ASSET_URL=$(echo "$RELEASE_JSON" | grep '"browser_download_url"' | grep 'vpn-pack-.*\.tar\.gz"' | head -1 | sed 's/.*"browser_download_url"[[:space:]]*:[[:space:]]*"//' | sed 's/".*//')
+-    if [ -z "$ASSET_URL" ]; then
+-        die "Could not find vpn-pack archive in release $TAG_NAME"
+-    fi
++# ── Stage 2: Resource checks ──────────────────────────────────────
+ 
+-    CHECKSUMS_URL=$(echo "$RELEASE_JSON" | grep '"browser_download_url"' | grep 'checksums\.txt"' | head -1 | sed 's/.*"browser_download_url"[[:space:]]*:[[:space:]]*"//' | sed 's/".*//')
++# Check /persistent/ exists and has space
++[ -d /persistent ] || die "/persistent/ directory not found"
++AVAIL_KB=$(df -k /persistent | awk 'NR==2 {print $4}')
++AVAIL_MB=$((AVAIL_KB / 1024))
++[ "$AVAIL_MB" -ge 50 ] || die "/persistent/ has only ${AVAIL_MB}MB free (need 50MB)"
++info "/persistent/ has ${AVAIL_MB}MB free"
+ 
+-    ARCHIVE_BUNDLE_URL=$(echo "$RELEASE_JSON" | grep '"browser_download_url"' | grep 'vpn-pack-.*\.tar\.gz\.cosign\.bundle"' | head -1 | sed 's/.*"browser_download_url"[[:space:]]*:[[:space:]]*"//' | sed 's/".*//')
+-    CHECKSUMS_BUNDLE_URL=$(echo "$RELEASE_JSON" | grep '"browser_download_url"' | grep 'checksums\.txt\.cosign\.bundle"' | head -1 | sed 's/.*"browser_download_url"[[:space:]]*:[[:space:]]*"//' | sed 's/".*//')
++# Check /etc/systemd/system/ is writable
++touch /etc/systemd/system/.write-test 2>/dev/null && rm -f /etc/systemd/system/.write-test \
++    || die "/etc/systemd/system/ is not writable"
+ 
+-    if [ -f /persistent/vpn-pack/VERSION ]; then
+-        CURRENT_VERSION=$(head -1 /persistent/vpn-pack/VERSION 2>/dev/null || echo "")
+-        if [ -n "$CURRENT_VERSION" ]; then
+-            info "Current version: ${BOLD}${CURRENT_VERSION}${NC}"
+-        fi
+-        info "New version: ${BOLD}${TAG_NAME}${NC}"
+-        info "Upgrading..."
+-    else
+-        info "Installing vpn-pack ${BOLD}${TAG_NAME}${NC}..."
+-    fi
++# ── Stage 3: Conflict checks ──────────────────────────────────────
+ 
+-    echo ""
+-}
++UPGRADE=false
+ 
+-vp_download_and_verify() {
+-    INSTALL_TMP=$(mktemp -d -t vpn-pack-install.XXXXXX)
+-    chmod 700 "$INSTALL_TMP"
+-    trap 'rm -rf "$INSTALL_TMP"' EXIT
++# Check for running tailscaled
++if systemctl is-active --quiet tailscaled 2>/dev/null; then
++    warn "tailscaled is currently running"
++    UPGRADE=true
++fi
+ 
+-    ARCHIVE_FILE=$(basename "$ASSET_URL")
++# Check for existing installation
++if [ -f "${BIN_DIR}/tailscaled" ]; then
++    warn "Existing installation found at ${INSTALL_DIR}"
++    if [ -f "${STATE_DIR}/tailscaled.state" ]; then
++        info "Auth state will be preserved (upgrade mode)"
++    fi
++    UPGRADE=true
++fi
+ 
+-    info "Downloading ${ARCHIVE_FILE}..."
+-    curl -fsSL -o "${INSTALL_TMP}/${ARCHIVE_FILE}" "$ASSET_URL" || {
+-        rm -rf "$INSTALL_TMP"
+-        die "Download failed"
+-    }
++# Check for stock tailscaled in system paths
++if [ -x /usr/sbin/tailscaled ] && [ ! -L /usr/sbin/tailscaled ]; then
++    warn "Stock tailscaled found at /usr/sbin/tailscaled"
++    warn "It may conflict with this installation"
++fi
+ 
+-    # SEC-C1: signed verification, no silent skip.
+-    if [ -z "$CHECKSUMS_URL" ]; then
+-        rm -rf "$INSTALL_TMP"
+-        die "Release has no checksums.txt asset — refusing to install"
+-    fi
+-    if [ -z "$ARCHIVE_BUNDLE_URL" ] || [ -z "$CHECKSUMS_BUNDLE_URL" ]; then
+-        rm -rf "$INSTALL_TMP"
+-        die "Release has no cosign bundles — refusing to install unsigned release"
+-    fi
+-    if ! command -v sha256sum >/dev/null 2>&1; then
+-        rm -rf "$INSTALL_TMP"
+-        die "sha256sum required for checksum verification"
+-    fi
++echo ""
+ 
+-    info "Downloading cosign bundles..."
+-    curl -fsSL -o "${INSTALL_TMP}/${ARCHIVE_FILE}.cosign.bundle" "$ARCHIVE_BUNDLE_URL" || {
+-        rm -rf "$INSTALL_TMP"
+-        die "cosign bundle for archive download failed"
+-    }
+-    curl -fsSL -o "${INSTALL_TMP}/checksums.txt.cosign.bundle" "$CHECKSUMS_BUNDLE_URL" || {
+-        rm -rf "$INSTALL_TMP"
+-        die "cosign bundle for checksums download failed"
+-    }
++# ── Stage 4: Installation ─────────────────────────────────────────
+ 
+-    info "Downloading checksums..."
+-    curl -fsSL -o "${INSTALL_TMP}/checksums.txt" "$CHECKSUMS_URL" || {
+-        rm -rf "$INSTALL_TMP"
+-        die "Checksums download failed"
+-    }
++if [ "$UPGRADE" = true ]; then
++    info "Stopping existing services..."
++    # Stop socket BEFORE service. If service stops first, the socket
++    # keeps listening; the next inbound connection (nginx worker,
++    # healthcheck, browser tab on /vpn-pack/) socket-activates the
++    # service again — with the STILL-OLD on-disk binary, because
++    # binary replacement happens later in this script. The upgrade
++    # then fails with "Socket service vpn-pack-manager.service
++    # already active, refusing." when we try to start the new socket.
++    systemctl stop vpn-pack-manager.socket 2>/dev/null || true
++    systemctl stop vpn-pack-manager 2>/dev/null || true
++    systemctl stop tailscaled 2>/dev/null || true
++fi
+ 
+-    ensure_cosign
++info "Creating directory structure..."
++mkdir -p "${BIN_DIR}"
++mkdir -p "${STATE_DIR}"
++mkdir -p "${CONFIG_DIR}"
++chmod 700 "${STATE_DIR}"
+ 
+-    info "Verifying cosign signature on archive..."
+-    verify_signature "${INSTALL_TMP}/${ARCHIVE_FILE}" "${INSTALL_TMP}/${ARCHIVE_FILE}.cosign.bundle"
+-    info "Verifying cosign signature on checksums..."
+-    verify_signature "${INSTALL_TMP}/checksums.txt" "${INSTALL_TMP}/checksums.txt.cosign.bundle"
++info "Installing binaries to ${BIN_DIR}..."
++cp -f "${SCRIPT_DIR}/bin/tailscale" "${BIN_DIR}/tailscale"
++cp -f "${SCRIPT_DIR}/bin/tailscaled" "${BIN_DIR}/tailscaled"
++cp -f "${SCRIPT_DIR}/bin/vpn-pack-manager" "${BIN_DIR}/vpn-pack-manager"
++chmod 755 "${BIN_DIR}/tailscale" "${BIN_DIR}/tailscaled" "${BIN_DIR}/vpn-pack-manager"
+ 
+-    info "Verifying SHA256 checksum..."
+-    if ! (cd "$INSTALL_TMP" && sha256sum -c checksums.txt >/dev/null 2>&1); then
+-        rm -rf "$INSTALL_TMP"
+-        die "Checksum verification FAILED — download may be corrupted"
+-    fi
+-    info "Signatures and checksum verified"
+-}
++# Record manager binary sha256 so uninstall.sh can refuse to run --cleanup
++# against a tampered binary (SEC-C4).
++sha256sum "${BIN_DIR}/vpn-pack-manager" | awk '{print $1}' > "${BIN_DIR}/.expected-sha256"
++chmod 0644 "${BIN_DIR}/.expected-sha256"
+ 
+-vp_extract() {
+-    info "Extracting..."
+-    tar xzf "${INSTALL_TMP}/${ARCHIVE_FILE}" -C "$INSTALL_TMP"
++# -n: treat an existing symlink-to-directory as a normal file to replace,
++# instead of dereferencing it and creating the link *inside* that directory.
++ln -sfn "${BIN_DIR}/tailscale" /usr/local/bin/tailscale
++ln -sfn "${BIN_DIR}/tailscaled" /usr/local/bin/tailscaled
+ 
+-    echo ""
++# Install defaults only if not present (preserve user customization on upgrade)
++if [ ! -f "${INSTALL_DIR}/tailscaled.defaults" ]; then
++    info "Installing default configuration..."
++    cp "${SCRIPT_DIR}/systemd/tailscaled.defaults" "${INSTALL_DIR}/tailscaled.defaults"
++else
++    info "Keeping existing tailscaled.defaults (upgrade)"
++fi
+ 
+-    EXTRACTED=""
+-    for d in "${INSTALL_TMP}"/vpn-pack*; do
+-        if [ -d "$d" ] && [ -f "$d/install.sh" ]; then
+-            EXTRACTED="$d"
+-            break
+-        fi
+-    done
++# Provision the token BEFORE the nginx config is rendered/reloaded and
++# BEFORE the manager starts, so nginx begins sending X-VpnPack-Token in
++# the same run that the manager begins enforcing it — no self-DoS window.
++ensure_nginx_token
+ 
+-    if [ -z "$EXTRACTED" ]; then
+-        rm -rf "$INSTALL_TMP"
+-        die "Archive does not contain expected install.sh"
+-    fi
++info "Installing nginx config for /vpn-pack/ path..."
++# Render the config template, substituting the real token for the
++# placeholder. The token is hex, so the sed '|' delimiter is safe. The
++# rendered (secret-bearing) copy is written to the persistent NGINX_SRC
++# and then to NGINX_DEST; the manager's self-heal copies NGINX_SRC -> DEST
++# verbatim, preserving the token.
++NGINX_TOKEN_VALUE="$(cat "${NGINX_TOKEN_FILE}")"
++NGINX_RENDERED="$(mktemp "${CONFIG_DIR}/.nginx-render.XXXXXX")"
++sed "s|${NGINX_TOKEN_PLACEHOLDER}|${NGINX_TOKEN_VALUE}|g" \
++    "${SCRIPT_DIR}/nginx-vpnpack.conf" > "${NGINX_RENDERED}"
++if grep -q "${NGINX_TOKEN_PLACEHOLDER}" "${NGINX_RENDERED}"; then
++    rm -f "${NGINX_RENDERED}"
++    die "nginx token placeholder was not substituted"
++fi
++# 0640, not 0644: the rendered config embeds the per-install token secret, so
++# it must not be world-readable (unlike UniFi's secret-free 0644 configs). The
++# nginx master reads it as root and the manager self-heal reads it as root, so
++# no non-root reader needs it — matches the 0640 on the token file itself.
++safe_install "${NGINX_RENDERED}" "${NGINX_SRC}" 0640
++rm -f "${NGINX_RENDERED}"
++mkdir -p "$(dirname "${NGINX_DEST}")"
++safe_install "${NGINX_SRC}" "${NGINX_DEST}" 0640
++if ! nginx_test_output=$(nginx -t 2>&1); then
++    error "nginx config test failed; refusing to reload"
++    echo "$nginx_test_output" >&2
++    exit 1
++fi
++nginx -s reload 2>/dev/null || warn "nginx reload failed (will be picked up on next restart)"
+ 
+-    # Copy VERSION to /persistent so manager can read it
+-    if [ -f "$EXTRACTED/VERSION" ]; then
+-        mkdir -p /persistent/vpn-pack
+-        cp -f "$EXTRACTED/VERSION" /persistent/vpn-pack/VERSION
+-    fi
+-}
++info "Installing systemd services..."
++safe_install "${SCRIPT_DIR}/systemd/tailscaled.service" "${SYSTEMD_UNIT}" 0644
++safe_install "${SCRIPT_DIR}/systemd/vpn-pack-manager.service" "${MANAGER_UNIT}" 0644
++safe_install "${SCRIPT_DIR}/systemd/vpn-pack-manager.socket" "${MANAGER_SOCKET_UNIT}" 0644
+ 
+-vp_run_inner_installer() {
+-    bash "$EXTRACTED/install.sh"
+-    INSTALL_EXIT=$?
++systemctl daemon-reload
++systemctl enable tailscaled
++# Socket must be enabled before the service so the listen fd is ready
++# when systemd activates the manager. .service Requires the .socket
++# unit, so a misordered start would be rejected by systemd anyway.
++systemctl enable vpn-pack-manager.socket
++systemctl enable vpn-pack-manager
+ 
+-    rm -rf "$INSTALL_TMP"
++info "Starting tailscaled..."
++systemctl start tailscaled
+ 
+-    if [ "$INSTALL_EXIT" -ne 0 ]; then
+-        die "Installation failed (exit code: $INSTALL_EXIT)"
++info "Starting vpn-pack-manager.socket..."
++systemctl start vpn-pack-manager.socket
++
++info "Starting vpn-pack-manager..."
++systemctl start vpn-pack-manager
++
++# ── Stage 5: Verification ─────────────────────────────────────────
++
++echo ""
++
++# Wait for tailscaled to be ready (up to 10 seconds)
++for i in $(seq 1 10); do
++    if systemctl is-active --quiet tailscaled 2>/dev/null; then
++        break
+     fi
++    sleep 1
++done
+ 
+-    echo ""
+-    info "vpn-pack ${TAG_NAME} installed successfully"
+-}
++FAIL=false
+ 
+-# ── Orchestration ─────────────────────────────────────────────────
+-vp_preflight
+-vp_resolve_release
+-vp_download_and_verify
+-vp_extract
+-vp_run_inner_installer
++if systemctl is-active --quiet tailscaled 2>/dev/null; then
++    info "tailscaled is ${GREEN}running${NC}"
++else
++    error "tailscaled failed to start"
++    error "Run: journalctl -u tailscaled -e"
++    FAIL=true
++fi
++
++if systemctl is-active --quiet vpn-pack-manager 2>/dev/null; then
++    info "vpn-pack-manager is ${GREEN}running${NC}"
++else
++    error "vpn-pack-manager failed to start"
++    error "Run: journalctl -u vpn-pack-manager -e"
++    FAIL=true
++fi
++
++[ "$FAIL" = true ] && exit 1
++
++# Install VERSION and uninstall script
++if [ -f "${SCRIPT_DIR}/VERSION" ]; then
++    cp -f "${SCRIPT_DIR}/VERSION" "${INSTALL_DIR}/VERSION"
++fi
++if [ -f "${SCRIPT_DIR}/uninstall.sh" ]; then
++    cp -f "${SCRIPT_DIR}/uninstall.sh" "${INSTALL_DIR}/uninstall.sh"
++    chmod +x "${INSTALL_DIR}/uninstall.sh"
++fi
++
++# ── Stage 6: Next steps ──────────────────────────────────────────
++
++LAN_IP=$(ip -4 addr show br0 2>/dev/null | grep -oP 'inet \K[^/]+' | head -1)
++[ -z "$LAN_IP" ] && LAN_IP="<device-ip>"
++
++echo ""
++echo -e "  ${BOLD}vpn-pack v${VERSION:-unknown} installed${NC}"
++echo ""
++echo -e "  ${BOLD}Next steps:${NC}"
++echo ""
++echo -e "  1. Open UniFi console in your browser:"
++echo -e "     ${BOLD}https://${LAN_IP}${NC}"
++echo ""
++echo -e "  2. Go to Settings > API and create an API key"
++echo -e "     (needed for vpn-pack to manage firewall zones)"
++echo ""
++echo -e "  3. Open vpn-pack UI:"
++echo -e "     ${BOLD}https://${LAN_IP}/vpn-pack/${NC}"
++echo ""
++echo -e "  4. Enter the API key and authenticate Tailscale"
++echo ""
+--- a/manager/go.mod	2026-11-12 10:05:09
++++ b/manager/go.mod	2026-11-12 10:05:09
+@@ -7,8 +7,8 @@
+ 	github.com/jsimonetti/rtnetlink v1.4.2
+ 	github.com/stretchr/testify v1.12.1
+ 	golang.org/x/mod v0.41.0
+-	golang.org/x/sync v0.23.0
+-	golang.org/x/sys v0.48.0
++	golang.org/x/sync v0.24.0
++	golang.org/x/sys v0.49.0
+ 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20241231184526-a9ab2273dd10
+ 	tailscale.com v0.0.0
+ )
+@@ -31,9 +31,9 @@
+ 	go.yaml.in/yaml/v3 v3.0.5 // indirect
+ 	go4.org/mem v0.0.0-20240501181205-ae6ca9944745 // indirect
+ 	go4.org/netipx v0.0.0-20260823151212-3075585bcbeb // indirect
+-	golang.org/x/crypto v0.57.0 // indirect
++	golang.org/x/crypto v0.58.0 // indirect
+ 	golang.org/x/exp v0.0.0-20260908205506-85c1c2202aba // indirect
+-	golang.org/x/net v0.59.0 // indirect
++	golang.org/x/net v0.60.0 // indirect
+ 	golang.zx2c4.com/wireguard v0.0.0-20260522210424-ecfc5a8d5446 // indirect
+ 	golang.zx2c4.com/wireguard/windows v1.0.1 // indirect
+ )
+--- a/manager/go.sum	2026-11-12 10:05:09
++++ b/manager/go.sum	2026-11-12 10:05:09
+@@ -144,20 +144,20 @@
+ go4.org/mem v0.0.0-20240501181205-ae6ca9944745/go.mod h1:reUoABIJ9ikfM5sgtSF3Wushcza7+WeD01VB9Lirh3g=
+ go4.org/netipx v0.0.0-20260823151212-3075585bcbeb h1:XBM4hvfwGAttkkiTIFfeigdfcL1xIfdKXqFdgiHGtDs=
+ go4.org/netipx v0.0.0-20260823151212-3075585bcbeb/go.mod h1:PLyyIXexvUFg3Owu6p/WfdlivPbZJsZdgWZlrGope/Y=
+-golang.org/x/crypto v0.57.0 h1:3ZVCjf8Ggz7zneR/EHRVx68Ctf+2pmIMP2UFhh9cC6M=
+-golang.org/x/crypto v0.57.0/go.mod h1:Fdz0i5U6CoizGwLda9DttjSk6qlZo25zYNtR+ycvuZA=
++golang.org/x/crypto v0.58.0 h1:COkYLr4k7nDI4r6QtMML2AfzeIswWHAJthLS6K/M/54=
++golang.org/x/crypto v0.58.0/go.mod h1:Xh+kl5A+M0gMiWDytH2Hhr5Z7WbNCpv/eB/EFgfSk+w=
+ golang.org/x/exp v0.0.0-20260908205506-85c1c2202aba h1:Ck8QetSgk912qxWLMCKxd0in+aiyBQyDSMae6e/xmpU=
+ golang.org/x/exp v0.0.0-20260908205506-85c1c2202aba/go.mod h1:50RgIsmK7OwqzTTeqcSXQW8SswW0o8fRcDxmqGluJ8E=
+ golang.org/x/mod v0.41.0 h1:qJmnOUb4YB+FsEuM3HcWucdZASCPGhsX6uljO6pog0c=
+ golang.org/x/mod v0.41.0/go.mod h1:Ek9pY8RKWXwsWvd3rQiHYtMqkjSUV+s1Rj7j4H5Ur6o=
+-golang.org/x/net v0.59.0 h1:5zfYln+w5XCxwrnMMJPufRgNoXEaGxl0wo5GqPXyues=
+-golang.org/x/net v0.59.0/go.mod h1:2DA/G1UfVbCpQPeWTmMPGY7Cs2PkBkwu743bVX5PIVg=
+-golang.org/x/sync v0.23.0 h1:KameEIfc1IkluZyXWLn39Wd4tURc6GbCiISGiZm2bQk=
+-golang.org/x/sync v0.23.0/go.mod h1:sUUOizhqBxiL6pEWpqNLUiaJn1ShEbZ6BBqskPbjZm0=
+-golang.org/x/sys v0.48.0 h1:bbX/i/6MgT9BVLM9RT1thmxL04yeTAhbEz4SyadbXoo=
+-golang.org/x/sys v0.48.0/go.mod h1:hNLxWAXmnKAxqDtdwIYC4bM9oQPEecfsnNMuSxOs3og=
+-golang.org/x/term v0.46.0 h1:3+OXuTbaKDgwk8jTi3aSLHRlmWqHEUDUtxnbFigO4YE=
+-golang.org/x/term v0.46.0/go.mod h1:+K02xbkittuwc0Am4abfA3Fc+XRGXkvBXNO88NCXPoc=
++golang.org/x/net v0.60.0 h1:79p50tfZlm0J9YfoDsSi639qSXNGVwEzOPLCxM2FsYU=
++golang.org/x/net v0.60.0/go.mod h1:2DA/G1UfVbCpQPeWTmMPGY7Cs2PkBkwu743bVX5PIVg=
++golang.org/x/sync v0.24.0 h1:iqiDrGoDgyuvAKrhLQthUEzU/R378N78gXbBjxed7oA=
++golang.org/x/sync v0.24.0/go.mod h1:sUUOizhqBxiL6pEWpqNLUiaJn1ShEbZ6BBqskPbjZm0=
++golang.org/x/sys v0.49.0 h1:XbzkgYJHdqh/8m2Uu0W/dQv8nktxx4BFHp1M0gROTXA=
++golang.org/x/sys v0.49.0/go.mod h1:hNLxWAXmnKAxqDtdwIYC4bM9oQPEecfsnNMuSxOs3og=
++golang.org/x/term v0.47.0 h1:cpyOwQkr2Nzxe2p6KnrTG7Ei2wtzjsuSjhpXXepZ/BM=
++golang.org/x/term v0.47.0/go.mod h1:efAfAuG6RKABvg1ArGebRkvX6LXul14SM67o2e4mUCY=
+ golang.org/x/text v0.42.0 h1:JbOZXgfeCPU9gacVtYliJqOhD+zhrEqK4LfdpmlUZqI=
+ golang.org/x/text v0.42.0/go.mod h1:ojzP1Z+2QtioaF8DTtO8K5q7JWVVYwZKenzujK0Zd0E=
+ golang.org/x/time v0.16.0 h1:vMb6ptszcQMkcwiRTAuNNU50gom6++Q/6gY2hDM6VDE=
+--- a/manager/ui/bun.nix	2026-11-12 10:05:09
++++ b/manager/ui/bun.nix	2026-11-12 10:05:09
+@@ -6,9 +6,6 @@
+ # or `pkgs.callPackage` if you wish to handle
+ # it manually.
+ {
+-  copyPathToStore,
+-  fetchFromGitHub,
+-  fetchgit,
+   fetchurl,
+   ...
+ }:

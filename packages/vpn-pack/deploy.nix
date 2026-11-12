@@ -3,6 +3,7 @@
   lib ? pkgs.lib,
   tailscaleBin,
   managerBin,
+  vpnPackSrc,
   version ? "1.6.4",
   tailscaleVersion ? "1.104.5",
   gitCommit ? "4549ba8",
@@ -163,7 +164,7 @@ pkgs.stdenv.mkDerivation {
     cp ${nginxConf} $distDir/nginx-vpnpack.conf
 
     # Copy install & uninstall scripts
-    cp ${./install.sh} $distDir/install.sh
+    cp ${vpnPackSrc}/install.sh $distDir/install.sh
     cp ${./uninstall.sh} $distDir/uninstall.sh
     chmod +x $distDir/install.sh $distDir/uninstall.sh
 

@@ -1,20 +1,22 @@
 # packages/vpn-pack/overlay.nix
 # Dedicated overlay for UniFi OS aarch64-linux target environment and Tailscale patches.
+{ vpnPackSrc }:
 final: prev:
 let
   tailscaleVersion = prev.tailscale.version;
+  patchesDir = "${vpnPackSrc}/patches";
 
   # Patch Tailscale source code for Ubiquiti UniFi routing, fwmark, and distro detection
   tailscalePatchedSrc = prev.applyPatches {
     name = "tailscale-patched-${tailscaleVersion}";
     src = prev.tailscale.src;
     patches = [
-      ./patches/001-fwmark-0x800000.patch
-      ./patches/002-ubnt-device-model.patch
-      ./patches/003-ubnt-distro-version.patch
-      ./patches/004-package-type-unifi.patch
-      ./patches/005-ubnt-forward-chain-order.patch
-      ./patches/006-ubnt-exit-route-table.patch
+      "${patchesDir}/001-fwmark-0x800000.patch"
+      "${patchesDir}/002-ubnt-device-model.patch"
+      "${patchesDir}/003-ubnt-distro-version.patch"
+      "${patchesDir}/004-package-type-unifi.patch"
+      "${patchesDir}/005-ubnt-forward-chain-order.patch"
+      "${patchesDir}/006-ubnt-exit-route-table.patch"
     ];
   };
 
