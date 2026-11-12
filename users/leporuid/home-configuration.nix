@@ -1,16 +1,54 @@
 { pkgs, ... }:
-let
-  configDir = ../../config;
-in
 {
+  imports = [
+    ../../modules/home/my-config.nix
+  ];
+
   # 1. Hjem-Impure: out-of-store symlinking for live dotfile editing without rebuilds
   impure = {
     enable = true;
-    dotsDir = "${configDir}";
+    dotsDir = "${../../config}";
     dotsDirImpure = "/Users/leporuid/Developer/nixos-and-darwin-shared-hjem/config";
   };
 
-  # 2. User packages installed directly to user environment
+  # 2. Declarative configuration synthesis engine (my-config)
+  my.config = {
+    directory = "/Users/leporuid/Developer/nixos-and-darwin-shared-hjem/config";
+    storeDirectory = ../../config;
+    source = {
+      # Shells
+      ".config/fish" = "fish";
+      ".config/nushell" = "nushell";
+      ".config/starship.toml" = "starship.toml";
+      ".config/sheldon" = "sheldon";
+
+      # Development & Editors
+      ".config/nvim" = "nvim";
+      ".config/helix" = "helix";
+      ".config/zed" = "zed";
+      ".config/tmux" = "tmux";
+      ".config/zellij" = "zellij";
+
+      # Terminals & Themes
+      ".config/ghostty" = "ghostty";
+      ".config/foot" = "foot";
+      ".config/bat" = "bat";
+
+      # Version Control & Tools
+      ".config/git" = "git";
+      ".config/jj" = "jj";
+      ".config/direnv" = "direnv";
+      ".config/atuin" = "atuin";
+      ".config/mise" = "mise";
+      ".config/gallery-dl" = "gallery-dl";
+
+      # Agents & Skills
+      ".claude/settings.json" = "claude/settings.json";
+      ".agents/skills" = "agents/skills";
+    };
+  };
+
+  # 3. User packages installed directly to user environment
   packages = with pkgs; [
     # Shells and Integrations
     fish
@@ -44,46 +82,15 @@ in
     tree
   ];
 
-  # 3. Native Hjem file linking (managed via root config directory)
+  # 4. Native Hjem files (text content)
   files = {
     ".config/welcome.txt".text = ''
       Welcome Yu-Min Peng!
-      Your home files and configurations are managed by Hjem + Hjem-Rum + Hjem-Impure on red-tape.
+      Your home files and configurations are managed by Hjem + Hjem-Rum + my-config on red-tape.
     '';
-
-    # Shell configurations
-    ".config/fish".source = configDir + "/fish";
-    ".config/nushell/config.nu".source = configDir + "/nushell/config.nu";
-    ".config/nushell/env.nu".source = configDir + "/nushell/env.nu";
-    ".config/starship.toml".source = configDir + "/starship.toml";
-    ".config/sheldon".source = configDir + "/sheldon";
-
-    # Development & Editor configurations
-    ".config/nvim".source = configDir + "/nvim";
-    ".config/helix".source = configDir + "/helix";
-    ".config/zed".source = configDir + "/zed";
-    ".config/tmux".source = configDir + "/tmux";
-    ".config/zellij".source = configDir + "/zellij";
-
-    # Terminals & Themes
-    ".config/ghostty".source = configDir + "/ghostty";
-    ".config/foot".source = configDir + "/foot";
-    ".config/bat".source = configDir + "/bat";
-
-    # Version Control & Tools
-    ".config/git".source = configDir + "/git";
-    ".config/jj".source = configDir + "/jj";
-    ".config/direnv".source = configDir + "/direnv";
-    ".config/atuin".source = configDir + "/atuin";
-    ".config/mise".source = configDir + "/mise";
-    ".config/gallery-dl".source = configDir + "/gallery-dl";
-
-    # Agent & Skill configurations
-    ".claude/settings.json".source = configDir + "/claude/settings.json";
-    ".agents/skills".source = configDir + "/agents/skills";
   };
 
-  # 4. Hjem-Rum module ecosystem (under rum.programs.*)
+  # 5. Hjem-Rum module ecosystem (under rum.programs.*)
   rum.programs = {
     fish = {
       enable = true;
