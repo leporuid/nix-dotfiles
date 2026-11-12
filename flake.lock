@@ -1073,18 +1073,13 @@
         ]
       },
       "locked": {
-        "lastModified": 1782211810,
-        "narHash": "sha256-wf6IvsXtac3w9maJvMHBAU11us9HooF9mj8TERatWFQ=",
-        "owner": "otavio",
-        "repo": "red-tape",
-        "rev": "a9c966a9299357bd47d00a8717485fcf5d6eed77",
-        "type": "github"
+        "narHash": "sha256-JH8fOc9w3/6h4juUwn8Sv1XrjVFMDk5kIkpsw1QleKE=",
+        "path": "/Users/leporuid/Developer/otavio-red-tape",
+        "type": "path"
       },
       "original": {
-        "owner": "otavio",
-        "ref": "fix/home-configurations-pkgs",
-        "repo": "red-tape",
-        "type": "github"
+        "path": "/Users/leporuid/Developer/otavio-red-tape",
+        "type": "path"
       }
     },
     "root": {

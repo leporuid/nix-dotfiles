@@ -15,18 +15,14 @@
   };
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     # Determinate Nix: Determinate Systems' Nix distribution & daemon (do not follow nixpkgs)
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
 
-    # Adios-flake: track latest upstream from Mic92
-    adios-flake.url = "github:Mic92/adios-flake";
-
     red-tape = {
       url = "path:../otavio-red-tape";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.adios-flake.follows = "adios-flake";
+      inputs.adios-flake.follows = "github:Mic92/adios-flake";
     };
 
 
