@@ -52,12 +52,4 @@
   nix.enable = false;
   nix.channel.enable = false;
   nix.nixPath = lib.mkForce [ ];
-
-  # User profile via Hjem
-  hjem.users.${vars.username} =
-    { ... }:
-    {
-      directory = vars.homeDirectory;
-      imports = [ ../../users/leporuid/home-configuration.nix ];
-    };
 }

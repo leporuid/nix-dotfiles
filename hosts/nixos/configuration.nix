@@ -20,11 +20,5 @@
     fsType = pkgs.lib.mkDefault "ext4";
   };
 
-  hjem.users.leporuid =
-    { ... }:
-    {
-      imports = [ ../../users/leporuid/home-configuration.nix ];
-    };
-
   system.stateVersion = "25.05";
 }
