@@ -9,7 +9,7 @@
   imports = [
     inputs.determinate.darwinModules.default
     inputs.hjem.darwinModules.default
-    ../../modules/common/vars.nix
+    ../../modules/shared/vars.nix
     ../../modules/darwin
     ../../modules/nixos/host-shared.nix
   ];

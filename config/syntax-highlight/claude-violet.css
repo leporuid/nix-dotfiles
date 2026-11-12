@@ -1,0 +1,27 @@
+/* Claude Violet Custom CSS for Syntax Highlight (HTML Render Engine) */
+body {
+    background-color: #24212a !important;
+    color: #d6d0dd !important;
+    font-family: "Maple Mono NF CN", monospace !important;
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+}
+
+pre {
+    background-color: #24212a !important;
+    color: #d6d0dd !important;
+}
+
+.hl.num { color: #e5c07b !important; }
+.hl.esc { color: #cba6f7 !important; }
+.hl.str { color: #a6c8a1 !important; }
+.hl.dstr { color: #a6c8a1 !important; }
+.hl.slc { color: #625b6b !important; font-style: italic !important; }
+.hl.com { color: #625b6b !important; font-style: italic !important; }
+.hl.dir { color: #c084fc !important; }
+.hl.sym { color: #c084fc !important; }
+.hl.line { color: #585b70 !important; }
+.hl.kwa { color: #cba6f7 !important; font-weight: bold !important; }
+.hl.kwb { color: #8fb8d8 !important; }
+.hl.kwc { color: #c084fc !important; }
+.hl.kwd { color: #ec6a88 !important; }

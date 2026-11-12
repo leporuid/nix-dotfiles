@@ -1,0 +1,133 @@
+window-rule {
+    // These display media, the media should dictate how wide the column should be
+    match app-id=r#"^org\.gnome\.(Loupe|Showtime)$"#
+    default-column-display "normal"
+    default-column-width {}
+}
+
+window-rule {
+    match app-id=r#"^org\.gnome\.Calculator$"#
+    open-floating true
+    default-floating-position x=100 y=0 relative-to="right"
+}
+
+window-rule {
+    match app-id=r#"^com.vixalien.sticky$"#
+    open-floating true
+    default-floating-position x=40 y=40 relative-to="top-right"
+}
+
+window-rule {
+    match app-id=r#"^XEyes$"#
+
+    default-column-width { fixed 340; }
+    default-window-height { fixed 240; }
+    open-floating true
+    default-floating-position x=30 y=30 relative-to="top-right"
+}
+
+// Indicate screencasted windows with red colors.
+window-rule {
+    match is-window-cast-target=true
+
+    focus-ring {
+        off
+    }
+
+    border {
+        width 4
+        active-color "#7bff44aa"
+        inactive-color "#4f9b05aa"
+    }
+
+    tab-indicator {
+        active-color "#4f9b05"
+        inactive-color "#4f9b05"
+    }
+}
+
+// I use the following apps in full-width, pretty much exclusively
+window-rule {
+    match app-id=r#"^firefox$"#
+    match app-id=r#"^code$"#
+    match app-id=r#"^spotify$"#
+    // Yes, I occasionally use the real, full-fat, full-tracking Chrome.
+    match app-id=r#"^google-chrome$"#
+    
+    default-column-width {
+        proportion 1.0
+    }
+}
+
+window-rule {
+    match app-id=r#"^firefox$"# title=r#"^Picture-in-Picture$"#
+
+    open-floating true
+    geometry-corner-radius 8
+    default-floating-position x=12 y=12 relative-to="bottom-right"
+    default-column-width { fixed 480; }
+    default-window-height { fixed 270; }
+    border {
+        inactive-color "#ffffff40"
+    }
+}
+
+window-rule {
+    match app-id=r#"^org\.keepassxc\.KeePassXC$"#
+    match app-id=r#"^org\.gnome\.World\.Secrets$"#
+    match app-id=r#"^1password$"#
+
+    block-out-from "screen-capture"
+
+    // Use this instead if you want them visible on third-party screenshot tools.
+    // block-out-from "screencast"
+}
+
+// Often want to have these applications open with another app visible in the
+// same workspace, but close enough to full screen that I can focus.
+window-rule {
+    match app-id=r#"^com.slack.Slack$"#
+    match app-id=r#"^MongoDB Compass$"#
+    match app-id=r#"^com\.discordapp\.Discord$"#
+    default-column-width {
+        proportion 0.8
+    }
+}
+
+window-rule {
+    match app-id=r#"^com\.discordapp\.Discord$"#
+}
+
+window-rule {
+    match app-id=r#"^steam$"#
+    exclude title=r#"^notificationtoasts_\d+_desktop$"#
+    default-column-width {
+        proportion 0.8
+    }
+    shadow { off; }
+    border { off; }
+    focus-ring { off; }
+    clip-to-geometry false
+}
+
+window-rule {
+    match app-id=r#"^steam$"# title=r#"^notificationtoasts_\d+_desktop$"#
+    shadow { off; }
+    border { off; }
+    focus-ring { off; }
+    clip-to-geometry false
+    default-floating-position x=0 y=0 relative-to="bottom-right"
+}
+
+window-rule {
+    match app-id=r#"^Minecraft"#
+    shadow { off; }
+    border { off; }
+    focus-ring { off; }
+    clip-to-geometry false
+    default-column-width {
+        proportion 1.0
+    }
+    open-fullscreen true
+}
+
