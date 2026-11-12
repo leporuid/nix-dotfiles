@@ -24,10 +24,11 @@
     adios-flake.url = "github:Mic92/adios-flake";
 
     red-tape = {
-      url = "github:otavio/red-tape/fix/home-configurations-pkgs";
+      url = "path:../otavio-red-tape";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.adios-flake.follows = "adios-flake";
     };
+
 
     # Hjem: lightweight $HOME manager alternative to Home Manager
     hjem.url = "github:feel-co/hjem";
