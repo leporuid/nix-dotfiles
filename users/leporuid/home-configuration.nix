@@ -12,11 +12,19 @@ in
 
   # 2. User packages installed directly to user environment
   packages = with pkgs; [
+    # Shells and Integrations
+    fish
+    fish-lsp
     nushell
     carapace
     starship
+
+    # CLI Productivity Tools
     bat
+    eza
     fd
+    fzf
+    ripgrep
     lazygit
     zoxide
     atuin
@@ -29,13 +37,20 @@ in
       Welcome Yu-Min Peng!
       Your home files and configurations are managed by Hjem + Hjem-Rum + Hjem-Impure on red-tape.
     '';
+    # Live editable Fish configuration tree
+    ".config/fish".source = configDir + "/fish";
+    # Nushell configuration files
     ".config/nushell/config.nu".source = configDir + "/nushell/config.nu";
     ".config/nushell/env.nu".source = configDir + "/nushell/env.nu";
+    # Starship prompt configuration
     ".config/starship.toml".source = configDir + "/starship.toml";
   };
 
   # 4. Hjem-Rum module ecosystem (under rum.programs.*)
   rum.programs = {
+    fish = {
+      enable = true;
+    };
     git = {
       enable = true;
       settings = {
