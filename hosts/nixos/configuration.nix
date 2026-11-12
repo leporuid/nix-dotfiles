@@ -1,9 +1,12 @@
 { pkgs, inputs, ... }:
 {
   imports = [
+    inputs.determinate.nixosModules.default
     inputs.hjem.nixosModules.default
     ../../modules/nixos/host-shared.nix
   ];
+
+  determinateNix.enable = true;
 
   hjem = {
     clobberByDefault = true;

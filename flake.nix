@@ -4,6 +4,9 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-unstable";
 
+    # Determinate Nix: Determinate Systems' Nix distribution & daemon (do not follow nixpkgs)
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
+
     # Adios-flake: track latest upstream from Mic92
     adios-flake.url = "github:Mic92/adios-flake";
 
