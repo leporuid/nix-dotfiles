@@ -7,5 +7,6 @@
     ./neovim.nix
     ./fish.nix
     ./direnv-instant.nix
+    ./nixcord.nix
   ];
 }
