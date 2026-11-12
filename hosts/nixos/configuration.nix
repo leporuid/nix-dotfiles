@@ -142,7 +142,9 @@
     enable = true;
     openFirewall = true;
     useRoutingFeatures = "both";
-    authKeyFile = lib.mkIf (config.age.secrets ? "tailscale-oracle") config.age.secrets."tailscale-oracle".path;
+    authKeyFile = lib.mkIf (
+      config.age.secrets ? "tailscale-oracle"
+    ) config.age.secrets."tailscale-oracle".path;
     authKeyParameters.preauthorized = true;
 
     # Used at first login
