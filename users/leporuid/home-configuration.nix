@@ -1,38 +1,41 @@
 { pkgs, ... }:
 {
+  # 1. Modular feature imports in moni-dz style
   imports = [
-    ../../modules/home/my-config.nix
+    ../../modules/home
   ];
 
-  # 1. Hjem-Impure: out-of-store symlinking for live dotfile editing without rebuilds
+  # 2. Hjem-Impure: out-of-store symlinking for live dotfile editing without rebuilds
   impure = {
     enable = true;
     dotsDir = "${../../config}";
     dotsDirImpure = "/Users/leporuid/Developer/nixos-and-darwin-shared-hjem/config";
   };
 
-  # 2. Declarative configuration synthesis engine (my-config)
+  # 3. Enable domain modules
+  my.themes.enable = true;
+  my.programs.fish.enable = true;
+  my.programs.neovim.enable = true;
+
+  # 4. Declarative configuration synthesis engine (my-config)
   my.config = {
     directory = "/Users/leporuid/Developer/nixos-and-darwin-shared-hjem/config";
     storeDirectory = ../../config;
     source = {
       # Shells
-      ".config/fish" = "fish";
       ".config/nushell" = "nushell";
       ".config/starship.toml" = "starship.toml";
       ".config/sheldon" = "sheldon";
 
       # Development & Editors
-      ".config/nvim" = "nvim";
       ".config/helix" = "helix";
       ".config/zed" = "zed";
       ".config/tmux" = "tmux";
       ".config/zellij" = "zellij";
 
-      # Terminals & Themes
+      # Terminals
       ".config/ghostty" = "ghostty";
       ".config/foot" = "foot";
-      ".config/bat" = "bat";
 
       # Version Control & Tools
       ".config/git" = "git";
@@ -48,31 +51,17 @@
     };
   };
 
-  # 3. User packages installed directly to user environment
+  # 5. Core developer tools & productivity utilities
   packages = with pkgs; [
-    # Shells and Integrations
-    fish
-    fish-lsp
     nushell
     carapace
     starship
     sheldon
-
-    # Editors & Multiplexers
-    neovim
     helix
     tmux
     zellij
-
-    # CLI Productivity Tools
-    bat
-    eza
-    fd
-    fzf
-    ripgrep
     lazygit
     zoxide
-    atuin
     direnv
     jujutsu
     mise
@@ -82,7 +71,7 @@
     tree
   ];
 
-  # 4. Native Hjem files (text content)
+  # 6. Native Hjem files (text content)
   files = {
     ".config/welcome.txt".text = ''
       Welcome Yu-Min Peng!
@@ -90,11 +79,8 @@
     '';
   };
 
-  # 5. Hjem-Rum module ecosystem (under rum.programs.*)
+  # 7. Hjem-Rum module ecosystem (under rum.programs.*)
   rum.programs = {
-    fish = {
-      enable = true;
-    };
     git = {
       enable = true;
       settings = {

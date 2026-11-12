@@ -40,6 +40,11 @@
 
     git-hooks.url = "github:cachix/git-hooks.nix";
     git-hooks.inputs.nixpkgs.follows = "nixpkgs";
+
+    vpn-pack-src = {
+      url = "github:eds-ch/vpn-pack/v1.6.4";
+      flake = false;
+    };
   };
 
   # Load red-tape via mkFlake
