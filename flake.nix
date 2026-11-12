@@ -21,7 +21,7 @@
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
 
     red-tape = {
-      url = "path:../otavio-red-tape";
+      url = "../otavio-red-tape";
       inputs.adios-flake.url = "github:Mic92/adios-flake";
     };
 
