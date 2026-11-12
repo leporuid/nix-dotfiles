@@ -15,7 +15,7 @@ rustPlatform.buildRustPackage {
   # toolchain, but it works for now. Might need to use rust-overlay?
   env.RUSTC_BOOTSTRAP = true;
 
-  cargoHash = "sha256-KTp26PKEVu0yvclIytX8o4kIhFW4ZVm7Pqss/aWQMWw=";
+  cargoHash = "sha256-x2QOt/rsFcRz1nNle+qcxOx1UN7fzXhohQ6cpWJMvcw=";
 
   meta = {
     description = "Code formatter for Scheme, Lisp, and any S-expressions";

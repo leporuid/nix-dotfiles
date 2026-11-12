@@ -160,6 +160,22 @@
         "url": "https://flakehub.com/f/hercules-ci/flake-parts/0.1"
       }
     },
+    "gallery-ai": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1794461164,
+        "narHash": "sha256-TSlIGIGogd739vtgX0rBIIH7hVljhZOwhQIBrm9LO+I=",
+        "owner": "CrimsonGlory",
+        "repo": "gallery-ai",
+        "rev": "a4eba0c94ff41c1c44a26dd239b9e0078caa3084",
+        "type": "github"
+      },
+      "original": {
+        "owner": "CrimsonGlory",
+        "repo": "gallery-ai",
+        "type": "github"
+      }
+    },
     "git-hooks": {
       "inputs": {
         "flake-compat": "flake-compat_2",
@@ -412,6 +428,7 @@
       "inputs": {
         "adios-flake": "adios-flake",
         "determinate": "determinate",
+        "gallery-ai": "gallery-ai",
         "git-hooks": "git-hooks",
         "hjem": "hjem",
         "hjem-impure": "hjem-impure",
@@ -420,7 +437,8 @@
         "nixpkgs": "nixpkgs_3",
         "red-tape": "red-tape",
         "treefmt": "treefmt",
-        "vpn-pack-src": "vpn-pack-src"
+        "vpn-pack-src": "vpn-pack-src",
+        "yt-ai": "yt-ai"
       }
     },
     "treefmt": {
@@ -457,6 +475,22 @@
         "owner": "eds-ch",
         "ref": "v1.6.4",
         "repo": "vpn-pack",
+        "type": "github"
+      }
+    },
+    "yt-ai": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1794457945,
+        "narHash": "sha256-hE1Zn9/QRDztotjCAKSMc4pTDuSpjmU+QUX5LZM5A/8=",
+        "owner": "CrimsonGlory",
+        "repo": "yt-ai",
+        "rev": "0e768a86561b37d160674d31aea2f5a1b7b515fd",
+        "type": "github"
+      },
+      "original": {
+        "owner": "CrimsonGlory",
+        "repo": "yt-ai",
         "type": "github"
       }
     }
