@@ -1,10 +1,10 @@
-{ pkgs, flake }:
-pkgs.stdenv.mkDerivation {
+{ pkgs, ... }:
+pkgs.stdenvNoCC.mkDerivation {
   name = "run";
 
-  src = flake;
+  src = ../.;
 
-  buildInputs = [ pkgs.fish ];
+  dontBuild = true;
 
   installPhase = ''
     mkdir -p $out/bin

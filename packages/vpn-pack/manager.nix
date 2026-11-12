@@ -14,24 +14,14 @@
 }:
 
 let
-  ui = pkgs.stdenv.mkDerivation {
+  ui = pkgs.stdenvNoCC.mkDerivation {
     pname = "vpn-pack-ui";
     inherit version;
-    src = "${vpnPackSrc}/manager/ui";
-    nativeBuildInputs = [ pkgs.bun ];
-
-    buildPhase = ''
-      if [ -d dist ] && [ -f dist/index.html ]; then
-        echo "==> Using verified prebuilt UI dist"
-      else
-        echo "==> Building with bun"
-        bun run build
-      fi
-    '';
-
+    src = ./ui-dist;
+    dontBuild = true;
     installPhase = ''
       mkdir -p $out
-      cp -r dist/* $out/
+      cp -r * $out/
     '';
   };
 

@@ -24,7 +24,9 @@ pkgs.stdenvNoCC.mkDerivation {
 
   doCheck = true;
   checkPhase = ''
-    ${treefmtWrapper}/bin/treefmt --fail-on-change
+    export HOME=$TMPDIR
+    export XDG_CACHE_HOME=$TMPDIR
+    ${treefmtWrapper}/bin/treefmt --no-cache --fail-on-change
   '';
 
   installPhase = ''
