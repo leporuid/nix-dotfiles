@@ -22,7 +22,7 @@ in
     # =========================================================================
     imports = [
       inputs.determinate.darwinModules.default
-      ../shared/vars.nix
+      ../common/vars.nix
       inputs.nix-index-database.darwinModules.nix-index
     ];
 

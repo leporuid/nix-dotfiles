@@ -8,7 +8,7 @@
 {
   imports = [
     inputs.determinate.darwinModules.default
-    ../../modules/shared/vars.nix
+    ../../modules/common/vars.nix
     ../../modules/darwin
     ../../modules/nixos/host-shared.nix
   ];

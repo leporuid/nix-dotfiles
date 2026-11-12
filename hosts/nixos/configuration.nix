@@ -2,19 +2,10 @@
 {
   imports = [
     inputs.determinate.nixosModules.default
-    inputs.hjem.nixosModules.default
-    ../../modules/nixos/host-shared.nix
+    ../../modules/nixos
   ];
 
   determinate.enable = true;
-
-  hjem = {
-    clobberByDefault = true;
-    extraModules = [
-      inputs.hjem-rum.hjemModules.default
-      inputs.hjem-impure.hjemModules.default
-    ];
-  };
 
   nixpkgs.hostPlatform = "aarch64-linux";
 
