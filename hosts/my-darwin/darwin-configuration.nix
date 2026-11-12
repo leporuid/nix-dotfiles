@@ -1,6 +1,6 @@
-{ pkgs, inputs, ... }:
+{ pkgs, self, inputs, ... }:
 {
-  imports = [ inputs.self.nixosModules.host-shared ];
+  imports = [ self.nixosModules.host-shared ];
 
   nixpkgs.hostPlatform = "aarch64-darwin";
 
