@@ -45,6 +45,16 @@
       url = "github:eds-ch/vpn-pack/v1.6.4";
       flake = false;
     };
+
+    gallery-ai = {
+      url = "github:CrimsonGlory/gallery-ai";
+      flake = false;
+    };
+
+    yt-ai = {
+      url = "github:CrimsonGlory/yt-ai";
+      flake = false;
+    };
   };
 
   # Load red-tape via mkFlake

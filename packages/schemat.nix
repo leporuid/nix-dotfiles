@@ -8,7 +8,7 @@ rustPlatform.buildRustPackage {
     owner = "raviqqe";
     repo = pname;
     rev = "main";
-    hash = "sha256-tS60Ix1U9HSM/T551RLJBRrs8hkfZiG51ztTX0qgXOU=";
+    hash = "sha256-DxRm9lfBMw6yj4eU2SW5WUnNZ7BNUHgfQx0xXWr0XwA=";
   };
 
   # FIXME: This should really be removed in favor of using a proper nightly

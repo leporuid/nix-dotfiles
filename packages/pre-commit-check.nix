@@ -5,12 +5,12 @@
 }:
 let
   treefmtConfig = import ../treefmt.nix { inherit pkgs; };
-  treefmtEval = inputs.treefmt-nix.lib.evalModule pkgs treefmtConfig;
+  treefmtEval = inputs.treefmt.lib.evalModule pkgs treefmtConfig;
   treefmtWrapper = treefmtEval.config.build.wrapper;
 in
 pkgs.stdenvNoCC.mkDerivation {
   name = "pre-commit-check";
-  src = inputs.self;
+  src = ../.;
 
   nativeBuildInputs = [
     treefmtWrapper

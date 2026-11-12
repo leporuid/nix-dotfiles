@@ -419,7 +419,8 @@
         "nix-darwin": "nix-darwin",
         "nixpkgs": "nixpkgs_3",
         "red-tape": "red-tape",
-        "treefmt": "treefmt"
+        "treefmt": "treefmt",
+        "vpn-pack-src": "vpn-pack-src"
       }
     },
     "treefmt": {
@@ -439,6 +440,23 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "vpn-pack-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1786426300,
+        "narHash": "sha256-sw9FK5AGH5Qu+vbxRmcU3OLetJ1XD+k4CpUaDHWKWC4=",
+        "owner": "eds-ch",
+        "repo": "vpn-pack",
+        "rev": "4549ba89cd8cf527255eadd5501f20bae5f276ce",
+        "type": "github"
+      },
+      "original": {
+        "owner": "eds-ch",
+        "ref": "v1.6.4",
+        "repo": "vpn-pack",
         "type": "github"
       }
     }
