@@ -12,8 +12,12 @@
   rum.programs = {
     git = {
       enable = true;
-      userName = "Yu-Min Peng";
-      userEmail = "leporuid@icloud.com";
+      settings = {
+        user = {
+          name = "Yu-Min Peng";
+          email = "leporuid@icloud.com";
+        };
+      };
     };
   };
 }
