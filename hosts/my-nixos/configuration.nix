@@ -6,7 +6,10 @@
 
   users.users.me.isNormalUser = true;
 
+  # Template host: disable initrd to prevent APFS terminfo case-collision on macOS hosts
   boot.loader.grub.enable = pkgs.lib.mkDefault false;
+  boot.initrd.enable = pkgs.lib.mkDefault false;
+
   fileSystems."/" = {
     device = pkgs.lib.mkDefault "/dev/null";
     fsType = pkgs.lib.mkDefault "ext4";
