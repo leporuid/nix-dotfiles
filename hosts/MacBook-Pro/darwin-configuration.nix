@@ -8,7 +8,6 @@
 {
   imports = [
     inputs.determinate.darwinModules.default
-    inputs.hjem.darwinModules.default
     ../../modules/shared/vars.nix
     ../../modules/darwin
     ../../modules/nixos/host-shared.nix
@@ -54,14 +53,7 @@
   nix.channel.enable = false;
   nix.nixPath = lib.mkForce [ ];
 
-  hjem = {
-    clobberByDefault = true;
-    extraModules = [
-      inputs.hjem-rum.hjemModules.default
-      inputs.hjem-impure.hjemModules.default
-    ];
-  };
-
+  # User profile via Hjem
   hjem.users.${vars.username} =
     { ... }:
     {

@@ -1,4 +1,4 @@
-# Home modules aggregator in moni-dz style
+# Hjem modules aggregator in moni-dz style
 { ... }:
 {
   imports = [
@@ -6,5 +6,6 @@
     ./themes.nix
     ./neovim.nix
     ./fish.nix
+    ./direnv-instant.nix
   ];
 }
