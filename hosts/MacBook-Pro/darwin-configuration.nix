@@ -10,10 +10,15 @@
     inputs.determinate.darwinModules.default
     inputs.hjem.darwinModules.default
     ../../modules/common/vars.nix
-    ../../modules/darwin/system-defaults.nix
-    ../../modules/darwin/applications.nix
+    ../../modules/darwin
     ../../modules/nixos/host-shared.nix
   ];
+
+  # =========================================================================
+  # moni-dz style feature modules
+  # =========================================================================
+  my.darwin.system.enable = true;
+  my.darwin.applications.enable = true;
 
   networking.hostName = vars.hostname;
   networking.computerName = "🐰MacBook Pro";
