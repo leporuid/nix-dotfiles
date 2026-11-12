@@ -20,11 +20,11 @@
         "adios": "adios"
       },
       "locked": {
-        "lastModified": 1772646328,
-        "narHash": "sha256-0xwNbjvHON8LqhIx5VMPZpR1B5Unq/7BH6tktELwRyA=",
+        "lastModified": 1793308264,
+        "narHash": "sha256-tPaJU3F4mshoSnp2x5ArlepBNBFniNNOugT7mWIIz5g=",
         "owner": "Mic92",
         "repo": "adios-flake",
-        "rev": "6082a7bf428fe6c29b80c8ef4582ffce46cfea77",
+        "rev": "8617ee1c4dd5bfad7a3ea5a3aec7cb0dbd82551d",
         "type": "github"
       },
       "original": {
@@ -151,7 +151,9 @@
     },
     "red-tape": {
       "inputs": {
-        "adios-flake": "adios-flake",
+        "adios-flake": [
+          "adios-flake"
+        ],
         "nixpkgs": [
           "nixpkgs"
         ]
@@ -173,6 +175,7 @@
     },
     "root": {
       "inputs": {
+        "adios-flake": "adios-flake",
         "git-hooks": "git-hooks",
         "hjem": "hjem",
         "hjem-rum": "hjem-rum",
