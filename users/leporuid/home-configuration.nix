@@ -20,7 +20,7 @@ in
   impure = {
     enable = true;
     dotsDir = "${../../config}";
-    dotsDirImpure = "/Users/leporuid/Developer/nixos-and-darwin-shared-hjem/config";
+    dotsDirImpure = "${config.directory}/Developer/nix-dotfiles/config";
   };
 
   # 3. Enable domain modules
@@ -30,7 +30,7 @@ in
 
   # 4. Declarative configuration synthesis engine (my-config)
   my.config = {
-    directory = "/Users/leporuid/Developer/nixos-and-darwin-shared-hjem/config";
+    directory = "${config.directory}/Developer/nix-dotfiles/config";
     storeDirectory = ../../config;
     source = {
       # Shells
