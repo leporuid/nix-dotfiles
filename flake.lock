@@ -645,11 +645,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794493589,
-        "narHash": "sha256-XeiAGbzjdC0D7ekQZbufWyqeY8x8UItxjCP335lh4Eg=",
+        "lastModified": 1794528109,
+        "narHash": "sha256-jolGLkv2EZG2o1ETt2Bg6oZywukzWPy7SqP1uQncvTg=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "90011236663d4116738fc2d63de6ab64523387b6",
+        "rev": "7eb5c0a14aa9a5d575d36c77b464cc4513090d56",
         "type": "github"
       },
       "original": {
@@ -835,11 +835,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794488443,
-        "narHash": "sha256-fML/rVvsHYtirHdclrV2Jzw9kZoJogF0zYpiAqdAtYI=",
+        "lastModified": 1794516078,
+        "narHash": "sha256-A1wp/GflJzRQas7nVLbeS/O+GBpv2HU5oXfd1z87GmE=",
         "owner": "4evy",
         "repo": "nixcord",
-        "rev": "d7037f854e1af43a3c7f42847f9487bfa0218ae9",
+        "rev": "1ec55ed3d53afa9df22948e070b0e0679788d569",
         "type": "github"
       },
       "original": {
@@ -1013,6 +1013,22 @@
         "type": "github"
       }
     },
+    "nixpkgs_7": {
+      "locked": {
+        "lastModified": 1794386569,
+        "narHash": "sha256-x9sADJvoVG0L6RejZB+/BB4YiGZFBZrfTlhF4uBq1tQ=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "d4f25a3e562008648d45bcf2d70bcc7422cad84e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "pyproject-build-systems": {
       "inputs": {
         "nixpkgs": [
@@ -1065,26 +1081,21 @@
     },
     "red-tape": {
       "inputs": {
-        "adios-flake": [
-          "adios-flake"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ]
+        "adios-flake": "adios-flake",
+        "nixpkgs": "nixpkgs_7"
       },
       "locked": {
-        "narHash": "sha256-JH8fOc9w3/6h4juUwn8Sv1XrjVFMDk5kIkpsw1QleKE=",
-        "path": "/Users/leporuid/Developer/otavio-red-tape",
+        "narHash": "sha256-pa8y+52oGUfJdeIQL5rPbb3Dx0jemnBOKQkL5/Yp1Ys=",
+        "path": "/Users/leporuid/Developer/red-tape",
         "type": "path"
       },
       "original": {
-        "path": "/Users/leporuid/Developer/otavio-red-tape",
+        "path": "/Users/leporuid/Developer/red-tape",
         "type": "path"
       }
     },
     "root": {
       "inputs": {
-        "adios-flake": "adios-flake",
         "agenix": "agenix",
         "determinate": "determinate",
         "direnv-instant": "direnv-instant",

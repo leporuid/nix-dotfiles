@@ -15,12 +15,13 @@
   };
 
   inputs = {
+    red-tape.url = "path:/Users/leporuid/Developer/red-tape";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     # Determinate Nix: Determinate Systems' Nix distribution & daemon (do not follow nixpkgs)
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
 
-    red-tape.url = "path:/Users/leporuid/Developer/otavio-red-tape";
+    
 
     # Hjem: lightweight $HOME manager alternative to Home Manager
     hjem.url = "github:feel-co/hjem";
@@ -111,8 +112,7 @@
   };
 
   # Load red-tape via mkFlake
-  outputs =
-    inputs:
+  outputs = inputs:
     inputs.red-tape.mkFlake {
       inherit inputs;
       src = ./.;
