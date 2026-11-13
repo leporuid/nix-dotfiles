@@ -1085,7 +1085,7 @@
         "nixpkgs": "nixpkgs_7"
       },
       "locked": {
-        "narHash": "sha256-pa8y+52oGUfJdeIQL5rPbb3Dx0jemnBOKQkL5/Yp1Ys=",
+        "narHash": "sha256-CeA9zWDWxzJ9rC51IkljO/9A3l9DuZ6XMXXl8Eg0XFY=",
         "path": "/Users/leporuid/Developer/red-tape",
         "type": "path"
       },
