@@ -20,11 +20,11 @@
         "adios": "adios"
       },
       "locked": {
-        "lastModified": 1793308264,
-        "narHash": "sha256-tPaJU3F4mshoSnp2x5ArlepBNBFniNNOugT7mWIIz5g=",
+        "lastModified": 1772646328,
+        "narHash": "sha256-0xwNbjvHON8LqhIx5VMPZpR1B5Unq/7BH6tktELwRyA=",
         "owner": "Mic92",
         "repo": "adios-flake",
-        "rev": "8617ee1c4dd5bfad7a3ea5a3aec7cb0dbd82551d",
+        "rev": "6082a7bf428fe6c29b80c8ef4582ffce46cfea77",
         "type": "github"
       },
       "original": {
@@ -1015,11 +1015,11 @@
     },
     "nixpkgs_7": {
       "locked": {
-        "lastModified": 1794386569,
-        "narHash": "sha256-x9sADJvoVG0L6RejZB+/BB4YiGZFBZrfTlhF4uBq1tQ=",
+        "lastModified": 1772433332,
+        "narHash": "sha256-izhTDFKsg6KeVBxJS9EblGeQ8y+O8eCa6RcW874vxEc=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "d4f25a3e562008648d45bcf2d70bcc7422cad84e",
+        "rev": "cf59864ef8aa2e178cccedbe2c178185b0365705",
         "type": "github"
       },
       "original": {
@@ -1085,13 +1085,17 @@
         "nixpkgs": "nixpkgs_7"
       },
       "locked": {
-        "narHash": "sha256-CeA9zWDWxzJ9rC51IkljO/9A3l9DuZ6XMXXl8Eg0XFY=",
-        "path": "/Users/leporuid/Developer/red-tape",
-        "type": "path"
+        "lastModified": 1774285314,
+        "narHash": "sha256-ad5J3MsK11stsDfR0no6zr6K/c7Rr8HCQFpVw1ixmLA=",
+        "owner": "leporuid",
+        "repo": "red-tape",
+        "rev": "5ad2da408cc59621dfedd2d9256e0b6c082256c6",
+        "type": "github"
       },
       "original": {
-        "path": "/Users/leporuid/Developer/red-tape",
-        "type": "path"
+        "owner": "leporuid",
+        "repo": "red-tape",
+        "type": "github"
       }
     },
     "root": {

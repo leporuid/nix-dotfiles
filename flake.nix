@@ -15,7 +15,7 @@
   };
 
   inputs = {
-    red-tape.url = "path:/Users/leporuid/Developer/red-tape";
+    red-tape.url = "github:/leporuid/red-tape";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     # Determinate Nix: Determinate Systems' Nix distribution & daemon (do not follow nixpkgs)
