@@ -30,6 +30,10 @@ in
   my.programs.neovim.enable = true;
   my.programs.ghostty.enable = true;
   my.programs.helix.enable = true;
+  my.programs.nushell.enable = true;
+  my.programs.starship.enable = true;
+  my.programs.tmux.enable = true;
+  my.programs.zellij.enable = true;
 
   # 4. Declarative configuration synthesis engine (my-config)
   my.config = {
@@ -37,16 +41,12 @@ in
     storeDirectory = ../../config;
     source = {
       # Shells
-      ".config/nushell" = "nushell";
-      ".config/starship.toml" = "starship.toml";
       ".config/sheldon" = "sheldon";
       ".config/zsh" = "zsh";
       ".zshenv" = "zsh/home_zshenv";
 
       # Development & Editors
       ".config/zed" = "zed";
-      ".config/tmux" = "tmux";
-      ".config/zellij" = "zellij";
 
       # Terminals
       ".config/foot" = "foot";
@@ -78,15 +78,10 @@ in
   # 5. Core developer tools & productivity utilities
   packages = with pkgs; [
     # Shell & prompt
-    nushell
-    carapace
-    starship
     sheldon
 
     # Editors & multiplexers
     inputs.helix.packages.${pkgs.stdenv.hostPlatform.system}.helix
-    tmux
-    zellij
     vim
 
     # Modern CLI & search
@@ -139,7 +134,6 @@ in
   environment.sessionVariables = {
     ATUIN_NOBIND = "true";
     JJ_CONFIG = "${config.directory}/${platformConfig}/jj/config.toml";
-    STARSHIP_CONFIG = "$HOME/.config/starship.toml";
     ZDOTDIR = "$HOME/.config/zsh";
     NIX_CONFIG_REV = inputs.self.rev or inputs.self.dirtyRev or "dirty";
     NIX_CONFIG_DIR = config.my.config.directory;
