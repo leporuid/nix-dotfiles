@@ -8,6 +8,22 @@
 let
   cfg = config.my.programs.neovim;
 
+  neovimWithDependencies = pkgs.symlinkJoin {
+    name = "neovim-with-dependencies";
+    paths = [ pkgs.neovim ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram "$out/bin/nvim" \
+        --prefix PATH : ${
+          lib.makeBinPath [
+            pkgs.curl
+            pkgs.tree-sitter
+            pkgs.ripgrep
+          ]
+        }
+    '';
+  };
+
   mkPluginLink =
     group: p:
     let
@@ -34,6 +50,10 @@ let
         type = lib.types.bool;
         default = false;
       };
+      recursive = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+      };
     };
   });
 in
@@ -51,7 +71,7 @@ in
 
   config = lib.mkIf cfg.enable {
     packages = [
-      pkgs.neovim
+      neovimWithDependencies
       pkgs.tree-sitter
       pkgs.ripgrep
     ];

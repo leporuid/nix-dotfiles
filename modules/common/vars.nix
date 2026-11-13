@@ -1,7 +1,7 @@
 # Shared host, user variables, and binary caches across macOS (nix-darwin) and Oracle (NixOS).
 {
-  pkgs,
   lib,
+  pkgs,
   ...
 }:
 let

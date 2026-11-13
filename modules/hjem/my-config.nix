@@ -173,6 +173,13 @@ in
     force = lib.mkOption {
       default = true;
       type = types.bool;
+      description = "Deprecated alias for clobber.";
+    };
+
+    clobber = lib.mkOption {
+      default = cfg.force;
+      defaultText = lib.literalExpression "config.my.config.force";
+      type = types.bool;
       description = "Whether the configuration links should override whatever exists already.";
     };
   };
@@ -183,13 +190,13 @@ in
       let
         nonNullSource = lib.filterAttrs (_: v: v != null) cfg.source;
         sourceFiles = lib.mapAttrs (
-          path: val: (renderConfigContent path val) // { inherit (cfg) force; }
+          path: val: (renderConfigContent path val) // { inherit (cfg) clobber; }
         ) nonNullSource;
 
         nonNullText = lib.filterAttrs (_: v: v != null) cfg.text;
         textFiles = builtins.mapAttrs (_: v: {
           text = renderConfigText v;
-          inherit (cfg) force;
+          inherit (cfg) clobber;
         }) nonNullText;
       in
       sourceFiles // textFiles;

@@ -1,8 +1,8 @@
 {
   inputs,
   config,
-  pkgs,
   lib,
+  pkgs,
   ...
 }:
 let
@@ -12,6 +12,12 @@ let
   ];
 in
 {
+  imports = [
+    inputs.nix-homebrew.darwinModules.nix-homebrew
+    inputs.mac-app-util.darwinModules.default
+    inputs.nixcord.darwinModules.nixcord
+  ];
+
   options.my.darwin.applications = {
     enable = lib.mkEnableOption "Darwin applications, nixcord, and Homebrew management" // {
       default = true;
@@ -20,16 +26,7 @@ in
 
   config = lib.mkIf cfg.enable {
     # =========================================================================
-    # 1. Imports and System Modules
-    # =========================================================================
-    imports = [
-      inputs.nix-homebrew.darwinModules.nix-homebrew
-      inputs.mac-app-util.darwinModules.default
-      inputs.nixcord.darwinModules.nixcord
-    ];
-
-    # =========================================================================
-    # 2. System Packages & Applications
+    # 1. System Packages & Applications
     # =========================================================================
     environment.systemPackages = [
       inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re

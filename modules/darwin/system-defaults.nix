@@ -1,8 +1,8 @@
 {
   inputs,
-  pkgs,
   config,
   lib,
+  pkgs,
   vars,
   ...
 }:
@@ -10,6 +10,12 @@ let
   cfg = config.my.darwin.system;
 in
 {
+  imports = [
+    inputs.determinate.darwinModules.default
+    ../common/vars.nix
+    inputs.nix-index-database.darwinModules.nix-index
+  ];
+
   options.my.darwin.system = {
     enable = lib.mkEnableOption "Darwin system defaults, launchd daemons, and core settings" // {
       default = true;
@@ -18,16 +24,7 @@ in
 
   config = lib.mkIf cfg.enable {
     # =========================================================================
-    # 1. Imports and System Modules
-    # =========================================================================
-    imports = [
-      inputs.determinate.darwinModules.default
-      ../common/vars.nix
-      inputs.nix-index-database.darwinModules.nix-index
-    ];
-
-    # =========================================================================
-    # 2. Environment, System Packages, and Local DNS Settings
+    # 1. Environment, System Packages, and Local DNS Settings
     # =========================================================================
     environment.etc = {
       "resolver/ts.net".text = ''

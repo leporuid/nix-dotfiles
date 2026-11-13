@@ -1,10 +1,10 @@
 # Self-contained native NixOS configuration for Oracle Cloud ARM A1 (nixos).
 {
+  inputs,
+  config,
   lib,
   pkgs,
-  inputs,
   vars,
-  config,
   ...
 }:
 {

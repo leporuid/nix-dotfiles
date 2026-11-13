@@ -1,14 +1,12 @@
 {
-  pkgs,
   inputs,
   lib,
+  pkgs,
   vars,
   ...
 }:
 {
   imports = [
-    inputs.determinate.darwinModules.default
-    ../../modules/common/vars.nix
     ../../modules/darwin
     ../../modules/nixos/host-shared.nix
   ];
@@ -28,6 +26,7 @@
   ];
 
   nixpkgs.hostPlatform = "aarch64-darwin";
+  nixpkgs.config.allowUnfree = true;
 
   system.primaryUser = vars.username;
   system.stateVersion = 6;
@@ -36,7 +35,6 @@
   users.users.${vars.username} = {
     inherit (vars) description;
     home = vars.homeDirectory;
-    shell = pkgs.fish;
     openssh.authorizedKeys = {
       keys = vars.sshKeys;
       keyFiles = vars.sshKeyFiles;

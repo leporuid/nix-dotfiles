@@ -1,8 +1,8 @@
 {
+  inputs,
   config,
   lib,
   pkgs,
-  inputs,
   ...
 }:
 let
@@ -34,8 +34,8 @@ in
   config = lib.mkIf cfg.enable {
     packages = [ cfg.package ];
 
-    # Fish shell integration: auto-loads from conf.d
-    files.".config/fish/conf.d/direnv-instant.fish".text = ''
+    # Fish shell integration: auto-loads from vendor_conf.d
+    files.".local/share/fish/vendor_conf.d/direnv-instant.fish".text = ''
       if status is-interactive
         set -gx DIRENV_INSTANT_USE_CACHE ${if cfg.useCache then "1" else "0"}
         set -gx DIRENV_INSTANT_MUX_DELAY ${toString cfg.muxDelay}

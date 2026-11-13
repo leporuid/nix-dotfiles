@@ -19,7 +19,10 @@ in
     rum.programs.fish.enable = true;
 
     my.config.source = {
-      ".config/fish" = "fish";
+      ".config/fish/completions" = "fish/completions";
+      ".config/fish/conf.d" = "fish/conf.d";
+      ".config/fish/config.fish" = "fish/config.fish";
+      ".config/fish/functions" = "fish/functions";
     };
 
     packages = with pkgs; [

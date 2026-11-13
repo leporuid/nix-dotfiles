@@ -1,13 +1,19 @@
 {
-  pkgs,
   inputs,
+  config,
   lib,
+  pkgs,
   ...
 }:
+let
+  isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
+  platformConfig = if isDarwin then "Library/Application Support" else ".config";
+in
 {
   # 1. Modular feature imports in moni-dz style
   imports = [
     ../../modules/hjem
+    ../../config/nvim/plugins.nix
   ];
 
   # 2. Hjem-Impure: out-of-store symlinking for live dotfile editing without rebuilds
@@ -41,29 +47,32 @@
       ".config/zellij" = "zellij";
 
       # Terminals
-      ".config/ghostty" = "ghostty";
+      ".config/ghostty/config" = "ghostty/config";
+      ".config/ghostty/os-config" =
+        if isDarwin then "ghostty/os-config-darwin" else "ghostty/os-config-linux";
       ".config/foot" = "foot";
       ".config/kitty" = "kitty";
 
       # Version Control & Tools
       ".config/git" = "git";
-      ".config/jj" = "jj";
-      ".config/direnv" = "direnv";
+      "${platformConfig}/jj" = "jj";
+      ".config/direnv/direnv.toml" = "direnv/direnv.toml";
       ".config/atuin" = "atuin";
       ".config/mise" = "mise";
       ".config/gallery-dl" = "gallery-dl";
       ".config/syntax-highlight" = "syntax-highlight";
       ".npmrc" = "npm/npmrc";
 
-      # macOS Utilities
-      ".config/btt" = "btt";
-      ".config/raycast" = "raycast";
-
       # Agents & Skills
       ".claude/settings.json" = "claude/settings.json";
       ".agents/skills" = "agents/skills";
       ".claude/skills" = "agents/skills";
       ".gemini/skills" = "gemini/skills";
+    }
+    // lib.optionalAttrs isDarwin {
+      # macOS Utilities
+      ".config/btt" = "btt";
+      ".config/raycast" = "raycast";
     };
   };
 
@@ -76,7 +85,7 @@
     sheldon
 
     # Editors & multiplexers
-    helix
+    inputs.helix.packages.${pkgs.stdenv.hostPlatform.system}.helix
     tmux
     zellij
     vim
@@ -112,6 +121,7 @@
 
     # Nix & formatting tools
     nil
+    nixfmt
     nix-output-monitor
     taplo
     ast-grep
@@ -126,8 +136,21 @@
     inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.ktoolbox
   ];
 
-  # 6. Native Hjem files (text content & external derivations)
+  # 6. Session environment variables (POSIX script via Hjem environment.loadEnv)
+  environment.sessionVariables = {
+    ATUIN_NOBIND = "true";
+    JJ_CONFIG = "${config.directory}/${platformConfig}/jj/config.toml";
+    STARSHIP_CONFIG = "$HOME/.config/starship.toml";
+    ZDOTDIR = "$HOME/.config/zsh";
+    NIX_CONFIG_REV = inputs.self.rev or inputs.self.dirtyRev or "dirty";
+    NIX_CONFIG_DIR = config.my.config.directory;
+    NIX_CONFIG_LAST_MODIFIED = builtins.toString (inputs.self.lastModified or 0);
+  };
+
+  # 7. Native Hjem files (text content & external derivations)
   files = {
+    ".local/share/zsh/hm-session-vars.sh".source = config.environment.loadEnv;
+
     ".config/welcome.txt".text = ''
       Welcome Yu-Min Peng!
       Your home files and configurations are managed by Hjem + Hjem-Rum + my-config on red-tape.
@@ -140,9 +163,14 @@
     ".config/direnv/lib/nix-direnv.sh" = {
       source = "${pkgs.nix-direnv}/share/nix-direnv/direnvrc";
     };
+
+    # Unified agent instructions distribution across harnesses
+    ".claude/CLAUDE.md".source = ../../AGENTS.md;
+    ".codex/AGENTS.md".source = ../../AGENTS.md;
+    ".config/opencode/AGENTS.md".source = ../../AGENTS.md;
   };
 
-  # 7. Hjem-Rum module ecosystem (under rum.programs.*)
+  # 8. Hjem-Rum module ecosystem (under rum.programs.*)
   rum.programs = {
     git = {
       enable = true;

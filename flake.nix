@@ -21,8 +21,6 @@
     # Determinate Nix: Determinate Systems' Nix distribution & daemon (do not follow nixpkgs)
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
 
-    
-
     # Hjem: lightweight $HOME manager alternative to Home Manager
     hjem.url = "github:feel-co/hjem";
     hjem.inputs.nixpkgs.follows = "nixpkgs";
@@ -112,10 +110,15 @@
   };
 
   # Load red-tape via mkFlake
-  outputs = inputs:
+  outputs =
+    { self, ... }@inputs:
     inputs.red-tape.mkFlake {
-      inherit inputs;
+      inherit self inputs;
       src = ./.;
+      modules = [
+        inputs.red-tape.modules.redTape.darwin
+        inputs.red-tape.modules.redTape.hjem
+      ];
       systems = [
         "aarch64-darwin"
         "aarch64-linux"
