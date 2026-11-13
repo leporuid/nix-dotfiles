@@ -25,9 +25,11 @@ in
   };
 
   # 3. Enable domain modules
-  my.themes.enable = isDarwin;
-  my.programs.fish.enable = isDarwin;
-  my.programs.neovim.enable = isDarwin;
+  my.themes.enable = true;
+  my.programs.fish.enable = true;
+  my.programs.neovim.enable = true;
+  my.programs.ghostty.enable = true;
+  my.programs.helix.enable = true;
 
   # 4. Declarative configuration synthesis engine (my-config)
   my.config = {
@@ -42,15 +44,11 @@ in
       ".zshenv" = "zsh/home_zshenv";
 
       # Development & Editors
-      ".config/helix" = "helix";
       ".config/zed" = "zed";
       ".config/tmux" = "tmux";
       ".config/zellij" = "zellij";
 
       # Terminals
-      ".config/ghostty/config" = "ghostty/config";
-      ".config/ghostty/os-config" =
-        if isDarwin then "ghostty/os-config-darwin" else "ghostty/os-config-linux";
       ".config/foot" = "foot";
       ".config/kitty" = "kitty";
 
@@ -174,7 +172,7 @@ in
   # 8. Hjem-Rum module ecosystem (under rum.programs.*)
   rum.programs = {
     git = {
-      enable = isDarwin;
+      enable = true;
       settings = {
         user = {
           name = "Yu-Min Peng";

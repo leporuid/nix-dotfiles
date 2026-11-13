@@ -6,6 +6,8 @@
     ./themes.nix
     ./neovim.nix
     ./fish.nix
+    ./helix.nix
+    ./ghostty.nix
     ./direnv-instant.nix
     ./nixcord.nix
   ];
