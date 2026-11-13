@@ -18,15 +18,16 @@ in
 
   # 2. Hjem-Impure: out-of-store symlinking for live dotfile editing without rebuilds
   impure = {
-    enable = true;
+    # Enable out-of-store symlinks on macOS; use pure store paths on headless NixOS
+    enable = isDarwin;
     dotsDir = "${../../config}";
     dotsDirImpure = "${config.directory}/Developer/nix-dotfiles/config";
   };
 
   # 3. Enable domain modules
-  my.themes.enable = true;
-  my.programs.fish.enable = true;
-  my.programs.neovim.enable = true;
+  my.themes.enable = isDarwin;
+  my.programs.fish.enable = isDarwin;
+  my.programs.neovim.enable = isDarwin;
 
   # 4. Declarative configuration synthesis engine (my-config)
   my.config = {
@@ -173,7 +174,7 @@ in
   # 8. Hjem-Rum module ecosystem (under rum.programs.*)
   rum.programs = {
     git = {
-      enable = true;
+      enable = isDarwin;
       settings = {
         user = {
           name = "Yu-Min Peng";

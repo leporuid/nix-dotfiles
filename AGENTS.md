@@ -1,4 +1,4 @@
-# Agent Guide (`nixos-and-darwin-shared-hjem`)
+# Agent Guide (`nix-dotfiles`)
 
 This repository collects project-specific expectations, tool contracts, and architectural guardrails for automated coding agents working across macOS (`nix-darwin`) and Linux (`NixOS`) powered by **`red-tape`**, **`adios-flake`**, **`hjem`**, and **`hjem-impure`**.
 
