@@ -49,7 +49,7 @@ This repository primarily manages my macOS daily-driver environment, with additi
 
 | Host | Platform | Role | Status |
 | --- | --- | --- | --- |
-| MacBook-Pro | macOS | Primary workstation | Active |
+| MacBook-Pro | macOS | Primary machine | Active |
 | nixos | NixOS | VPS / Server | Configured |
 | nixos-vm | NixOS | Linux Builder experimentation | Experimental |
 
