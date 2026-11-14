@@ -7,6 +7,12 @@
 }:
 let
   cfg = config.my.programs.fish;
+
+  # Link individual conf.d files so rum-environment-variables.fish is not clobbered
+  confDFiles = lib.pipe (builtins.readDir ../../config/fish/conf.d) [
+    (lib.filterAttrs (name: type: type == "regular" && lib.hasSuffix ".fish" name))
+    (lib.mapAttrs' (name: _: lib.nameValuePair ".config/fish/conf.d/${name}" "fish/conf.d/${name}"))
+  ];
 in
 {
   options.my.programs.fish = {
@@ -20,10 +26,10 @@ in
 
     my.config.source = {
       ".config/fish/completions" = "fish/completions";
-      ".config/fish/conf.d" = "fish/conf.d";
       ".config/fish/config.fish" = "fish/config.fish";
       ".config/fish/functions" = "fish/functions";
-    };
+    }
+    // confDFiles;
 
     packages = with pkgs; [
       fish

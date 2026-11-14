@@ -7,7 +7,6 @@
 }:
 let
   isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
-  platformConfig = if isDarwin then "Library/Application Support" else ".config";
 in
 {
   # 1. Modular feature imports in moni-dz style
@@ -15,21 +14,17 @@ in
     ../../modules/hjem
     ../../config/nvim/plugins.nix
   ];
-  # 2. Hjem-Impure: out-of-store symlinking for live dotfile editing without rebuilds
-  impure = {
-    # Enable out-of-store symlinks on macOS; use pure store paths on headless NixOS
-    enable = isDarwin;
-    dotsDir = "${../../config}";
-    dotsDirImpure = "${config.directory}/Developer/nix-dotfiles/config";
-  };
   my = {
-    # 3. Enable domain modules
+    # 2. Enable domain modules
     themes.enable = true;
     programs = {
+      atuin.enable = true;
+      direnv.enable = true;
       fish.enable = true;
-      neovim.enable = true;
       ghostty.enable = true;
       helix.enable = true;
+      jujutsu.enable = true;
+      neovim.enable = true;
       nushell.enable = true;
       starship.enable = true;
       tmux.enable = true;
@@ -39,6 +34,7 @@ in
     config = {
       directory = "${config.directory}/Developer/nix-dotfiles/config";
       storeDirectory = ../../config;
+      useOutOfStoreSymlinks = isDarwin;
       source = {
         # Shells
         ".config/sheldon" = "sheldon";
@@ -54,9 +50,6 @@ in
 
         # Version Control & Tools
         ".config/git" = "git";
-        "${platformConfig}/jj" = "jj";
-        ".config/direnv/direnv.toml" = "direnv/direnv.toml";
-        ".config/atuin" = "atuin";
         ".config/mise" = "mise";
         ".config/gallery-dl" = "gallery-dl";
         ".config/syntax-highlight" = "syntax-highlight";
@@ -81,7 +74,6 @@ in
   packages =
     (with pkgs; [
       # Shell & prompt
-      atuin
       sheldon
 
       # Editors
@@ -98,15 +90,12 @@ in
       # Version control
       git
       lazygit
-      jujutsu
       delta
       gh
       git-open
 
       # Build tools, languages & dev environments
       just
-      direnv
-      nix-direnv
       mise
       bun
       uv
@@ -143,9 +132,7 @@ in
     ];
   # 6. Session environment variables (POSIX script via Hjem environment.loadEnv)
   environment.sessionVariables = {
-    ATUIN_NOBIND = "true";
-    JJ_CONFIG = "${config.directory}/${platformConfig}/jj/config.toml";
-    ZDOTDIR = "$HOME/.config/zsh";
+    ZDOTDIR = "${config.directory}/.config/zsh";
     NIX_CONFIG_REV = inputs.self.rev or inputs.self.dirtyRev or "dirty";
     NIX_CONFIG_DIR = config.my.config.directory;
     NIX_CONFIG_LAST_MODIFIED = builtins.toString (inputs.self.lastModified or 0);
@@ -163,10 +150,6 @@ in
 
     ".config/ghostty/shaders" = {
       source = inputs.ghostty-cursor-shaders;
-    };
-
-    ".config/direnv/lib/nix-direnv.sh" = {
-      source = "${pkgs.nix-direnv}/share/nix-direnv/direnvrc";
     };
 
     # Unified agent instructions distribution across harnesses

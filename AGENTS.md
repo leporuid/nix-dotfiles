@@ -1,6 +1,6 @@
 # Agent Guide (`nix-dotfiles`)
 
-This repository collects project-specific expectations, tool contracts, and architectural guardrails for automated coding agents working across macOS (`nix-darwin`) and Linux (`NixOS`) powered by **`red-tape`**, **`adios-flake`**, **`hjem`**, and **`hjem-impure`**.
+This repository collects project-specific expectations, tool contracts, and architectural guardrails for automated coding agents working across macOS (`nix-darwin`) and Linux (`NixOS`) powered by **`red-tape`**, **`adios-flake`**, **`hjem`**, and **`hjem-rum`**.
 
 ---
 
@@ -9,7 +9,7 @@ This repository collects project-specific expectations, tool contracts, and arch
 | Directory / File | Description & Purpose |
 | :--- | :--- |
 | `flake.nix` | Root `red-tape.mkFlake` entrypoint; tracks inputs, system matrix, `hjemModules` output, and `overlays.default`. |
-| `devshell.nix` | Developer shell toolchain (`llm-agents`, `agenix` with `age`, `nixos-rebuild`, `nixos-anywhere`, linters) sourcing `git-hooks.nix`. |
+| `devshell.nix` | Developer shell toolchain (`mkShellNoCC`: `llm-agents`, `agenix` with `age`, `nixos-rebuild`, `nixos-anywhere`, linters) sourcing `git-hooks.nix`. |
 | `formatter.nix` | Root `treefmt-nix` formatter entrypoint delegating to `treefmt.nix`. |
 | `treefmt.nix` | Unified formatter and linter rules (`deadnix`, `statix`, `nixfmt`, `fish_indent`, `shfmt`, `taplo`, `yamlfmt`). |
 | `pedantix.toml` | Nix code style and argument sorting rules enforced across the repository. |
@@ -19,7 +19,7 @@ This repository collects project-specific expectations, tool contracts, and arch
 | `hosts/nixos-vm/` | Lightweight NixOS VM configuration. |
 | `modules/darwin/` | Darwin system modules (`applications.nix`, `system-defaults.nix`, `hjem.nix`). |
 | `modules/nixos/` | NixOS system modules (`hjem.nix`). |
-| `modules/hjem/` | User-level Hjem modules (`default.nix`, `my-config.nix`, `themes.nix`, `fish.nix`, `neovim.nix`, `helix.nix`, `ghostty.nix`, `starship.nix`, `nushell.nix`, `tmux.nix`, `zellij.nix`, `direnv-instant.nix`, `nixcord.nix`). |
+| `modules/hjem/` | User-level Hjem modules (`default.nix`, `my-config.nix`, `themes.nix`, `fish.nix`, `neovim.nix`, `helix.nix`, `ghostty.nix`, `starship.nix`, `nushell.nix`, `tmux.nix`, `zellij.nix`, `atuin.nix`, `direnv.nix`, `direnv-instant.nix`, `jujutsu.nix`, `nixcord.nix`). |
 | `modules/common/` | Shared platform configurations (`vars.nix`, `hjem.nix`). |
 | `packages/*.nix` | Custom derivations and package wrappers consumed via `inputs.self.packages.<system>.<name>`. |
 | `users/leporuid/` | Shared user profile (`home-configuration.nix`) managing packages and files. |
@@ -34,11 +34,11 @@ This repository collects project-specific expectations, tool contracts, and arch
   - **Profile Lifecycle**: Manage profile generations via `nix profile wipe-history [--profile <path>] [--older-than <duration>]`.
   - **Store Management**: Run store garbage collection via `nix store gc --verbose` and hard-link deduplication via `nix store optimise --verbose`.
   - **Build Diagnostics**: Use `nix top` and `nix ps` for active build process inspection and memory monitoring.
-- **Home Management via Hjem & Hjem-Impure**:
+- **Home Management via Hjem**:
   - Replaces heavy Home Manager with ultra-lightweight `hjem`.
   - **Clobber Invariant**: Always ensure `hjem.clobberByDefault = true;` to avoid collisions with existing files. File overrides use the `clobber` attribute (never deprecated `force`).
   - **No Empty Files**: Hjem modules must never generate empty or placeholder files.
-  - **Impure Dev Mode**: Run `hjem-impure` in terminal to replace immutable store symlinks with live links pointing directly back to `config/`.
+  - **Out-of-Store Symlinks (macOS)**: `my.config.useOutOfStoreSymlinks = isDarwin;` links `config/` directly on macOS for live edits without rebuilds, while keeping Linux hosts on pure Nix store paths.
 - **Formatting & Style**:
   - Code formatting is managed via `treefmt` (`nix fmt`).
   - Function argument ordering is strictly enforced by `pedantix.toml`:
@@ -47,7 +47,7 @@ This repository collects project-specific expectations, tool contracts, and arch
   | Changed Paths | Required Verification Before Commit / Push |
   | :--- | :--- |
   | `*.nix`, `flake.lock`, `hosts/`, `users/`, `modules/`, `packages/` | `nix fmt`, `nix flake check`, and host evaluation check (`darwinConfigurations.MacBook-Pro` & `nixosConfigurations.nixos`) |
-  | Only `config/**` (raw dotfiles) | May skip full rebuild; test with `hjem-impure` |
+  | Only `config/**` (raw dotfiles) | Takes effect immediately on macOS via `useOutOfStoreSymlinks` (no rebuild required) |
   | Newly added / deleted files referenced by Nix expressions | Must run `git add` before evaluating (`nix flake check` requires tracked files) |
   - **Never Mask Exit Codes**: Never pipe verification commands directly into `tail` or `head` without preserving pipeline status. Evaluate success strictly by exit code (`$? == 0`).
 
@@ -74,7 +74,7 @@ This repository collects project-specific expectations, tool contracts, and arch
   - Custom Hjem program options are located under `my.programs.<program>` (e.g., `my.programs.fish`, `my.programs.ghostty`, `my.programs.starship`, `my.programs.neovim`), while Hjem-Rum modules are under `rum.programs.<program>` (e.g., `rum.programs.git`).
 - **Raw Application Configurations (`config/`)**:
   - Keep application configurations directly under root `config/`.
-  - Linked via Hjem `files` (`my.config.source`) and managed live via `impure.dotsDir` / `impure.dotsDirImpure` (`hjem-impure`).
+  - Linked via Hjem `files` (`my.config.source`) and managed live on macOS via `my.config.useOutOfStoreSymlinks = isDarwin;`.
 
 ---
 

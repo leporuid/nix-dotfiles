@@ -12,7 +12,10 @@
     ./starship.nix
     ./nushell.nix
     ./ghostty.nix
+    ./atuin.nix
+    ./direnv.nix
     ./direnv-instant.nix
+    ./jujutsu.nix
     ./nixcord.nix
   ];
 }

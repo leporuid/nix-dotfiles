@@ -23,7 +23,7 @@ in
     packages = [ cfg.package ];
 
     environment.sessionVariables = {
-      STARSHIP_CONFIG = "$HOME/.config/starship.toml";
+      STARSHIP_CONFIG = "${config.directory}/.config/starship.toml";
     };
 
     my.config.source = {

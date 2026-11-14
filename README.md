@@ -16,7 +16,7 @@ This project uses a personal fork of red-tape, originally created by [Phaer](htt
 2. **Home Manager-Free User Configuration**
    - Uses [Hjem](https://github.com/feel-co/hjem) as a native NixOS and nix-darwin module for declarative user environment management.
    - Uses [Hjem-Rum](https://github.com/snugnug/hjem-rum) (`rum.programs.*`) alongside custom Hjem modules (`my.programs.*`) for reusable program configurations.
-   - Integrates [Hjem-Impure](https://github.com/Rexcrazy804/hjem-impure) on macOS for out-of-store symlinking and live dotfile editing without rebuilding the system, while keeping Linux hosts on pure Nix store paths.
+   - Uses `my.config.useOutOfStoreSymlinks` on macOS for live dotfile editing without rebuilding the system, while keeping Linux hosts on pure Nix store paths.
    - Eliminates the need for Home Manager while keeping user configurations modular and declarative.
 
 3. **Multi-Platform Configuration**
@@ -63,7 +63,6 @@ Each host maintains its own system configuration while sharing common user-level
 | [adios-flake](https://github.com/Mic92/adios-flake) | Modular flake output composition |
 | [Hjem](https://github.com/feel-co/hjem) | User environment management |
 | [Hjem-Rum](https://github.com/snugnug/hjem-rum) | Reusable program configuration modules |
-| [Hjem-Impure](https://github.com/Rexcrazy804/hjem-impure) | Out-of-store dotfile symlinking (macOS) |
 | [nix-darwin](https://github.com/nix-darwin/nix-darwin) | macOS system configuration |
 | [NixOS](https://github.com/NixOS/nixpkgs) | Linux system configuration |
 | [treefmt-nix](https://github.com/numtide/treefmt-nix) | Code formatting |
@@ -89,7 +88,7 @@ Flake outputs include:
 - `devShells`, `formatter` (`formatter.nix`), and `checks` for development environments, formatting, and CI validation.
 
 ## Acknowledgements
-
+- [clo4](https://github.com/clo4) — Original inspiration for this configuration ([clo4/nix-dotfiles](https://github.com/clo4/nix-dotfiles)).
 - [Phaer](https://github.com/phaer) — Original author of [red-tape](https://github.com/phaer/red-tape).
 - [Otavio](https://github.com/otavio) — Author of the red-tape fork and host-building improvements in [PR #7](https://github.com/phaer/red-tape/pull/7).
 - [Mic92](https://github.com/Mic92) — Author and maintainer of [adios-flake](https://github.com/Mic92/adios-flake).
