@@ -1,6 +1,23 @@
 command_timeout = 1000
 add_newline = false
 continuation_prompt = "[▸▹ ](dimmed white)"
+palette = "soft_neon_violet"
+
+[palettes.soft_neon_violet]
+background = "#170032"
+deep = "#3F0474"
+pink = "#C026D3"
+violet = "#A855F7"
+lavender = "#C9A7D8"
+text = "#EAD7FF"
+bright = "#F8EEFF"
+muted = "#A06E86"
+subtle = "#8176B8"
+red = "#B96F91"
+green = "#91AE9A"
+yellow = "#C8AB86"
+blue = "#8176B8"
+cyan = "#8FA5B9"
 
 format = """($nix_shell$container$fill$git_metrics$hostname)\n
 $sudo\
@@ -15,10 +32,9 @@ symbol = ' '
 
 [character]
 format = "$symbol "
-success_symbol = "[◎](bold italic bright-yellow)"
-error_symbol = "[⊘](italic purple)"
-#error_symbol = "[○](italic purple)"
-vimcmd_symbol = "[■](italic dimmed green)"
+success_symbol = "[◎](bold italic pink)"
+error_symbol = "[⊘](italic red)"
+vimcmd_symbol = "[■](italic green)"
 # not supported in zsh
 vimcmd_replace_one_symbol = "◌"
 vimcmd_replace_symbol = "□"
@@ -30,7 +46,7 @@ style = 'green italic'
 
 [sudo]
 format = "[$symbol]($style)"
-style = "bold italic bright-purple"
+style = "bold italic pink"
 symbol = "⋈┈"
 disabled = false
 
@@ -48,15 +64,16 @@ ssh_symbol = ""
 [directory]
 home_symbol = "⌂"
 #home_symbol = "󰋞"
-truncation_length = 2
-fish_style_pwd_dir_length = 1                                                                                                                                      # turn on fish directory truncation
+truncation_length = 3
+fish_style_pwd_dir_length = 1                                                                                                                               # turn on fish directory truncation
 truncation_symbol = "□ "
 read_only = " ◈"
+read_only_style = "subtle"
 use_os_path_sep = true
-style = "italic blue"
+style = "italic violet"
 format = '[$path]($style)[$read_only]($read_only_style)'
-repo_root_style = 'bold blue'
-repo_root_format = '[$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style) [△](bold bright-blue)'
+repo_root_style = 'bold lavender'
+repo_root_format = '[$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style) [△](bold pink)'
 
 [directory.substitutions]
 '/opt/homebrew' = ""
@@ -69,13 +86,15 @@ repo_root_format = '[$before_root_path]($before_repo_root_style)[$repo_root]($re
 'iCloud Drive' = "󰀸"
 
 [cmd_duration]
-format = "[◄ $duration ](italic white)"
-disabled = true
+format = "[◄ $duration ](italic muted)"
+min_time = 2000
+show_milliseconds = false
+disabled = false
 
 [jobs]
 format = "[$symbol$number]($style) "
-style = "white"
-symbol = "[▶](blue italic)"
+style = "muted"
+symbol = "[▶](violet italic)"
 
 [localip]
 ssh_only = true
@@ -110,45 +129,44 @@ threshold = 70
 style = "italic dimmed yellow"
 
 [git_branch]
-format = " [$branch(:$remote_branch)]($style)"
-#symbol = "[◬](bold italic bright-blue)"
-symbol = "[△](bold italic bright-blue)"
-style = "italic bright-blue"
+format = " [$symbol$branch(:$remote_branch)]($style)"
+symbol = "[△](bold italic pink)"
+style = "italic violet"
 truncation_symbol = "⋯"
-truncation_length = 11
+truncation_length = 15
 ignore_branches = ["main", "master"]
 only_attached = true
 
 [git_metrics]
 format = '([▴$added]($added_style))([▿$deleted]($deleted_style))'
-added_style = 'italic dimmed green'
-deleted_style = 'italic dimmed red'
+added_style = 'italic green'
+deleted_style = 'italic pink'
 ignore_submodules = true
 disabled = false
 
 [git_status]
-style = "bold italic bright-blue"
+style = "bold italic lavender"
 format = "([⎪$ahead_behind$staged$modified$untracked$renamed$deleted$conflicted$stashed⎥]($style))"
-conflicted = "[◪◦](italic bright-magenta)"
-ahead = "[▴│[${count}](bold white)│](italic green)"
-behind = "[▿│[${count}](bold white)│](italic red)"
-diverged = "[◇ ▴┤[${ahead_count}](regular white)│▿┤[${behind_count}](regular white)│](italic bright-magenta)"
-untracked = "[◌◦](italic bright-yellow)"
-stashed = "[◃◈](italic white)"
+conflicted = "[◪◦](italic pink)"
+ahead = "[▴│[${count}](bold bright)│](italic green)"
+behind = "[▿│[${count}](bold bright)│](italic pink)"
+diverged = "[◇ ▴┤[${ahead_count}](regular bright)│▿┤[${behind_count}](regular bright)│](italic pink)"
+untracked = "[◌◦](italic violet)"
+stashed = "[◃◈](italic muted)"
 modified = "[●◦](italic yellow)"
-staged = "[▪┤[$count](bold white)│](italic bright-cyan)"
-renamed = "[◎◦](italic bright-blue)"
+staged = "[▪┤[${count}](bold bright)│](italic violet)"
+renamed = "[◎◦](italic blue)"
 deleted = "[✕](italic red)"
 
 [deno]
-format = " [deno](italic) [ $version](green bold)"
+format = " [deno](italic) [ $version](violet bold)"
 version_format = "${raw}"
 
 [lua]
 format = " [lua](italic) [${symbol}${version}]($style)"
 version_format = "${raw}"
 symbol = " "
-style = "bold bright-yellow"
+style = "bold violet"
 
 [nodejs]
 format = " [󰎙 (italic)](bold bright-green)"
@@ -162,30 +180,30 @@ disabled = true
 format = " [py](italic) [${symbol}${version}]($style)"
 symbol = "[⌉](bold bright-blue)⌊ "
 version_format = "${raw}"
-style = "bold bright-yellow"
+style = "bold violet"
 
 [ruby]
 format = " [rb](italic) [${symbol}${version}]($style)"
 symbol = "◆ "
 version_format = "${raw}"
-style = "bold red"
+style = "bold pink"
 
 [rust]
 format = " [rs](italic) [$symbol$version]($style)"
 symbol = " "
 version_format = "${raw}"
-style = "bold red"
+style = "bold violet"
 
 [package]
 format = " [pkg](italic dimmed) [$symbol$version]($style)"
 version_format = "${raw}"
 symbol = "󰏖 "
-style = "dimmed yellow italic bold"
+style = "bold muted"
 
 [swift]
 format = " [sw](italic) [${symbol}${version}]($style)"
 symbol = " "
-style = "bold bright-red"
+style = "bold pink"
 version_format = "${raw}"
 
 [aws]
@@ -235,6 +253,7 @@ format = " elm [$symbol($version )]($style)"
 [golang]
 #symbol = "∩ "
 symbol = " "
+style = "bold lavender"
 format = " go [$symbol($version )]($style)"
 
 [haskell]
@@ -262,12 +281,12 @@ symbol = " "
 format = " nim [$symbol($version )]($style)"
 
 [nix_shell]
-style = 'bold italic dimmed blue'
+style = 'bold italic violet'
 symbol = '✶'
-format = '[$symbol⎪$state⎪]($style) '
-impure_msg = '[⌽](bold dimmed red)'
-pure_msg = '[⌾](bold dimmed green)'
-unknown_msg = '[◌](bold dimmed yellow)'
+format = '[$symbol⎪$state⎪]($style) [$name](italic muted) '
+impure_msg = '[⌽](bold pink)'
+pure_msg = '[⌾](bold green)'
+unknown_msg = '[◌](bold muted)'
 
 [spack]
 #symbol = "◇ "

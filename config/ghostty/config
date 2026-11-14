@@ -11,8 +11,36 @@ background-opacity = 0.92
 background-blur-radius = 20
 link-url = true
 auto-update-channel = stable
-theme = "Glass"
 shell-integration-features = no-cursor
+
+# Soft Neon Violet color scheme
+background = #170032
+foreground = #EAD7FF
+
+palette = 0=#170D20
+palette = 1=#B96F91
+palette = 2=#91AE9A
+palette = 3=#C8AB86
+palette = 4=#8176B8
+palette = 5=#C026D3
+palette = 6=#8FA5B9
+palette = 7=#DCCBEA
+
+palette = 8=#62536E
+palette = 9=#D58AAA
+palette = 10=#AAC5B0
+palette = 11=#E0C39E
+palette = 12=#A99AE0
+palette = 13=#D65CDE
+palette = 14=#B4C6D8
+palette = 15=#F8EEFF
+
+cursor-color = #C026D3
+cursor-text = #170032
+cursor-style = underline
+
+selection-background = #3F0474
+selection-foreground = #F8EEFF
 
 
 # This file will be linked to the appropriate os-config file depending on the current platform
