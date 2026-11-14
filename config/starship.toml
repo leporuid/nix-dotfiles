@@ -267,7 +267,7 @@ symbol = '✶'
 format = '[$symbol⎪$state⎪]($style) '
 impure_msg = '[⌽](bold dimmed red)'
 pure_msg = '[⌾](bold dimmed green)'
-unknown_msg = '[◌](bold dimmed ellow)'
+unknown_msg = '[◌](bold dimmed yellow)'
 
 [spack]
 #symbol = "◇ "

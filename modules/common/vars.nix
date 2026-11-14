@@ -58,8 +58,8 @@ in
 
       sshKeys = [
         # SSH ID - @leporuid
-        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBN6rDDWpOzuVy7v8foYFJdjlcNJBZpmZcwZWWhoa3dbprqJGRClVKyg1NYNj1a3D43XvxeA+Vd1AgaAQDrSIbIE="
-
+        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBC/CoiKLL0z+HwqsGgfaBzt2wxuXbf/qBzldpIrPj7n7G8v2VXJPbATbSgZBRZV0Ss+peT2hkMNKvdnHC95XWfo="
+        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBDjpuPuSa1+ds+Nd34aF38YgU5E8QIGDAyP3NpIlODxCMS4/BgWtUORoQJiTqW1yWAnyomN/g4eqVt6XczCm6Sk="
         # My iPhone, blink terminal
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGr7upNdIAAtGkiQaUkCaj5g6QW843fL3bbsJyP/0tAB"
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDrcoI6oOTch+FI7XVlJ5eYJaGx4ZO2noO9GcXVFMhn9"

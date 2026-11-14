@@ -1,4 +1,4 @@
-scrollback-limit = 100000000
+scrollback-limit = 10000000
 window-padding-color = extend
 font-family = "Maple Mono NF CN"
 font-feature = "zero, cv01, cv02, cv33, cv34, cv35, cv36, cv96, cv97, cv98, cv99, ss03, ss05, ss07, ss08"
@@ -10,7 +10,6 @@ window-theme = auto
 background-opacity = 0.92
 background-blur-radius = 20
 link-url = true
-cursor-style = "underline"
 auto-update-channel = stable
 theme = "Glass"
 shell-integration-features = no-cursor

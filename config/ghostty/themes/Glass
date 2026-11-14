@@ -1,22 +1,42 @@
-palette = 0=#24212A
-palette = 1=#D97A8A
-palette = 2=#A6C8A1
-palette = 3=#E5C07B
-palette = 4=#8FB8D8
-palette = 5=#CBA6F7
-palette = 6=#8FC9C3
-palette = 7=#D6D0DD
-palette = 8=#625B6B
-palette = 9=#E28B9A
-palette = 10=#B6D7B0
-palette = 11=#F0D39A
-palette = 12=#A8C9E8
-palette = 13=#C084FC
-palette = 14=#9ADBD3
-palette = 15=#F2ECF7
-background = #24212A
-foreground = #D6D0DD
-cursor-color = #CBA6F7
-cursor-text = #24212A
-selection-background = #4A3F5C
-selection-foreground = #F2ECF7
+
+# ==========================================
+# Soft Neon Violet
+# ==========================================
+
+# Background & Foreground
+background = #170032
+foreground = #EAD7FF
+
+# ANSI Normal (0-7)
+palette = 0=#170D20
+palette = 1=#B96F91
+palette = 2=#91AE9A
+palette = 3=#C8AB86
+palette = 4=#8176B8
+palette = 5=#C026D3
+palette = 6=#8FA5B9
+palette = 7=#DCCBEA
+
+# ANSI Bright (8-15)
+palette = 8=#62536E
+palette = 9=#D58AAA
+palette = 10=#AAC5B0
+palette = 11=#E0C39E
+palette = 12=#A99AE0
+palette = 13=#D65CDE
+palette = 14=#B4C6D8
+palette = 15=#F8EEFF
+
+# Cursor
+cursor-color = #C026D3
+cursor-text = #170032
+cursor-style = underline
+
+# Selection
+selection-background = #3F0474
+selection-foreground = #F8EEFF
+
+# Appearance
+background-opacity = 0.92
+background-blur-radius = 20
+window-padding-color = extend
