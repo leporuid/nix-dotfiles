@@ -15,7 +15,7 @@ This repository collects project-specific expectations, tool contracts, and arch
 | `hosts/nixos/` | Self-contained native NixOS configuration for Oracle Cloud / server (`configuration.nix`). |
 | `hosts/nixos-vm/` | Lightweight NixOS VM configuration. |
 | `modules/darwin/` | Darwin system modules (`applications.nix`, `system-defaults.nix`, `hjem.nix`). |
-| `modules/nixos/` | NixOS system modules (`host-shared.nix`, `hjem.nix`). |
+| `modules/nixos/` | NixOS system modules (`hjem.nix`). |
 | `modules/hjem/` | User-level Hjem modules (`my-config.nix`, `fish.nix`, `neovim.nix`, `nixcord.nix`, `themes.nix`, `direnv-instant.nix`). |
 | `modules/common/` | Shared platform configurations (`vars.nix`, `hjem.nix`). |
 | `packages/*.nix` | Custom derivations and package wrappers consumed via `inputs.self.packages.<system>.<name>`. |
