@@ -53,7 +53,7 @@ This project uses a personal fork of red-tape, originally created by [Phaer](<ht
 
 - [Phaer](<https://github.com/phaer>) — Original author of red-tape.
 - [Otavio](<https://github.com/otavio>) — Author of the red-tape fork and host-building improvements in [PR #7](<https://github.com/phaer/red-tape/pull/7>).
-- Mic92 — Author and maintainer of [adios-flake](<https://github.com/Mic92/adios-flake>).
+- [Mic92](<https://github.com/Mic92>) — Author and maintainer of [adios-flake](<https://github.com/Mic92/adios-flake>).
 - [feel-co](<https://github.com/feel-co>) — Maintainers of [Hjem](<https://github.com/feel-co/hjem>).
 - [snugnug](<https://github.com/snugnug>) — Maintainer of [Hjem-Rum](<https://github.com/snugnug/hjem-rum>).
 
