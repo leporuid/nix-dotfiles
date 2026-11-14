@@ -1,8 +1,8 @@
 {
-  pkgs,
   inputs,
-  version ? "1.6.4",
+  pkgs,
   gitCommit ? "4549ba8",
+  version ? "1.6.4",
   ...
 }:
 
@@ -17,9 +17,7 @@ let
     ];
   };
 
-  vpnPackOverlay = import ./overlay.nix {
-    vpnPackSrc = vpnPackPatchedSrc;
-  };
+  vpnPackOverlay = import ./overlay.nix { };
 
   baseTargetPkgs =
     if pkgs.stdenv.hostPlatform.isLinux && pkgs.stdenv.hostPlatform.isAarch64 then
@@ -35,10 +33,10 @@ let
 
   manager = pkgs.callPackage ./manager.nix {
     inherit
-      version
-      tailscaleVersion
       gitCommit
       tailscalePatched
+      tailscaleVersion
+      version
       ;
     vpnPackSrc = vpnPackPatchedSrc;
     buildGoModule = targetPkgs.buildGoModule.override {
@@ -47,7 +45,7 @@ let
   };
 
   deploy = pkgs.callPackage ./deploy.nix {
-    inherit version tailscaleVersion gitCommit;
+    inherit gitCommit tailscaleVersion version;
     inherit tailscaleBin;
     inherit (manager) managerBin;
     vpnPackSrc = vpnPackPatchedSrc;
@@ -56,7 +54,7 @@ in
 deploy
 // {
   passthru = {
-    inherit tailscalePatched tailscaleBin;
+    inherit tailscaleBin tailscalePatched;
     inherit (manager) managerBin ui;
     overlay = vpnPackOverlay;
     src = vpnPackPatchedSrc;

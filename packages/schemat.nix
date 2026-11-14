@@ -1,4 +1,4 @@
-{ pname, pkgs, ... }:
+{ pkgs, pname, ... }:
 with pkgs;
 rustPlatform.buildRustPackage {
   inherit pname;

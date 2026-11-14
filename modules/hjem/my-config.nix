@@ -127,7 +127,7 @@ in
 {
   options.my.config = {
     directory = lib.mkOption {
-      default = "/Users/leporuid/Developer/nixos-and-darwin-shared-hjem/config";
+      default = "/Users/leporuid/Developer/nix-dotfiles/config";
       type = types.either types.path types.str;
       description = ''
         Local absolute path to the configuration directory when useOutOfStoreSymlinks is enabled.

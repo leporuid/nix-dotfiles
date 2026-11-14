@@ -1,4 +1,4 @@
-# lib/default.nix — Shared functional library for nixos-and-darwin-shared-hjem
+# lib/default.nix — Shared functional library for nix-dotfiles
 # Exported by red-tape as `flake.lib`
 {
   inputs ? { },
@@ -6,22 +6,22 @@
   ...
 }:
 let
-  formats = import ./formats.nix { inherit lib; };
-  darwin = import ./darwin.nix { inherit lib; };
-  hjem = import ./hjem.nix { inherit lib; };
+  formats = import ./formats.nix { };
+  darwin = import ./darwin.nix { };
+  hjem = import ./hjem.nix { };
   hosts = import ./hosts.nix { inherit inputs lib; };
 in
 {
   inherit
-    formats
     darwin
+    formats
     hjem
     hosts
     ;
   inherit (formats)
-    mkToml
-    mkJson
     mkIni
+    mkJson
+    mkToml
     mkYaml
     ;
   inherit (darwin) mkAppCloneScript;

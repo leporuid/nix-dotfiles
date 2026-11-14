@@ -1,4 +1,4 @@
-{ pname, pkgs, ... }:
+{ pkgs, pname, ... }:
 pkgs.buildGoModule {
   inherit pname;
   version = "0-unstable-2026-09-16";

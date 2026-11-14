@@ -1,12 +1,12 @@
 {
-  pkgs,
   lib ? pkgs.lib,
-  tailscaleBin,
+  pkgs,
   managerBin,
+  tailscaleBin,
   vpnPackSrc,
-  version ? "1.6.4",
-  tailscaleVersion ? "1.104.5",
   gitCommit ? "4549ba8",
+  tailscaleVersion ? "1.104.5",
+  version ? "1.6.4",
   ...
 }:
 

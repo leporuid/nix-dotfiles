@@ -73,7 +73,6 @@ in
     packages = [
       neovimWithDependencies
       pkgs.tree-sitter
-      pkgs.ripgrep
     ];
 
     files = links;

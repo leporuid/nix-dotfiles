@@ -2,11 +2,11 @@
 let
   fromGitHub =
     {
+      hash,
       owner,
       repo,
-      name ? repo,
       rev,
-      hash,
+      name ? repo,
       opt ? false,
       recursive ? false,
     }:
@@ -15,10 +15,10 @@ let
       start = !opt;
       src = pkgs.fetchFromGitHub {
         inherit
+          hash
           owner
           repo
           rev
-          hash
           ;
       };
     };

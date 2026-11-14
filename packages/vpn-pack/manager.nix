@@ -7,9 +7,9 @@
       go = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.go_1_27;
     }
   ),
-  version ? "1.6.4",
-  tailscaleVersion ? "1.104.5",
   gitCommit ? "4549ba8",
+  tailscaleVersion ? "1.104.5",
+  version ? "1.6.4",
   ...
 }:
 
@@ -37,12 +37,10 @@ let
     src = managerSrc;
     proxyVendor = true;
     vendorHash = "sha256-n328hWEKKeJbZY/NmhrFqbE6BdzlG5mb1VIw/W8u32k=";
-
     postPatch = ''
       mkdir -p ui/dist
       cp -r ${ui}/* ui/dist/
     '';
-
     ldflags = [
       "-s"
       "-w"
@@ -51,17 +49,16 @@ let
       ("-X unifi-tailscale/manager/config.GitCommit=" + gitCommit)
       "-X unifi-tailscale/manager/config.GithubRepo=eds-ch/vpn-pack"
     ];
-
     hardeningDisable = [ "all" ];
     dontPatchELF = true;
-
-    env.CGO_ENABLED = 0;
-    env.GOFLAGS = "-mod=mod";
+    env = {
+      CGO_ENABLED = 0;
+      GOFLAGS = "-mod=mod";
+    };
     preBuild = ''
       chmod -R u+w .
       export CGO_ENABLED=0
     '';
-
     postInstall = ''
       if [ -f $out/bin/manager ]; then
         mv $out/bin/manager $out/bin/vpn-pack-manager
@@ -74,10 +71,9 @@ let
         done
       fi
     '';
-
     doCheck = false;
   };
 in
 {
-  inherit ui managerBin;
+  inherit managerBin ui;
 }

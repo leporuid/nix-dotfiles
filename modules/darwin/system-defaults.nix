@@ -12,7 +12,6 @@ in
 {
   imports = [
     inputs.determinate.darwinModules.default
-    ../common/vars.nix
     inputs.nix-index-database.darwinModules.nix-index
   ];
 
@@ -23,79 +22,76 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # =========================================================================
-    # 1. Environment, System Packages, and Local DNS Settings
-    # =========================================================================
-    environment.etc = {
-      "resolver/ts.net".text = ''
-        nameserver 100.100.100.100
-      '';
-
-      # Clear Determinate CLI Sentry endpoint to eliminate telemetry leakage
-      "nix/sentry-endpoint".text = "";
-    };
-
-    environment.systemPackages = with pkgs; [
-      fish
-      (writeShellApplication {
-        name = "tailscale";
-        text = ''
-          export TAILSCALE_BE_CLI=1
-          exec /Applications/Tailscale.app/Contents/MacOS/Tailscale "$@"
+    environment = {
+      # =========================================================================
+      # 1. Environment, System Packages, and Local DNS Settings
+      # =========================================================================
+      etc = {
+        "resolver/ts.net".text = ''
+          nameserver 100.100.100.100
         '';
-      })
 
-      (writeShellApplication {
-        name = "apfs-purge";
-        text = ''
-          date
-          exec sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -P -minsize 0 /System/Volumes/Data
-        '';
-      })
-    ];
+        # Clear Determinate CLI Sentry endpoint to eliminate telemetry leakage
+        "nix/sentry-endpoint".text = "";
+      };
+      systemPackages = with pkgs; [
+        (writeShellApplication {
+          name = "tailscale";
+          text = ''
+            export TAILSCALE_BE_CLI=1
+            exec /Applications/Tailscale.app/Contents/MacOS/Tailscale "$@"
+          '';
+        })
 
-    environment.enableAllTerminfo = true;
-
-    # Exclude ~/.nix-profile from PATH and keep strictly per-user and system profiles
-    environment.profiles = lib.mkForce [
-      "/etc/profiles/per-user/${config.system.primaryUser}"
-      "/run/current-system/sw"
-      "/nix/var/nix/profiles/default"
-    ];
-
-    environment.pathsToLink = [
-      "/share/fish/vendor_completions.d"
-      "/share/fish/vendor_functions.d"
-      "/Applications"
-    ];
-
-    # =========================================================================
-    # 3. Nix Core and Determinate Installer Integration
-    # =========================================================================
-    programs.nix-index-database.comma.enable = true;
-    programs.zsh = {
-      promptInit = "";
-      enableGlobalCompInit = false;
-      enableBashCompletion = false;
+        (writeShellApplication {
+          name = "apfs-purge";
+          text = ''
+            date
+            exec sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -P -minsize 0 /System/Volumes/Data
+          '';
+        })
+      ];
+      enableAllTerminfo = true;
+      # Exclude ~/.nix-profile from PATH and keep strictly per-user and system profiles
+      profiles = lib.mkForce [
+        "/etc/profiles/per-user/${config.system.primaryUser}"
+        "/run/current-system/sw"
+        "/nix/var/nix/profiles/default"
+      ];
+      pathsToLink = [
+        "/share/fish/vendor_completions.d"
+        "/share/fish/vendor_functions.d"
+        "/Applications"
+      ];
     };
-    programs.fish = {
-      enable = true;
-      useBabelfish = true;
-      interactiveShellInit = ''
-        if test "$TERM" = "dumb"
-          function fish_prompt
-            echo "\$ "
+    programs = {
+      # =========================================================================
+      # 3. Nix Core and Determinate Installer Integration
+      # =========================================================================
+      nix-index-database.comma.enable = true;
+      zsh = {
+        promptInit = "";
+        enableGlobalCompInit = false;
+        enableBashCompletion = false;
+      };
+      fish = {
+        enable = true;
+        useBabelfish = true;
+        interactiveShellInit = ''
+          if test "$TERM" = "dumb"
+            function fish_prompt
+              echo "\$ "
+            end
+
+            function fish_right_prompt; end
+            function fish_greeting; end
+            function fish_title; end
           end
-
-          function fish_right_prompt; end
-          function fish_greeting; end
-          function fish_title; end
-        end
-      '';
+        '';
+      };
     };
     users.users.${config.system.primaryUser}.shell = pkgs.fish;
     documentation.doc.enable = false;
-
     determinateNix = {
       enable = true;
 
@@ -107,43 +103,43 @@ in
 
       inherit (vars) customSettings;
     };
-
-    launchd.daemons.determinate-nix-daemon.serviceConfig = {
-      SoftResourceLimits.NumberOfFiles = 1048576;
-      HardResourceLimits.NumberOfFiles = 1048576;
-    };
-
-    # macOS default kern.tty.ptmx_max is 511. Heavy developer/Electron tools (VS Code, Cursor, Ghostty)
-    # leak PTYs over long sessions, leading to `posix_openpt: Device not configured (ENXIO)`.
-    # Raise to XNU's safe upper ceiling (999).
-    launchd.daemons.sysctl-ptmx = {
-      script = "/usr/sbin/sysctl -w kern.tty.ptmx_max=999 || true";
-      serviceConfig = {
-        RunAtLoad = true;
-        KeepAlive = false;
+    launchd = {
+      daemons = {
+        determinate-nix-daemon.serviceConfig = {
+          SoftResourceLimits.NumberOfFiles = 1048576;
+          HardResourceLimits.NumberOfFiles = 1048576;
+        };
+        # macOS default kern.tty.ptmx_max is 511. Heavy developer/Electron tools (VS Code, Cursor, Ghostty)
+        # leak PTYs over long sessions, leading to `posix_openpt: Device not configured (ENXIO)`.
+        # Raise to XNU's safe upper ceiling (999).
+        sysctl-ptmx = {
+          script = "/usr/sbin/sysctl -w kern.tty.ptmx_max=999 || true";
+          serviceConfig = {
+            RunAtLoad = true;
+            KeepAlive = false;
+          };
+        };
+        # Weekly automated APFS purgeable space and local snapshot reclamation
+        apfs-purge = {
+          serviceConfig = {
+            ProgramArguments = [
+              "/System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util"
+              "-P"
+              "-minsize"
+              "0"
+              "/System/Volumes/Data"
+            ];
+            StartCalendarInterval = [
+              {
+                Hour = 3;
+                Minute = 0;
+                Weekday = 0;
+              }
+            ];
+          };
+        };
       };
     };
-
-    # Weekly automated APFS purgeable space and local snapshot reclamation
-    launchd.daemons.apfs-purge = {
-      serviceConfig = {
-        ProgramArguments = [
-          "/System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util"
-          "-P"
-          "-minsize"
-          "0"
-          "/System/Volumes/Data"
-        ];
-        StartCalendarInterval = [
-          {
-            Hour = 3;
-            Minute = 0;
-            Weekday = 0;
-          }
-        ];
-      };
-    };
-
     # =========================================================================
     # 4. macOS System Architecture and Native Configurations
     # =========================================================================
@@ -215,7 +211,7 @@ in
         };
 
         CustomUserPreferences = {
-          "NSGlobalDomain" = {
+          NSGlobalDomain = {
             QLPanelAnimationDuration = 0.0;
           };
           "com.apple.symbolichotkeys" = {
@@ -231,9 +227,9 @@ in
           "com.apple.screencapture" = {
             location = "/Volumes/SDXC/Screenshots";
             type = "png";
-            "show-thumbnail" = false;
+            show-thumbnail = false;
             target = "clipboard";
-            "disable-shadow" = true;
+            disable-shadow = true;
           };
         };
       };

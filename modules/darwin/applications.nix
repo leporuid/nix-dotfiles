@@ -25,13 +25,19 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # =========================================================================
-    # 1. System Packages & Applications
-    # =========================================================================
-    environment.systemPackages = [
-      inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re
-    ];
-
+    environment = {
+      # =========================================================================
+      # 1. System Packages & Applications
+      # =========================================================================
+      systemPackages = [
+        inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re
+      ];
+      variables = {
+        HOMEBREW_NO_AUTO_UPDATE = "1";
+        HOMEBREW_NO_ENV_HINTS = "1";
+        HOMEBREW_NO_ANALYTICS = "1";
+      };
+    };
     # =========================================================================
     # 3. Discord & Vencord Configuration (nixcord)
     # =========================================================================
@@ -67,57 +73,40 @@ in
         };
       };
     };
+    system = {
+      # =========================================================================
+      # 4. Application Trampolines & Native Clones (Activation Scripts)
+      # =========================================================================
+      activationScripts = {
+        applications.text = lib.mkForce "";
 
-    # =========================================================================
-    # 4. Application Trampolines & Native Clones (Activation Scripts)
-    # =========================================================================
-    system.activationScripts = {
-      applications.text = lib.mkForce "";
+        postActivation.text = ''
+          rm -rf "/Applications/Nix Apps"
 
-      postActivation.text = ''
-        rm -rf "/Applications/Nix Apps"
+          ${inputs.self.lib.mkAppCloneScript "${
+            inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re
+          }/Applications/M3U8DLProtocol.app"}
 
-        m3u8App="${
-          inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re
-        }/Applications/M3U8DLProtocol.app"
-        if [ -d "$m3u8App" ]; then
-          rm -rf /Applications/M3U8DLProtocol.app
-          /bin/cp -cR "$m3u8App" /Applications/M3U8DLProtocol.app 2>/dev/null || /bin/cp -R "$m3u8App" /Applications/M3U8DLProtocol.app
-          chmod -R u+w /Applications/M3U8DLProtocol.app
-        fi
+          ${inputs.self.lib.mkAppCloneScript "${
+            config.programs.nixcord.discord.finalPackage or config.programs.nixcord.finalPackage.discord
+              or config.programs.nixcord.discord.package
+          }/Applications/Discord.app"}
 
-        discordPkg="${
-          config.programs.nixcord.discord.finalPackage or config.programs.nixcord.finalPackage.discord
-            or config.programs.nixcord.discord.package
-        }"
-        if [ -d "$discordPkg/Applications/Discord.app" ]; then
-          rm -rf /Applications/Discord.app
-          /bin/cp -cR "$discordPkg/Applications/Discord.app" /Applications/Discord.app 2>/dev/null || /bin/cp -R "$discordPkg/Applications/Discord.app" /Applications/Discord.app
-          chmod -R u+w /Applications/Discord.app
-        fi
-
-        userHome="/Users/${config.system.primaryUser}"
-        if [ -d "$userHome/.config/Vencord" ] && [ ! -e "$userHome/Library/Application Support/Vencord" ]; then
-          mkdir -p "$userHome/Library/Application Support"
-          ln -sfn "$userHome/.config/Vencord" "$userHome/Library/Application Support/Vencord"
-          chown -h "${config.system.primaryUser}" "$userHome/Library/Application Support/Vencord" 2>/dev/null || true
-        fi
+          userHome="/Users/${config.system.primaryUser}"
+          if [ -d "$userHome/.config/Vencord" ] && [ ! -e "$userHome/Library/Application Support/Vencord" ]; then
+            mkdir -p "$userHome/Library/Application Support"
+            ln -sfn "$userHome/.config/Vencord" "$userHome/Library/Application Support/Vencord"
+            chown -h "${config.system.primaryUser}" "$userHome/Library/Application Support/Vencord" 2>/dev/null || true
+          fi
+        '';
+      };
+      # =========================================================================
+      # 5. Homebrew & Casks Declarative Management
+      # =========================================================================
+      activationScripts.homebrew.text = lib.mkBefore ''
+        set +e
       '';
     };
-
-    # =========================================================================
-    # 5. Homebrew & Casks Declarative Management
-    # =========================================================================
-    system.activationScripts.homebrew.text = lib.mkBefore ''
-      set +e
-    '';
-
-    environment.variables = {
-      HOMEBREW_NO_AUTO_UPDATE = "1";
-      HOMEBREW_NO_ENV_HINTS = "1";
-      HOMEBREW_NO_ANALYTICS = "1";
-    };
-
     homebrew = {
       enable = true;
       global.brewfile = true;
@@ -165,7 +154,6 @@ in
         "zen"
       ];
     };
-
     nix-homebrew = {
       enable = true;
       user = config.system.primaryUser;

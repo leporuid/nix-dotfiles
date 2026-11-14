@@ -1,9 +1,5 @@
 # lib/darwin.nix — macOS specific declarative activation and trampoline helpers
-{
-  lib ? null,
-  ...
-}:
-{
+_: {
   # Generates an APFS clone activation script snippet to copy an application from the Nix store to /Applications
   # This ensures Spotlight, LaunchServices, and the macOS Dock register the app natively without symlink failures.
   mkAppCloneScript = appPath: ''

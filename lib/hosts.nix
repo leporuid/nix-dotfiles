@@ -10,9 +10,9 @@
   mkDarwinSystem =
     {
       hostName,
-      system ? "aarch64-darwin",
       modules ? [ ],
       specialArgs ? { },
+      system ? "aarch64-darwin",
     }:
     inputs.nix-darwin.lib.darwinSystem {
       modules = [
@@ -25,7 +25,7 @@
       ]
       ++ modules;
       specialArgs = {
-        inherit inputs hostName;
+        inherit hostName inputs;
         isDarwin = true;
         isNixOS = false;
         class = "nix-darwin";
@@ -37,9 +37,9 @@
   mkNixosSystem =
     {
       hostName,
-      system ? "x86_64-linux",
       modules ? [ ],
       specialArgs ? { },
+      system ? "x86_64-linux",
     }:
     inputs.nixpkgs.lib.nixosSystem {
       modules = [
@@ -52,7 +52,7 @@
       ]
       ++ modules;
       specialArgs = {
-        inherit inputs hostName;
+        inherit hostName inputs;
         isDarwin = false;
         isNixOS = true;
         class = "nixos";

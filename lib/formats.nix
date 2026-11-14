@@ -1,10 +1,6 @@
 # lib/formats.nix — Config format generators inspired by Apribase
 # Generates native configuration files directly from pure Nix attrsets without intermediate bloat.
-{
-  lib ? null,
-  ...
-}:
-{
+_: {
   # Generate TOML file from Nix attrset
   mkToml =
     pkgs: name: value:

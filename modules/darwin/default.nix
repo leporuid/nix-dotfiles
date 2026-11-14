@@ -1,4 +1,4 @@
-{ ... }:
+{ inputs, ... }:
 {
   imports = [
     ./hjem.nix
@@ -6,4 +6,6 @@
     ./system-defaults.nix
     ./applications.nix
   ];
+
+  nixpkgs.overlays = import ../../overlays { inherit inputs; };
 }
