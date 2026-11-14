@@ -1085,11 +1085,11 @@
         "nixpkgs": "nixpkgs_7"
       },
       "locked": {
-        "lastModified": 1794558968,
-        "narHash": "sha256-u1MzbcXLeTB5GG14utUGQk9z3oOn/cwkE0OV/4/0r78=",
+        "lastModified": 1794672101,
+        "narHash": "sha256-f/dj1WvdQVIOPypTmSQZMZSyup94KlW9bF9+eCZpC50=",
         "owner": "leporuid",
         "repo": "red-tape",
-        "rev": "867c6c2a5e73bae88140f5e348cea78a3b4a8108",
+        "rev": "6a64c9cc6a20cc9f8b34759c93dd6bb26ccea823",
         "type": "github"
       },
       "original": {
