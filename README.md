@@ -77,16 +77,16 @@ The development environment provides tools for formatting, linting, secret manag
 - `pedantix` for strict Nix argument ordering and style checks.
 - `nil` and `nixd` for Nix language server diagnostics.
 - `git-hooks.nix` for automated pre-commit checks.
-- `devshell.nix` for the development shell (`llm-agents`, `agenix`, `rage`, `just`).
+- `devshell.nix` for the development shell (`llm-agents`, `agenix` with `age`, `nixos-rebuild`, `nixos-anywhere`, `just`).
 
 Flake outputs include:
 
 - `darwinConfigurations` and `nixosConfigurations` for host configurations.
 - `hjemConfigurations` for standalone Hjem Manifest v3 evaluation.
-- `darwinModules`, `nixosModules`, and `hjemModules` for reusable system and user modules.
-- `overlays` for custom Nixpkgs overrides.
+- `darwinModules`, `nixosModules`, and `hjemModules` for reusable system and user modules (`my.programs.*` and `rum.programs.*`).
+- `overlays` (`overlays/default.nix`) for custom Nixpkgs overrides (Determinate Nix tool overrides, macOS `curl-impersonate` / `curl-cffi` fixes).
 - `packages` for custom derivations.
-- `devShells`, `formatter`, and `checks` for development environments, formatting, and CI validation.
+- `devShells`, `formatter` (`formatter.nix`), and `checks` for development environments, formatting, and CI validation.
 
 ## Acknowledgements
 

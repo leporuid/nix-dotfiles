@@ -8,19 +8,22 @@ This repository collects project-specific expectations, tool contracts, and arch
 
 | Directory / File | Description & Purpose |
 | :--- | :--- |
-| `flake.nix` | Root `red-tape.mkFlake` entrypoint; tracks inputs, system matrix, and flake settings. |
-| `devshell.nix` | Developer shell toolchain sourcing `git-hooks.nix` (`nil`, `statix`, `treefmt`) and generating `.pre-commit-config.yaml`. |
+| `flake.nix` | Root `red-tape.mkFlake` entrypoint; tracks inputs, system matrix, `hjemModules` output, and `overlays.default`. |
+| `devshell.nix` | Developer shell toolchain (`llm-agents`, `agenix` with `age`, `nixos-rebuild`, `nixos-anywhere`, linters) sourcing `git-hooks.nix`. |
+| `formatter.nix` | Root `treefmt-nix` formatter entrypoint delegating to `treefmt.nix`. |
+| `treefmt.nix` | Unified formatter and linter rules (`deadnix`, `statix`, `nixfmt`, `fish_indent`, `shfmt`, `taplo`, `yamlfmt`). |
 | `pedantix.toml` | Nix code style and argument sorting rules enforced across the repository. |
+| `overlays/` | Nixpkgs overlays (`default.nix`) applied to hosts and exposed via `flake.overlays.default`. |
 | `hosts/MacBook-Pro/` | Darwin host configuration (`darwin-configuration.nix`) and user profile bridge. |
 | `hosts/nixos/` | Self-contained native NixOS configuration for Oracle Cloud / server (`configuration.nix`). |
 | `hosts/nixos-vm/` | Lightweight NixOS VM configuration. |
 | `modules/darwin/` | Darwin system modules (`applications.nix`, `system-defaults.nix`, `hjem.nix`). |
 | `modules/nixos/` | NixOS system modules (`hjem.nix`). |
-| `modules/hjem/` | User-level Hjem modules (`my-config.nix`, `fish.nix`, `neovim.nix`, `nixcord.nix`, `themes.nix`, `direnv-instant.nix`). |
+| `modules/hjem/` | User-level Hjem modules (`default.nix`, `my-config.nix`, `themes.nix`, `fish.nix`, `neovim.nix`, `helix.nix`, `ghostty.nix`, `starship.nix`, `nushell.nix`, `tmux.nix`, `zellij.nix`, `direnv-instant.nix`, `nixcord.nix`). |
 | `modules/common/` | Shared platform configurations (`vars.nix`, `hjem.nix`). |
 | `packages/*.nix` | Custom derivations and package wrappers consumed via `inputs.self.packages.<system>.<name>`. |
 | `users/leporuid/` | Shared user profile (`home-configuration.nix`) managing packages and files. |
-| `config/` | Raw upstream configurations (`fish/`, `nushell/`, `starship.toml`, `git/`, `nvim/`, `agents/`, etc.). |
+| `config/` | Raw upstream configurations (`fish/`, `ghostty/`, `nushell/`, `starship.toml`, `git/`, `nvim/`, `agents/`, etc.). |
 
 ---
 
@@ -53,7 +56,7 @@ This repository collects project-specific expectations, tool contracts, and arch
 ## 3. Core Architecture Guardrails
 
 - **red-tape Convention**:
-  - `red-tape.mkFlake` automatically discovers `hosts/`, `packages/`, `modules/`, and `devshell.nix`.
+  - `red-tape.mkFlake` automatically discovers `hosts/`, `packages/`, `modules/`, `devshell.nix`, and `formatter.nix`.
   - Pass `inherit self inputs;` to `red-tape.mkFlake`.
   - Enable platform modules explicitly:
     ```nix
@@ -62,12 +65,13 @@ This repository collects project-specific expectations, tool contracts, and arch
       inputs.red-tape.modules.redTape.hjem
     ];
     ```
+  - Custom nixpkgs overlays live in `overlays/default.nix` and are exposed via `flake.overlays.default`.
   - Module headers must strictly follow `pedantix.toml` argument order.
 - **Top-Level Imports**:
   - Never place `imports = [ ... ];` inside a `config = lib.mkIf ... { ... }` block; module imports must always remain at the top level of the module file.
 - **Hjem Configuration & Arguments**:
   - Pass flake inputs to Hjem modules via `hjem.specialArgs = { inherit inputs; };`.
-  - Program options are located under `rum.programs.<program>` (e.g. `rum.programs.git`, `rum.programs.fish`).
+  - Custom Hjem program options are located under `my.programs.<program>` (e.g., `my.programs.fish`, `my.programs.ghostty`, `my.programs.starship`, `my.programs.neovim`), while Hjem-Rum modules are under `rum.programs.<program>` (e.g., `rum.programs.git`).
 - **Raw Application Configurations (`config/`)**:
   - Keep application configurations directly under root `config/`.
   - Linked via Hjem `files` (`my.config.source`) and managed live via `impure.dotsDir` / `impure.dotsDirImpure` (`hjem-impure`).
