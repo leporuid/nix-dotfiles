@@ -95,8 +95,19 @@ function edit-age -d "Edit encrypted files stored in nix-secrets"
     )
     or return
 
+    set -l relative_file (string replace "$secrets_dir/" "" "$file")
     set -lx AGENIX_RULES "$rules_file"
-    agenix -e "$file" $argv
+
+    pushd "$secrets_dir" >/dev/null; or return 1
+    if command -q agenix
+        agenix -e "$relative_file" $argv
+    else
+        nix run github:ryantm/agenix -- -e "$relative_file" $argv
+    end
+    set -l agenix_status $status
+    popd >/dev/null
+
+    return $agenix_status
 end
 
 function build-oci-image -d "Build the OCI Ampere A1 qcow2 custom image for nixos"
