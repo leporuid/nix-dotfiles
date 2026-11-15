@@ -6,10 +6,14 @@ rustPlatform.buildRustPackage {
   src = pkgs.fetchFromGitHub {
     owner = "APT37";
     repo = pname;
-    rev = "master";
-    hash = "sha256-ODjpOFkSDmhXwjblS7JqHDVoG0lQyZ/nupUi8peN5m4=";
+    rev = "9024bc9bee36c9d6ddf97b3516fcdfcf1f124526";
+    hash = "sha256-jZquLkvYQz0RM2oJBmMMGJW56/w+yaPnPEdhCvCt1u0=";
   };
-  cargoHash = "sha256-KOjntRYEVLP4C/LRGljf2Gg90Q+lzFsFZ3ozv2WoNCg=";
+  cargoHash = "sha256-4uWdzPK3ER/ckdnIhDHm6FSzWTHr9/dagQ4ZyukJb9w=";
+
+  # aws-lc-sys >= 0.42 is forced onto the system library by cargo-setup-hook (AWS_LC_SYS_USE_SYSTEM=1).
+  nativeBuildInputs = [ pkg-config ];
+  buildInputs = [ aws-lc ];
 
   meta = {
     description = "Media ripper for coomer.su and kemono.su";
