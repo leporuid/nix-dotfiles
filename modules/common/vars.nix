@@ -36,11 +36,7 @@ in
         connect-timeout = 10;
         fallback = true;
         keep-going = true;
-        keep-derivations = true;
-        keep-outputs = true;
         log-lines = 25;
-        max-free = 3221225472;
-        min-free = 1073741824;
         stalled-download-timeout = 20;
         warn-dirty = false;
       };

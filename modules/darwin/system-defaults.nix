@@ -99,7 +99,6 @@ in
 
       determinateNixd = {
         garbageCollector.strategy = "automatic";
-        builder.state = "enabled";
         telemetry.sentry.endpoint = null;
       };
 
