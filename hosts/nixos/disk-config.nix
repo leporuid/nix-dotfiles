@@ -26,6 +26,10 @@
               type = "filesystem";
               format = "ext4";
               mountpoint = "/";
+              mountOptions = [
+                "nodiscard"
+                "noatime"
+              ];
               extraArgs = [
                 "-L"
                 "nixos"

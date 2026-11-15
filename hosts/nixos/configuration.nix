@@ -377,6 +377,12 @@
       nixos.source = inputs.self;
       configuration-revision.text = inputs.self.rev or inputs.self.dirtyRev or "dirty";
 
+      # Configure determinate-nixd GC and disable Sentry telemetry
+      "determinate/config.json".text = builtins.toJSON {
+        garbageCollector.strategy = "automatic";
+        telemetry.sentry.endpoint = null;
+      };
+
       # Enforce a clean and standard /etc/shells without /nix/store clutter
       shells.text = lib.mkForce ''
         /bin/sh
@@ -439,14 +445,14 @@
     stateVersion = "25.05";
   };
   determinate.enable = true;
+  services.fstrim = {
+    enable = true;
+    interval = "weekly";
+  };
   nix = {
     settings = vars.customSettings;
     optimise.automatic = true;
-    gc = {
-      automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 14d";
-    };
+    # Garbage collection is managed continuously by determinate-nixd
     channel.enable = false;
     nixPath = [ ];
     registry = {
