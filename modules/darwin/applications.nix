@@ -14,7 +14,6 @@ in
 {
   imports = [
     inputs.nix-homebrew.darwinModules.nix-homebrew
-    inputs.mac-app-util.darwinModules.default
     inputs.nixcord.darwinModules.nixcord
   ];
 

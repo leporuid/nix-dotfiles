@@ -15,16 +15,18 @@
   };
 
   inputs = {
-    red-tape.url = "github:/leporuid/red-tape";
+    red-tape.url = "github:leporuid/red-tape";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-schemas.url = "github:DeterminateSystems/flake-schemas";
-    # Determinate Nix: Determinate Systems' Nix distribution & daemon (do not follow nixpkgs)
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
+    flake-schemas.url = "github:DeterminateSystems/flake-schemas";
+    multiverse.url = "github:fzakaria/nixpkgs-multiverse";
+
     hjem = {
       # Hjem: lightweight $HOME manager alternative to Home Manager
       url = "github:feel-co/hjem";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
     hjem-rum = {
       # Hjem-Rum: Home Manager-like module collection built on top of Hjem
       url = "github:snugnug/hjem-rum";
@@ -37,10 +39,12 @@
       url = "github:nix-darwin/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
     helix = {
       url = "github:helix-editor/helix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
       inputs = {
@@ -48,11 +52,13 @@
         treefmt-nix.follows = "treefmt";
       };
     };
+
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
     ktoolbox = {
       url = "github:leporuid/KToolBox/uv2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
     direnv-instant = {
       url = "github:Mic92/direnv-instant";
       inputs = {
@@ -60,14 +66,7 @@
         treefmt-nix.follows = "treefmt";
       };
     };
-    multiverse.url = "github:fzakaria/nixpkgs-multiverse";
-    mac-app-util = {
-      url = "github:hraban/mac-app-util";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        treefmt-nix.follows = "treefmt";
-      };
-    };
+
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
