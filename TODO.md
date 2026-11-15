@@ -11,12 +11,19 @@
 - [x] Configure `hosts/nixos` (`aarch64-linux`) as remote builder on `MacBook-Pro`, switch macOS `UserShell` to `/run/current-system/sw/bin/zsh` (bootstrapping `fish` via `.zshrc` with `unsetopt nomatch`), and document reference repo patterns (`8ca81d3`).
 - [x] Configure single-line `[profiles] nu` in `config/starship.toml` and `modules/hjem/starship.nix` (`7748d87`), remove stale `~/.config/nushell/vendor/autoload/starship.nu` backup, and verify generated Nushell prompt output (`"✶⎪⌽⎪◎ "` / `"⌂ /󰲋 "`).
 - [x] Pin mutable branch `rev`s in remaining `packages/*.nix` (`kumono.nix` + `pkg-config`/`aws-lc` for `aws-lc-sys`, `schemat.nix`, `unxip.nix`, `cktool.nix`, `age-plugin-se/default.nix`) and verify package builds.
+- [x] Push `main` to `origin/main` (`64e3026..eba9a71`).
+- [x] Deploy `/Applications` apps with `rsync` (`mkAppSyncScript` in `lib/darwin.nix`, used by `modules/darwin/applications.nix`) (`626cd29`).
+- [x] Port declarative Determinate module to `modules/darwin/determinate/` using local installer plists, and switch `system-defaults.nix` to `darwinModules.determinate` (`c9656b2`, `eba9a71`).
+- [x] Trim `determinate` / `nixcord` transitive inputs via `follows` in `flake.nix` (kept `determinate/3`) (`c9656b2`).
+- [x] Run `darwin-rebuild switch` after the Determinate port: nix-daemon runs from the new `determinate-nixd` store path, hook plist runs `/usr/bin/true`, `nix store info --store daemon` reports `2.35.3`, `Discord.app` and `M3U8DLProtocol.app` are real directories.
+- [x] Reboot `MacBook-Pro` and confirm `/nix` mounts through `/usr/local/libexec/darwin/<name>/determinate-nixd` (`nix store info --store daemon` reports `2.35.3`, `/usr/local/libexec/darwin/...` is `0:0 0755`, `/etc/determinate/config.json` is `0:0 0644`).
+- [x] Check GitHub Actions CI for `eba9a71` (run `43735739463` passed all 5 jobs).
+- [x] Test building `nixosConfigurations.nixos-vm` from `MacBook-Pro` via the `nixos` remote builder (`ssh-ng://leporuid@nixos`).
+- [x] Extend `check-links` in `run.fish` to compare NixOS host Hjem generations (`nixos`, `nixos-vm`) against the standalone manifest.
+- [x] Add `dix` closure diff activation module (`modules/common/dix.nix`, wired into `darwinModules.aggregate` and `nixosModules.aggregate`); `hjemSchemas` unit tests already exist in `red-tape/tests/hjem.nix`.
 
 ## Next Session
 
-- [ ] Push local `main` commits (`b15ad91`, `f6b6feb`, plus package pinning commits) to `origin/main`, then check GitHub Actions CI (`NIX_SECRETS_SSH_KEY` access to `nix-secrets`, `Format and Lint`, and `Flake Check and Host Eval`).
-- [ ] Run `darwin-rebuild switch` (`run switch-host`) on `MacBook-Pro` so `~/.config/nushell/config.nu` activates the updated Hjem store path, and confirm the single-line Starship prompt interactively in Nushell.
-- [ ] Test building `nixosConfigurations.nixos-vm` / `nixos` from `MacBook-Pro` via the `nixos` remote builder.
-- [ ] Optional: extend `check-links` to compare NixOS host Hjem generations against the standalone manifest (normalizing `/nix/store/<hash>-config/...` paths and platform-specific file subsets).
-- [ ] Optional: add `dix` closure diff (per `docs/REFERENCE_PATTERNS.md`) or `hjemSchemas` unit tests in `red-tape`.
+- [ ] Push `ktoolbox` (`uv2nix` branch: replaced `flake-utils` with `nixpkgs.lib.genAttrs`, dropping `flake-utils` and `systems`), then run `nix flake update ktoolbox` in `nix-dotfiles` and push `main` (`871acfd..HEAD`).
+- [ ] Confirm the single-line Starship prompt interactively in Nushell.
 - [ ] Optional: remove `~/Developer/nix-dotfiles-archive` and `~/Developer/refer` once everything is settled.
