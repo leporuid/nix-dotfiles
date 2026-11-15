@@ -22,7 +22,7 @@ in
       direnv.enable = true;
       fish.enable = true;
       ghostty.enable = true;
-      helix.enable = true;
+      helix.enable = isDarwin;
       jujutsu.enable = true;
       neovim.enable = true;
       nushell.enable = true;
@@ -111,7 +111,6 @@ in
       # Custom / specialized derivations from flake
       inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.has-ancestor
       inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.ccase
-      inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.comview
       inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.ktoolbox
     ])
     ++ lib.optionals isDarwin [
