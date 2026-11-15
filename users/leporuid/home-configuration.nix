@@ -153,15 +153,4 @@ in
     ".config/opencode/AGENTS.md".source = ../../AGENTS.md;
   };
   # 8. Hjem-Rum module ecosystem (under rum.programs.*)
-  rum.programs = {
-    git = {
-      enable = true;
-      settings = {
-        user = {
-          name = "Yu-Min Peng";
-          email = "leporuid@icloud.com";
-        };
-      };
-    };
-  };
 }
