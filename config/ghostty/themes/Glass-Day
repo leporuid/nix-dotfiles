@@ -1,36 +1,41 @@
+# ==========================================
+# Soft Violet × Claude Warm
+# ==========================================
+
 # Background & Foreground
-background = #B69BBE
-foreground = #35263D
+background = #260D35
+foreground = #E8E6DC
 
 # ANSI Normal (0-7)
-palette = 0=#35263D
-palette = 1=#A94F3B
-palette = 2=#647A4D
-palette = 3=#B65F43
-palette = 4=#527EAB
-palette = 5=#762C91
-palette = 6=#91677F
-palette = 7=#493C4D
+palette = 0=#141413
+palette = 1=#C15F3C
+palette = 2=#788C5D
+palette = 3=#D97757
+palette = 4=#6A9BCC
+palette = 5=#8924CE
+palette = 6=#A06E86
+palette = 7=#B0AEA5
 
 # ANSI Bright (8-15)
-palette = 8=#796681
-palette = 9=#C15F3C
-palette = 10=#819763
-palette = 11=#35263D
-palette = 12=#6A9BCC
-palette = 13=#A64CB9
+palette = 8=#62536E
+palette = 9=#D97757
+palette = 10=#94A875
+palette = 11=#FAF9F5
+palette = 12=#8BB2D9
+palette = 13=#FF36D9
 palette = 14=#A9879B
-palette = 15=#49364F
+palette = 15=#FAF9F5
 
 # Cursor
 cursor-color = #D97757
-cursor-text = #B69BBE
+cursor-text = #170032
 cursor-style = underline
 
 # Selection
-selection-background = #8F6A9A
-selection-foreground = #FFFFFF
+selection-background = #3F0474
+selection-foreground = #FAF9F5
 
 # Appearance
-background-opacity = 1.0
+background-opacity = 0.92
+background-blur-radius = 20
 window-padding-color = extend

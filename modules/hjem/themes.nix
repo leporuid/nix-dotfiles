@@ -43,6 +43,7 @@ in
     my.config.source = {
       ".config/ghostty/themes/Glass" = "ghostty/themes/Glass";
       ".config/ghostty/themes/Glass-Day" = "ghostty/themes/Glass-Day";
+      ".config/ghostty/themes/Glass-Light" = "ghostty/themes/Glass-Light";
     };
 
     environment.sessionVariables = {
