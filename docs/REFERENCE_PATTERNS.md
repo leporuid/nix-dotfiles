@@ -47,3 +47,11 @@ Distilled architectural patterns and reusable Nix snippets extracted from local 
 - **`bundle-of-nix`**: Feature-grouped `flake-parts` alternative; lacks standalone `hjem` host support (our `leporuid/red-tape` + `hjemConfigurations` Manifest v3 is already further ahead).
 - **`azukit-dev`**: Fast cached `sheldon` Zsh plugin initialization (already integrated into `config/zsh/.zshrc`).
 - **`age-plugin-se`**: Upstream SwiftPM/Secure Enclave source; already packaged cleanly in `packages/age-plugin-se.nix`.
+
+---
+
+## 6. `4evy/ndw` (`ndw`)
+
+- **Minimal `nix-darwin` Hard Fork**: Strips `nix-darwin` down to `aarch64-darwin` (macOS 27+) core modules (`determinate`, `system`, `environment`, `files`, `users`, `networking`, `bash`, `zsh`, `launchd`, `homebrew`).
+- **Why Not Replace `nix-darwin` in `nix-dotfiles`**: Drops `programs.fish`, `security.pam` (`sudo_local` Touch ID), `services.openssh`, `ids.gids.nixbld`, and `nix-index-database`, and conflicts with `hjem.darwinModules.default` (`system.activationScripts`) and `modules/darwin/determinate/`.
+- **Adopted Pattern (`system.settings` / `settings-current`)**: Exposes `apps.aarch64-darwin.settings-{current,capture,apply}` (ported from `nix-plist-manager`). Useful as an on-demand scanner (`nix run github:4evy/ndw#settings-current`) to audit live macOS preferences and sync missing keys into `modules/darwin/system-defaults.nix`.

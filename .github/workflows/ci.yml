@@ -127,6 +127,8 @@ jobs:
             set -gx IN_NIX_CONFIG_DEVSHELL 1
             source run.fish
             check-links --user leporuid --host MacBook-Pro --target-root /Users/leporuid
+            check-links --user leporuid --host nixos
+            check-links --user leporuid --host nixos-vm
           '
       - name: Run nix flake check (all-systems eval + x86_64-linux builds)
         run: |
