@@ -3,6 +3,7 @@
   config,
   lib,
   pkgs,
+  perSystem,
   ...
 }:
 let
@@ -113,6 +114,8 @@ in
       inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.has-ancestor
       inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.ccase
       inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.ktoolbox
+      perSystem.llm-agents.copilot-cli
+      perSystem.llm-agents.antigravity-cli
     ])
     ++ lib.optionals isDarwin [
       pkgs.ffmpeg

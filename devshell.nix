@@ -13,8 +13,6 @@ pkgs.mkShellNoCC {
     pre-commit-check.enabledPackages
     ++ [
       perSystem.self.pre-commit-check.passthru.treefmt
-      perSystem.llm-agents.copilot-cli
-      perSystem.llm-agents.antigravity-cli
       perSystem.llm-agents.default
       # Agenix uses rage by default which lacks age-plugin support; override with age for age-plugin-se
       (perSystem.agenix.default.override {
