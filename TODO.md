@@ -23,7 +23,4 @@
 - [x] Add `dix` closure diff activation module (`modules/common/dix.nix`, wired into `darwinModules.aggregate` and `nixosModules.aggregate`); `hjemSchemas` unit tests already exist in `red-tape/tests/hjem.nix`.
 - [x] Confirm the single-line Starship prompt interactively in Nushell.
 - [x] Replace `flake-utils` with `nixpkgs.lib.genAttrs` in `ktoolbox` (`2943254`), run `nix flake update ktoolbox` (dropping `ktoolbox/flake-utils` and `ktoolbox/flake-utils/systems`), and sync `AGENTS.md` / `docs/*.md` before removing `~/Developer/refer`.
-
-## Next Session
-
-- [ ] Optional: remove `~/Developer/nix-dotfiles-archive` once everything is settled.
+- [x] Confirm `~/Developer/nix-dotfiles-archive` is removed (already absent).
