@@ -371,27 +371,6 @@
         "type": "github"
       }
     },
-    "helix": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "rust-overlay": "rust-overlay"
-      },
-      "locked": {
-        "lastModified": 1794467235,
-        "narHash": "sha256-DRPuwFZs2eu5XnbfLqXydXcCFE9zvuxBVrLcZsmPoeU=",
-        "owner": "helix-editor",
-        "repo": "helix",
-        "rev": "a714a818a3a4f6dd5aad3b003a78692f90a1703f",
-        "type": "github"
-      },
-      "original": {
-        "owner": "helix-editor",
-        "repo": "helix",
-        "type": "github"
-      }
-    },
     "hjem": {
       "inputs": {
         "nixpkgs": [
@@ -799,11 +778,11 @@
         "nixpkgs": "nixpkgs_4"
       },
       "locked": {
-        "lastModified": 1794759882,
-        "narHash": "sha256-f1dY+Na2Ckljh6s9yQHzCkjmnUAbo7+OlqOs7Zx+QTg=",
+        "lastModified": 1794771781,
+        "narHash": "sha256-huSu8BD0EMz7sPr9lRIaZ7ExJ5Tt6TfAPfs3h+9xoko=",
         "owner": "leporuid",
         "repo": "red-tape",
-        "rev": "e4945e32de3a41030148ec6d8f3c56d22cb738b8",
+        "rev": "4251ead1b641183e37533cc61797eddf16d6225d",
         "type": "github"
       },
       "original": {
@@ -822,7 +801,6 @@
         "gallery-ai": "gallery-ai",
         "ghostty-cursor-shaders": "ghostty-cursor-shaders",
         "git-hooks": "git-hooks",
-        "helix": "helix",
         "hjem": "hjem",
         "hjem-rum": "hjem-rum",
         "homebrew-rayburst": "homebrew-rayburst",
@@ -839,27 +817,6 @@
         "treefmt": "treefmt",
         "vpn-pack-src": "vpn-pack-src",
         "yt-ai": "yt-ai"
-      }
-    },
-    "rust-overlay": {
-      "inputs": {
-        "nixpkgs": [
-          "helix",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1775358767,
-        "narHash": "sha256-f2eC+WIfhjevCPQILuV08i/kmKZzYZpUvkom/33VxCA=",
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "rev": "20fd44bc663daa53a2575e01293e24e681d62244",
-        "type": "github"
-      },
-      "original": {
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "type": "github"
       }
     },
     "ssh-keys": {
