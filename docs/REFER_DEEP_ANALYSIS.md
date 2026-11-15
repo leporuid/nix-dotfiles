@@ -9,7 +9,8 @@ Comprehensive architectural breakdown and pattern extraction across all 7 reposi
 | Repository | Core Framework | Home Layer | Key Strengths | Adopt in `nix-dotfiles`? |
 | :--- | :--- | :--- | :--- | :--- |
 | **`4evy-dotfiles`** | `flake-parts` + `Just` + `Bun/TS` (`bun2nix`) | `feel-co/hjem` (standalone + per-platform) | Modular `Justfile` sub-modules (`just/*/*.just`), `hjem` standalone validation (`just hjem check`), `determinate-nixd` CLI recipes, clean `sops` / `renovate` / `bun2nix` packaging (`lib.fileset.toSource`) | **Selective**: `lib.fileset.toSource` packaging pattern, `just` task organization, and `hjem` standalone check ideas |
-| **`cnix`** | `flake-parts` + `treefmt-nix` + `agenix` | `feel-co/hjem` + `nvf` | `clib` host-letter scoping (`clib.mkWhen` / `clib.mkEn` / `clib.mkPer`) with duplicate/unknown-host assertions | **Optional**: Helpful if `hosts/` grows beyond 4–5 Linux servers |
+| **`cnix`** (`cnsta/cnix`) | `flake-parts` + `treefmt-nix` + `agenix` | `feel-co/hjem` + `nvf` | `clib` host-letter scoping (`clib.mkWhen`/`mkEn`/`mkPer`), `scripts/default.nix` `writeShellApplication` factory, `modules/settings/` matrix | **Optional**: `scripts/` factory & `clib` helpful if `hosts/` grows beyond 4–5 Linux servers |
+| **`mikos-den`** (`sk4rd/mikos-den`) | `denful/den` + `import-tree` + `treefmt-nix` | `feel-co/hjem` | Dendritic aspect-per-feature (`den.aspects.<name>.{nixos,hjem}`), `virtualisation.vmVariant` test overrides, pure-data semantic `lib/theme/` | **Selective**: `vmVariant` test override pattern for `hosts/nixos-vm` & semantic theme helper structure |
 | **`dotfiles`** (Skullheadx) | Raw `flake.nix` (`nix-darwin` + `nixosSystem`) | `feel-co/hjem` + `nvf` | Minimalist `hjem-darwin.nix` (`Library/Application Support/lazygit`), `programs.zsh` native options (`unsetopt nomatch` for `.#host` flake refs in Zsh!) | **Yes (Small Gem)**: `unsetopt nomatch` in `config/zsh/.zshrc` so `.#MacBook-Pro` never requires quoting in Zsh |
 | **`nixfiles`** | Raw `flake.nix` (`nixosSystem`) | `feel-co/hjem` + `nixugen` | Clean `pkgs.formats.toml` generation for `helix/config.toml` & `helix/languages.toml` paired with `matugen` | **Reference**: Shows pure Nix-generated Helix config vs. our `config/helix` out-of-store symlink approach |
 | **`nixugen`** | Minimal Flake (`overlays` + `hjemModules`) | `feel-co/hjem` | Runtime `matugen` wallpaper theming without Nix rebuilds; clean `hjemModules.default` + `overlays.default` | **Future**: Ready-to-use if migrating from static Soft Neon Violet to dynamic wallpaper theming |
@@ -39,20 +40,33 @@ The largest and most engineering-heavy repository in `refer/` (from the author o
 
 ---
 
-## 2. `cnix`
+## 2. `cnix` (`cnsta/cnix`)
 
 A clean, multi-host NixOS desktop/homelab flake (`bunk`, `kima`, `sobotka`, `toothpc`, `ziggy`) built on `flake-parts` + `hjem` + `agenix` + `treefmt-nix`.
 
 ### Architecture & Key Files
-- **`lib/default.nix` (`clib`)**: Defines a single-letter host registry (`hosts/registry.nix`, e.g., `k` = `kima`, `s` = `sobotka`, `z` = `ziggy`) and helpers:
-  - `clib.mkWhen host "ks" { ... }`: Applies config only if `host` matches any letter in `"ks"`, throwing explicit errors on duplicate letters or unknown host/scope letters.
-  - `clib.mkEn host "ks"`: Shorthand for `mkWhen host "ks" { enable = true; }`.
-  - `clib.mkPer host { "k" = ...; "s" = ...; }`: Multi-branch host-scoped `mkMerge`.
-- **`modules/settings/`**: Centralizes host-scoped module toggles in one readable matrix.
-- **Custom Packages & Tooling**: Uses `nh`, `agenix`, `helix-flake`, `lanzaboote` (Secure Boot), `nvf`, and `treefmt-nix`.
+- **`lib/default.nix` (`clib`) & `hosts/registry.nix`**: Defines a single-letter host registry (`k` = `kima`, `b` = `bunk`, `t` = `toothpc`, `s` = `sobotka`, `z` = `ziggy`) and helpers (`clib.mkWhen`, `clib.mkEn`, `clib.mkPer`) throwing explicit errors on duplicate letters or unknown host/scope letters.
+- **`hosts/default.nix`**: Uses `inputs.nixpkgs.nixosModules.readOnlyPkgs` (`nixpkgs.pkgs = pkgs`) and binds `hjem.users.${user}` dynamically from `config.cnix.settings.accounts.username`.
+- **`scripts/default.nix`**: Wraps `pkgs.writeShellApplication` with typed `enable` + `readOnly` `package` options, filtering enabled scripts via `lib.pipe` into `environment.systemPackages`.
+- **`modules/settings/`**: Centralizes typed host-scoped settings (`accounts`, `boot`, `fonts`, `graphics`, `locale`, `monitors`, `network`, `nix`, `peripherals`, `theme`).
 
 ### Takeaways for `nix-dotfiles`
-- Right now we have 3 hosts (`MacBook-Pro`, `nixos`, `nixos-vm`), so our 4-domain `modules/{common,darwin,nixos,hjem}/` layout is cleaner than single-letter host codes. If we ever expand to 4+ NixOS servers/homelabs, `clib.mkWhen` / `clib.mkEn` is a great pattern to adopt in `lib/`.
+- Right now we have 3 hosts (`MacBook-Pro`, `nixos`, `nixos-vm`), so our 4-domain `modules/{common,darwin,nixos,hjem}/` layout is cleaner than single-letter host codes. If we ever expand to 4+ NixOS servers/homelabs, `clib.mkWhen` / `clib.mkEn` and the `scripts/default.nix` `writeShellApplication` factory are great patterns to adopt.
+
+---
+
+## 2B. `mikos-den` (`sk4rd/mikos-den`)
+
+A dendritic NixOS + `feel-co/hjem` flake built on `denful/den` + `denful/import-tree` + `disko` + `agenix` + `treefmt-nix` (55-line `flake.nix` evaluating `./modules` via `evalModules`).
+
+### Architecture & Key Files
+- **Dendritic Aspect Features (`modules/features/*.nix`)**: Each feature file defines `den.aspects.<feature>.{nixos,hjem}` together (e.g., `common-utils.nix`, `syncthing.nix`, `yubikey.nix`, `proton-vpn-client.nix`) and registers into `den.schema.{host,user}.includes`.
+- **VM Test Variant (`modules/features/nixos-testing-vm.nix`)**: Uses `virtualisation.vmVariant` to override normal user passwords to `"test"` and disable `age.secrets` when running `nixos-rebuild build-vm`, avoiding secret/SSH key setup during local VM tests.
+- **Pure-Data Semantic Theme (`lib/theme/` & `lib/settings-type.nix`)**: Separates raw palette (`oxocarbon.nix`) from semantic roles (`colors.bg`, `colors.syntax.*`, `colors.diff.*`), keeps font packages as attribute paths, and provides color conversion helpers (`lib.rgb`, `lib.channels`).
+
+### Takeaways for `nix-dotfiles`
+1. **`virtualisation.vmVariant` for `hosts/nixos-vm`**: Useful if expanding `nixos-vm` for interactive `build-vm` testing without agenix secrets.
+2. **Keep `red-tape` 4-Domain Split**: `den` + `import-tree` is a full dendritic paradigm shift; our `red-tape` + `modules/{common,darwin,nixos,hjem}` split already achieves cross-platform sharing cleanly with simpler tooling.
 
 ---
 
