@@ -13,32 +13,32 @@ $character"""
 right_format = """$all"""
 
 [palettes.soft_violet_claude]
-text = "#E8E6DC"
-subtext1 = "#B0AEA5"
-subtext0 = "#A06E86"
-overlay2 = "#A06E86"
-overlay1 = "#62536E"
-overlay0 = "#3F0474"
-surface2 = "#62536E"
-surface1 = "#3F0474"
-surface0 = "#24113A"
-base = "#141413"
-mantle = "#170032"
+text = "#FCEAF3"
+subtext1 = "#E8D5E6"
+subtext0 = "#D8A7BE"
+overlay2 = "#B88BA4"
+overlay1 = "#7A6690"
+overlay0 = "#43293A"
+surface2 = "#7A6690"
+surface1 = "#43293A"
+surface0 = "#241320"
+base = "#1C1025"
+mantle = "#241320"
 crust = "#170032"
-mauve = "#8924CE"
-pink = "#FF36D9"
-lavender = "#A06E86"
-peach = "#D97757"
-red = "#C15F3C"
-maroon = "#C15F3C"
-yellow = "#D97757"
-green = "#788C5D"
-teal = "#A06E86"
-blue = "#6A9BCC"
-sapphire = "#6A9BCC"
-sky = "#8BB2D9"
-rosewater = "#EAD7FF"
-flamingo = "#D97757"
+mauve = "#B07FD0"
+pink = "#FF85B8"
+lavender = "#C8A2F0"
+peach = "#FF9EBB"
+red = "#E06C88"
+maroon = "#D6447E"
+yellow = "#FFD4A8"
+green = "#8FBF9F"
+teal = "#6DD5A8"
+blue = "#8BB2D9"
+sapphire = "#B8D4F0"
+sky = "#B8D4F0"
+rosewater = "#FFD4C4"
+flamingo = "#FFB2D9"
 
 [fill]
 symbol = ' '
@@ -75,21 +75,19 @@ ssh_symbol = ""
 
 [directory]
 home_symbol = "⌂ "
-#home_symbol = "󰋞"
 truncation_length = 3
-fish_style_pwd_dir_length = 1                                                                                                                                   # turn on fish directory truncation
+fish_style_pwd_dir_length = 1                                                                                                                               # turn on fish directory truncation
 truncation_symbol = "□ "
 read_only = " ◈"
-read_only_style = "subtext0"
+read_only_style = "pink"
 use_os_path_sep = true
-style = "italic blue"
+style = "italic peach"
 format = '[$path]($style)[$read_only]($read_only_style)'
-repo_root_style = 'bold lavender'
-repo_root_format = '[$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style) [△](bold sapphire)'
+repo_root_style = 'bold flamingo'
+repo_root_format = '[$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style) [△](bold pink)'
 
 [directory.substitutions]
 '/opt/homebrew' = ""
-'~' = "󰋞"
 "Documents" = "󰈙 "
 "Downloads" = " "
 "Music" = "󰝚 "
@@ -98,7 +96,7 @@ repo_root_format = '[$before_root_path]($before_repo_root_style)[$repo_root]($re
 'iCloud Drive' = "󰀸"
 
 [cmd_duration]
-format = "[◄ $duration ](italic subtext0)"
+format = "[◄ $duration ](italic flamingo)"
 min_time = 2000
 show_milliseconds = false
 disabled = false
@@ -142,8 +140,8 @@ style = "italic yellow"
 
 [git_branch]
 format = " [$symbol$branch(:$remote_branch)]($style)"
-symbol = "[△](bold italic sapphire)"
-style = "italic sapphire"
+symbol = "[△](bold italic pink)"
+style = "italic peach"
 truncation_symbol = "⋯"
 truncation_length = 15
 ignore_branches = ["main", "master"]
@@ -284,8 +282,8 @@ format = " java [${symbol}(${version} )]($style)"
 
 [jj_bookmark]
 format = " [$symbol$bookmark(@$remote)$diverged( \\(+$overflow_count others\\))]($style)"
-symbol = "[△](bold italic sapphire)"
-style = "italic sapphire"
+symbol = "[△](bold italic pink)"
+style = "italic peach"
 truncation_symbol = "⋯"
 truncation_length = 15
 ignore_names = ["main", "master"]

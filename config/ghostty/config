@@ -1,5 +1,4 @@
 scrollback-limit = 10000000
-window-padding-color = extend
 font-family = "Maple Mono NF CN"
 font-feature = "zero, cv01, cv02, cv33, cv34, cv35, cv36, cv96, cv97, cv98, cv99, ss03, ss05, ss07, ss08"
 font-codepoint-map = U+E000-U+E00A,U+E0A0-U+E0A3,U+E0B0-U+E0C8,U+E0CA,U+E0CC-U+E0D7,U+E200-U+E2A9,U+E300-U+E3E3,U+E5FA-U+E6B7,U+E700-U+E8EF,U+EA60-U+EC1E,U+ED00-U+F2FF,U+EE00-U+EE0B,U+F300-U+F381,U+F400-U+F533,U+F0001-U+F1AF0=Maple Mono NF CN
@@ -7,40 +6,12 @@ font-size = 12
 window-height = 30
 window-width = 80
 window-theme = auto
-background-opacity = 0.92
-background-blur-radius = 20
 link-url = true
 auto-update-channel = stable
 shell-integration-features = no-cursor
 
-# Soft Neon Violet color scheme
-background = #170032
-foreground = #EAD7FF
-
-palette = 0=#170D20
-palette = 1=#B96F91
-palette = 2=#91AE9A
-palette = 3=#C8AB86
-palette = 4=#8176B8
-palette = 5=#C026D3
-palette = 6=#8FA5B9
-palette = 7=#DCCBEA
-
-palette = 8=#62536E
-palette = 9=#D58AAA
-palette = 10=#AAC5B0
-palette = 11=#E0C39E
-palette = 12=#A99AE0
-palette = 13=#D65CDE
-palette = 14=#B4C6D8
-palette = 15=#F8EEFF
-
-cursor-color = #C026D3
-cursor-text = #170032
-cursor-style = underline
-
-selection-background = #3F0474
-selection-foreground = #F8EEFF
+# Adaptive dark/light themes (themes/Glass and themes/Glass-Day)
+theme = dark:Glass,light:Glass-Day
 
 
 # This file will be linked to the appropriate os-config file depending on the current platform
