@@ -1,4 +1,5 @@
 {
+  inputs,
   config,
   lib,
   pkgs,
@@ -21,6 +22,10 @@ in
       ".config/ghostty/config" = "ghostty/config";
       ".config/ghostty/os-config" =
         if isDarwin then "ghostty/os-config-darwin" else "ghostty/os-config-linux";
+    };
+
+    files = {
+      ".config/ghostty/shaders".source = inputs.ghostty-cursor-shaders;
     };
   };
 }

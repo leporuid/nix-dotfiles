@@ -8,15 +8,21 @@
 let
   inherit (lib.modules) mkIf;
   inherit (lib.options) mkEnableOption;
+  inherit (lib.strings) concatStringsSep;
+  inherit (pkgs.lib.fileset) toSource;
 
   cfg = config.my.themes;
+  batSrc = toSource {
+    root = ../../config/bat;
+    fileset = ../../config/bat;
+  };
   batCache =
     pkgs.runCommand "bat-cache"
       {
         nativeBuildInputs = [ pkgs.bat ];
       }
       ''
-        bat cache --build --source "${../../config}/bat" --target "$out"
+        bat cache --build --source "${batSrc}" --target "$out"
       '';
 in
 {
@@ -44,6 +50,7 @@ in
     ];
 
     my.config.source = {
+      ".config/eza" = "eza";
       ".config/ghostty/themes/Glass" = "ghostty/themes/Glass";
       ".config/ghostty/themes/Glass-Day" = "ghostty/themes/Glass-Day";
       ".config/ghostty/themes/Glass-Light" = "ghostty/themes/Glass-Light";
@@ -53,7 +60,7 @@ in
       BAT_THEME = "Catppuccin Mocha";
       BAT_CACHE_PATH = "${batCache}";
       MANPAGER = "batman";
-      FZF_DEFAULT_OPTS = lib.concatStringsSep " " [
+      FZF_DEFAULT_OPTS = concatStringsSep " " [
         "--no-sort"
         "--reverse"
         "--margin=0,1"

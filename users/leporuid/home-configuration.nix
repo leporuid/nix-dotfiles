@@ -19,10 +19,12 @@ in
     # 2. Enable domain modules
     themes.enable = true;
     programs = {
+      agents.enable = true;
       atuin.enable = true;
       direnv.enable = true;
       fish.enable = true;
       ghostty.enable = true;
+      git.enable = true;
       helix.enable = isDarwin;
       jujutsu.enable = true;
       neovim.enable = true;
@@ -30,6 +32,7 @@ in
       starship.enable = true;
       tmux.enable = true;
       zellij.enable = true;
+      zsh.enable = true;
     };
     # 4. Declarative configuration synthesis engine (my-config)
     config = {
@@ -37,23 +40,10 @@ in
       storeDirectory = ../../config;
       useOutOfStoreSymlinks = isDarwin;
       source = {
-        # Shells
-        ".config/sheldon" = "sheldon";
-        ".config/zsh" = "zsh";
-        ".zshenv" = "zsh/home_zshenv";
-
-        # Version Control & Tools
-        ".config/git" = "git";
         ".config/mise" = "mise";
         ".config/gallery-dl" = "gallery-dl";
         ".config/syntax-highlight" = "syntax-highlight";
         ".npmrc" = "npm/npmrc";
-
-        # Agents & Skills
-        ".claude/settings.json" = "claude/settings.json";
-        ".agents/skills" = "agents/skills";
-        ".claude/skills" = "agents/skills";
-        ".gemini/skills" = "gemini/skills";
       }
       // lib.optionalAttrs isDarwin {
         # macOS GUI & Utilities
@@ -70,9 +60,6 @@ in
   # 5. Core developer tools & productivity utilities
   packages =
     (with pkgs; [
-      # Shell & prompt
-      sheldon
-
       # Editors
       vim
 
@@ -83,13 +70,6 @@ in
       jq
       curl
       wget
-
-      # Version control
-      git
-      lazygit
-      delta
-      gh
-      git-open
 
       # Build tools, languages & dev environments
       just
@@ -113,8 +93,6 @@ in
       perSystem.self.has-ancestor
       perSystem.self.ccase
       perSystem.self.ktoolbox
-      perSystem.llm-agents.herdr
-      perSystem.llm-agents.antigravity-cli
     ])
     ++ lib.optionals isDarwin [
       pkgs.ffmpeg
@@ -130,7 +108,6 @@ in
     ];
   # 6. Session environment variables (POSIX script via Hjem environment.loadEnv)
   environment.sessionVariables = {
-    ZDOTDIR = "${config.directory}/.config/zsh";
     NIX_CONFIG_REV = inputs.self.rev or inputs.self.dirtyRev or "dirty";
     NIX_CONFIG_DIR = config.my.config.directory;
     NIX_CONFIG_LAST_MODIFIED = builtins.toString (inputs.self.lastModified or 0);
@@ -142,18 +119,4 @@ in
     SWIFTLY_BIN_DIR = "${config.directory}/.swiftly/bin";
     SWIFTLY_TOOLCHAINS_DIR = "${config.directory}/Library/Developer/Toolchains";
   };
-  # 7. Native Hjem files (text content & external derivations)
-  files = {
-    ".local/share/zsh/hm-session-vars.sh".source = config.environment.loadEnv;
-
-    ".config/ghostty/shaders" = {
-      source = inputs.ghostty-cursor-shaders;
-    };
-
-    # Unified agent instructions distribution across harnesses
-    ".claude/CLAUDE.md".source = ../../AGENTS.md;
-    ".codex/AGENTS.md".source = ../../AGENTS.md;
-    ".config/opencode/AGENTS.md".source = ../../AGENTS.md;
-  };
-  # 8. Hjem-Rum module ecosystem (under rum.programs.*)
 }
