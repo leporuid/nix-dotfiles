@@ -34,6 +34,9 @@ fi
 # Beyond this point, we're setting up ZSH. If Fish doesn't exist on PATH
 # then I'll know that by now, so just set things up nicely.
 
+# Let unmatched globs (e.g. Nix flake refs like .#MacBook-Pro) pass through literally
+unsetopt nomatch
+
 if [[ -n $GHOSTTY_RESOURCES_DIR ]]; then
   source "$GHOSTTY_RESOURCES_DIR"/shell-integration/zsh/ghostty-integration
 fi

@@ -22,9 +22,10 @@ This repository collects project-specific expectations, tool contracts, and arch
 | `modules/nixos/` | NixOS system modules (`default.nix`, `hjem.nix`). |
 | `modules/hjem/` | User-level Hjem modules (`default.nix`, `my-config.nix`, `themes.nix`, `fish.nix`, `neovim.nix`, `helix.nix`, `ghostty.nix`, `starship.nix`, `nushell.nix`, `tmux.nix`, `zellij.nix`, `atuin.nix`, `direnv.nix`, `direnv-instant.nix`, `jujutsu.nix`, `nixcord.nix`). |
 | `modules/common/` | Shared platform configurations (`vars.nix`, `hjem.nix`). |
-| `packages/*.nix` | Custom derivations and package wrappers consumed via `inputs.self.packages.<system>.<name>`. |
+| `packages/*.nix` | Custom derivations and package wrappers consumed via `inputs.self.packages.<system>.<name>`; prefer `lib.fileset.toSource` for clean local source whitelisting. |
 | `users/leporuid/` | Shared user profile (`home-configuration.nix`) managing packages and files. |
 | `config/` | Raw upstream configurations (`fish/`, `ghostty/`, `nushell/`, `starship.toml`, `git/`, `nvim/`, `agents/`, etc.). |
+| `docs/` | Distilled architectural references (`REFERENCE_PATTERNS.md`, `REFER_DEEP_ANALYSIS.md`). |
 
 ---
 
@@ -72,10 +73,13 @@ This repository collects project-specific expectations, tool contracts, and arch
   - Never place `imports = [ ... ];` inside a `config = lib.mkIf ... { ... }` block; module imports must always remain at the top level of the module file.
 - **Hjem Configuration & Arguments**:
   - Pass flake inputs to Hjem modules via `hjem.specialArgs = { inherit inputs; };`.
-  - Custom Hjem program options are located under `my.programs.<program>` (e.g., `my.programs.fish`, `my.programs.ghostty`, `my.programs.starship`, `my.programs.neovim`), while Hjem-Rum modules are under `rum.programs.<program>` (e.g., `rum.programs.git`).
+  - Custom Hjem program options are located under `my.programs.<program>` (e.g., `my.programs.fish`, `my.programs.ghostty`, `my.programs.starship`, `my.programs.neovim`), while Hjem-Rum modules are under `rum.programs.<program>` (e.g., `rum.programs.git`, `rum.programs.nushell`).
+  - **Shell Integration Collision Guard**: Never enable `rum.programs.<tool>.integrations.<shell>.enable = true` if `my.config.source` already manages that shell's main config file (e.g., `fish/config.fish`).
+- **Flake Input Hygiene**: Zero out unused transitive inputs (`follows = "";`) to keep `flake.lock` minimal and evaluation fast.
 - **Raw Application Configurations (`config/`)**:
   - Keep application configurations directly under root `config/`.
   - Linked via Hjem `files` (`my.config.source`) and managed live on macOS via `my.config.useOutOfStoreSymlinks = isDarwin;`.
+  - `config/zsh/.zshrc` handles interactive handoff (`exec fish -l`) and places `unsetopt nomatch` after handoff so flake refs like `.#MacBook-Pro` pass literally in Zsh.
   - Nushell configuration must remain native Nushell syntax in `config/nushell/config.nu` and `config/nushell/env.nu`; do not translate Termius Bash/POSIX injection scripts into compatibility layers.
   - Termius shell integration is client-side input and cannot be disabled or corrected by NixOS or Hjem. Configure Termius separately when it injects Bash/POSIX snippets into Nushell.
 
@@ -85,7 +89,8 @@ This repository collects project-specific expectations, tool contracts, and arch
 
 ### macOS (`hosts/MacBook-Pro`)
 - Managed by `nix-darwin` + `hjem`.
-- **Primary Interactive Shell**: **Fish** (`programs.fish.enable = true;`, `users.users.${config.system.primaryUser}.shell = pkgs.fish;` in `modules/darwin/system-defaults.nix`).
+- **Login Shell & Interactive Shell**: `zsh` (`users.users.${config.system.primaryUser}.shell = pkgs.zsh;`, `UserShell: /run/current-system/sw/bin/zsh`) bootstrapping interactive **Fish** via `config/zsh/.zshrc` (`programs.fish.enable = true;` in `modules/darwin/system-defaults.nix`).
+- **Remote Builder**: Builds `aarch64-linux` derivations via `hosts/nixos` (`determinateNix.customSettings.builders = "ssh-ng://leporuid@nixos ..."` with `/etc/ssh/ssh_host_ed25519_key` and `programs.ssh.knownHosts.nixos`).
 - **Home Directory**: Explicitly set `directory = "/Users/leporuid";` under `hjem.users.leporuid`.
 - **Determinate Daemon**: `nix.enable = false;` to avoid conflicting with Determinate Nix daemon and launchd services.
 - **License**: Unfree packages permitted via `nixpkgs.config.allowUnfree = true;`.
