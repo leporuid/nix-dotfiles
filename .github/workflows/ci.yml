@@ -1,0 +1,126 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  lint:
+    name: Format and Lint
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup SSH agent for nix-secrets
+        uses: webfactory/ssh-agent@v0.10
+        with:
+          ssh-private-key: ${{ secrets.NIX_SECRETS_SSH_KEY }}
+      - name: Install Determinate Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+        with:
+          extra-conf: |
+            extra-substituters = https://cache.numtide.com https://nix-community.cachix.org https://crane.cachix.org
+            extra-trusted-public-keys = niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= crane.cachix.org-1:8Scfpmn9w+hGdXH/Q9tTLiYAE/2dnJYRJP7kl80GuRk=
+      - name: Setup Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Check formatting with treefmt
+        run: nix fmt -- --ci
+      - name: Run pedantix, deadnix, statix, and actionlint
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t nix_files < <(git ls-files '*.nix' ':!hosts/nixos/hardware-configuration.nix')
+          nix shell --inputs-from . \
+            nixpkgs#actionlint \
+            nixpkgs#deadnix \
+            nixpkgs#pedantix \
+            nixpkgs#statix \
+            -c bash -euo pipefail -c '
+              pedantix --check "$@"
+              deadnix --fail .
+              statix check .
+              actionlint .github/workflows/*.yml
+            ' -- "${nix_files[@]}"
+  eval-jobs:
+    name: Evaluate (${{ matrix.system }})
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        system:
+          - aarch64-darwin
+          - aarch64-linux
+          - x86_64-linux
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup SSH agent for nix-secrets
+        uses: webfactory/ssh-agent@v0.10
+        with:
+          ssh-private-key: ${{ secrets.NIX_SECRETS_SSH_KEY }}
+      - name: Install Determinate Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+        with:
+          extra-conf: |
+            extra-substituters = https://cache.numtide.com https://nix-community.cachix.org https://crane.cachix.org
+            extra-trusted-public-keys = niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= crane.cachix.org-1:8Scfpmn9w+hGdXH/Q9tTLiYAE/2dnJYRJP7kl80GuRk=
+      - name: Setup Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Evaluate system checks with Determinate nix-eval-jobs
+        shell: bash
+        env:
+          SYSTEM: ${{ matrix.system }}
+        run: |
+          set -euo pipefail
+          mkdir -p .ci-gcroots
+          nix run "https://flakehub.com/f/DeterminateSystems/nix-eval-jobs/3.tar.gz" -- \
+            --workers 4 \
+            --max-memory-size 4096 \
+            --gc-roots-dir "$(pwd)/.ci-gcroots" \
+            --flake ".#checks.${SYSTEM}" \
+            > eval-results.jsonl
+          jq -r 'select(.error != null) | "::error::\(.attrPath // .attr): \(.error)"' eval-results.jsonl
+          if jq -e 'select(.error != null)' eval-results.jsonl >/dev/null; then
+            exit 1
+          fi
+  flake-check:
+    name: Flake Check and Host Eval
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup SSH agent for nix-secrets
+        uses: webfactory/ssh-agent@v0.10
+        with:
+          ssh-private-key: ${{ secrets.NIX_SECRETS_SSH_KEY }}
+      - name: Install Determinate Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+        with:
+          extra-conf: |
+            extra-substituters = https://cache.numtide.com https://nix-community.cachix.org https://crane.cachix.org
+            extra-trusted-public-keys = niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= crane.cachix.org-1:8Scfpmn9w+hGdXH/Q9tTLiYAE/2dnJYRJP7kl80GuRk=
+      - name: Setup Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Evaluate host configurations and Hjem manifest
+        run: |
+          nix eval --raw .#darwinConfigurations.MacBook-Pro.config.system.build.toplevel.drvPath
+          echo
+          nix eval --raw .#nixosConfigurations.nixos.config.system.build.toplevel.drvPath
+          echo
+          nix eval --raw .#nixosConfigurations.nixos-vm.config.system.build.toplevel.drvPath
+          echo
+          nix eval --json .#hjemConfigurations.leporuid.manifest >/dev/null
+      - name: Run nix flake check (all-systems eval + x86_64-linux builds)
+        run: |
+          nix flake check --all-systems --no-build
+          nix flake check
