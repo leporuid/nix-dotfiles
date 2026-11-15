@@ -353,11 +353,11 @@
     "gallery-ai": {
       "flake": false,
       "locked": {
-        "lastModified": 1794633669,
-        "narHash": "sha256-IgKkNKHYGMoZCKhwbFcHKhPANZBPOJOrIVj39pUu6Ds=",
+        "lastModified": 1794718691,
+        "narHash": "sha256-KquFcwKSn1coLr4C1xMVraIUrGYI978zBE0H2jckLvM=",
         "owner": "CrimsonGlory",
         "repo": "gallery-ai",
-        "rev": "61022b545b2c6800125bd2dd711324159cdf919d",
+        "rev": "d4ebda0600686db95402b2e9e2f6369d3b0400a0",
         "type": "github"
       },
       "original": {
@@ -565,11 +565,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794697722,
-        "narHash": "sha256-kLUWR2G8oUYuciZVazof7fZ+M/baRaemoNjmwXH9Pic=",
+        "lastModified": 1794721493,
+        "narHash": "sha256-7extb+ld6xPCzcVuhVdvcvGPLu/qtDRrhFJmH68jXfM=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "db5b3ff7fca0005b0162c3c417fb98e369534e5c",
+        "rev": "aeb1afe1529c5dc7dcdc54d644a8aed212d99dd0",
         "type": "github"
       },
       "original": {
@@ -729,11 +729,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794695953,
-        "narHash": "sha256-5B6B2Se9HMcXZBV95kYMcEJJBK6W+5Gw1Jy/B4HDdMI=",
+        "lastModified": 1794734891,
+        "narHash": "sha256-mNqTTdTOfQPUGwt0++v7wuJtAEVdq62rO21MAF0M0YI=",
         "owner": "4evy",
         "repo": "nixcord",
-        "rev": "2840179d12e7a69bda760d5440b0301dd912bdcc",
+        "rev": "af9ba18a522f33edb95b263e878752d9e7590922",
         "type": "github"
       },
       "original": {
@@ -846,11 +846,11 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1794386569,
-        "narHash": "sha256-x9sADJvoVG0L6RejZB+/BB4YiGZFBZrfTlhF4uBq1tQ=",
+        "lastModified": 1794537146,
+        "narHash": "sha256-Wpz/7x/YWnDIBu7yj6ixe8j6fIMsidd9Y+o1PqPF3iM=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "d4f25a3e562008648d45bcf2d70bcc7422cad84e",
+        "rev": "d5cc6833999746cffdfe0598f7bc801a57b887a9",
         "type": "github"
       },
       "original": {
@@ -1102,11 +1102,11 @@
     "yt-ai": {
       "flake": false,
       "locked": {
-        "lastModified": 1794687384,
-        "narHash": "sha256-zaDDWC7FMZtH+i3RadOeUDzzFRwlNY2CyapmAY+Cg+I=",
+        "lastModified": 1794713958,
+        "narHash": "sha256-jnRoWQBhlzNcY/svSHfJW5SC9owW7eNBIBu4BWUBPaM=",
         "owner": "CrimsonGlory",
         "repo": "yt-ai",
-        "rev": "b41d765b7bc248b4d2b918a705868eaaa81f9d94",
+        "rev": "fc98d09e51884c5faae53a4db980b5aecfbbf295",
         "type": "github"
       },
       "original": {
