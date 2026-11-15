@@ -67,35 +67,36 @@ function check-applied -d "Check if the currently applied configuration needs to
     end
 end
 
-function edit-age -d "Edit the encrypted files stored in nix-secrets"
-    set -l secrets_dir ""
+function edit-age -d "Edit encrypted files stored in nix-secrets"
+    set -l secrets_dir
+
     if test -d "$HOME/Developer/nix-secrets"
         set secrets_dir "$HOME/Developer/nix-secrets"
-    else if test -d "../nix-secrets"
-        set secrets_dir "../nix-secrets"
+    else if test -d (path normalize "$PWD/../nix-secrets")
+        set secrets_dir (path normalize "$PWD/../nix-secrets")
+    else
+        echo "nix-secrets repository was not found" >&2
+        return 1
     end
 
-    if test -n "$secrets_dir"
-        set file (fd --type file --glob '*.age' . $secrets_dir | fzf --height=40% --layout=reverse)
-        or return
-        pushd $secrets_dir
-        if test -f agenix-rules.nix
-            set -lx AGENIX_RULES "$PWD/agenix-rules.nix"
-        else if test -f secrets.nix
-            set -lx AGENIX_RULES "$PWD/secrets.nix"
-        end
-        agenix -e (path resolve $file) $argv
-        popd
+    set -l rules_file
+    if test -f "$secrets_dir/agenix-rules.nix"
+        set rules_file "$secrets_dir/agenix-rules.nix"
+    else if test -f "$secrets_dir/secrets.nix"
+        set rules_file "$secrets_dir/secrets.nix"
     else
-        set file (fd --type file --glob '*.age' | fzf --height=40% --layout=reverse)
-        or return
-        if test -f agenix-rules.nix
-            set -lx AGENIX_RULES "$PWD/agenix-rules.nix"
-        else if test -f secrets.nix
-            set -lx AGENIX_RULES "$PWD/secrets.nix"
-        end
-        agenix -e $file $argv
+        echo "No agenix rules file found" >&2
+        return 1
     end
+
+    set -l file (
+        fd --type f --glob '*.age' "$secrets_dir" |
+        fzf --height=40% --layout=reverse
+    )
+    or return
+
+    set -lx AGENIX_RULES "$rules_file"
+    agenix -e "$file" $argv
 end
 
 function build-oci-image -d "Build the OCI Ampere A1 qcow2 custom image for nixos"
