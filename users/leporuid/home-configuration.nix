@@ -3,6 +3,7 @@
   config,
   lib,
   pkgs,
+  perSystem,
   ...
 }:
 let
@@ -110,23 +111,23 @@ in
       nerd-fonts.roboto-mono
 
       # Custom / specialized derivations from flake
-      inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.has-ancestor
-      inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.ccase
-      inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.ktoolbox
-      inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.copilot-cli
-      inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.antigravity-cli
+      perSystem.self.has-ancestor
+      perSystem.self.ccase
+      perSystem.self.ktoolbox
+      perSystem.llm-agents.copilot-cli
+      perSystem.llm-agents.antigravity-cli
     ])
     ++ lib.optionals isDarwin [
       pkgs.ffmpeg
       pkgs.gnused
       pkgs.mas
       pkgs.qpdf
-      inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.age-plugin-se
-      inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.gallery-dl
-      inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.kumono
-      inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.megabasterd
-      inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.unxip
-      inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.yt-dlp
+      perSystem.self.age-plugin-se
+      perSystem.self.gallery-dl
+      perSystem.self.kumono
+      perSystem.self.megabasterd
+      perSystem.self.unxip
+      perSystem.self.yt-dlp
     ];
   # 6. Session environment variables (POSIX script via Hjem environment.loadEnv)
   environment.sessionVariables = {
