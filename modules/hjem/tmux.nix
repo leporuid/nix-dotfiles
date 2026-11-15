@@ -14,9 +14,7 @@ in
   options.my.programs.tmux = {
     enable = mkEnableOption "tmux terminal multiplexer configuration via Hjem";
 
-    package = mkPackageOption pkgs "tmux" {
-      default = "tmux";
-    };
+    package = mkPackageOption pkgs "tmux" { };
   };
 
   config = mkIf cfg.enable {

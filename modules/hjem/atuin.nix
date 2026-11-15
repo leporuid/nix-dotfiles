@@ -14,9 +14,7 @@ in
   options.my.programs.atuin = {
     enable = mkEnableOption "Atuin shell history configuration via Hjem";
 
-    package = mkPackageOption pkgs "atuin" {
-      default = "atuin";
-    };
+    package = mkPackageOption pkgs "atuin" { };
   };
 
   config = mkIf cfg.enable {

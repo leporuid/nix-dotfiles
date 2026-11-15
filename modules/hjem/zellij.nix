@@ -14,9 +14,7 @@ in
   options.my.programs.zellij = {
     enable = mkEnableOption "Zellij terminal workspace configuration via Hjem";
 
-    package = mkPackageOption pkgs "zellij" {
-      default = "zellij";
-    };
+    package = mkPackageOption pkgs "zellij" { };
   };
 
   config = mkIf cfg.enable {

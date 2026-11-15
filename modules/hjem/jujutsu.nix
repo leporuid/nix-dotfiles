@@ -16,9 +16,7 @@ in
   options.my.programs.jujutsu = {
     enable = mkEnableOption "Jujutsu VCS configuration via Hjem";
 
-    package = mkPackageOption pkgs "jujutsu" {
-      default = "jujutsu";
-    };
+    package = mkPackageOption pkgs "jujutsu" { };
   };
 
   config = mkIf cfg.enable {

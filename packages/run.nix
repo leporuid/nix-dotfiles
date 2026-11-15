@@ -2,7 +2,13 @@
 pkgs.stdenvNoCC.mkDerivation {
   name = "run";
 
-  src = ../.;
+  src = pkgs.lib.fileset.toSource {
+    root = ../.;
+    fileset = pkgs.lib.fileset.unions [
+      ../config/fish/completions/run.fish
+      ../config/fish/functions/run.fish
+    ];
+  };
 
   dontBuild = true;
 

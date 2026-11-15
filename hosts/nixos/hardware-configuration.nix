@@ -11,20 +11,22 @@
     (modulesPath + "/profiles/qemu-guest.nix")
   ];
 
-  boot.initrd.availableKernelModules = [
-    "xhci_pci"
-    "virtio_pci"
-    "virtio_scsi"
-    "usbhid"
-  ];
-  boot.kernelParams = [
-    "console=ttyS0,115200n8"
-    "console=tty1"
-  ];
-  boot.kernelModules = [
-    "wireguard"
-    "ip_vs"
-  ];
-  boot.extraModulePackages = [ ];
+  boot = {
+    initrd.availableKernelModules = [
+      "xhci_pci"
+      "virtio_pci"
+      "virtio_scsi"
+      "usbhid"
+    ];
+    kernelParams = [
+      "console=ttyS0,115200n8"
+      "console=tty1"
+    ];
+    kernelModules = [
+      "wireguard"
+      "ip_vs"
+    ];
+    extraModulePackages = [ ];
+  };
 
 }

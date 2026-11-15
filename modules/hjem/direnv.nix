@@ -14,13 +14,9 @@ in
   options.my.programs.direnv = {
     enable = mkEnableOption "direnv and nix-direnv configuration via Hjem";
 
-    package = mkPackageOption pkgs "direnv" {
-      default = "direnv";
-    };
+    package = mkPackageOption pkgs "direnv" { };
 
-    nixDirenvPackage = mkPackageOption pkgs "nix-direnv" {
-      default = "nix-direnv";
-    };
+    nixDirenvPackage = mkPackageOption pkgs "nix-direnv" { };
 
     instant = {
       enable = mkEnableOption "direnv-instant non-blocking integration" // {
