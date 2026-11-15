@@ -21,7 +21,9 @@ if status is-interactive
     end
     __source starship init fish
     __source zoxide init fish
-    __source direnv hook fish
+    if not set -q __DIRENV_INSTANT_HOOKED
+        __source direnv hook fish
+    end
     __source fzf --fish
 
     functions -e __source
