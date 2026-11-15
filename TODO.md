@@ -21,9 +21,9 @@
 - [x] Test building `nixosConfigurations.nixos-vm` from `MacBook-Pro` via the `nixos` remote builder (`ssh-ng://leporuid@nixos`).
 - [x] Extend `check-links` in `run.fish` to compare NixOS host Hjem generations (`nixos`, `nixos-vm`) against the standalone manifest.
 - [x] Add `dix` closure diff activation module (`modules/common/dix.nix`, wired into `darwinModules.aggregate` and `nixosModules.aggregate`); `hjemSchemas` unit tests already exist in `red-tape/tests/hjem.nix`.
+- [x] Confirm the single-line Starship prompt interactively in Nushell.
 
 ## Next Session
 
 - [ ] Push `ktoolbox` (`uv2nix` branch: replaced `flake-utils` with `nixpkgs.lib.genAttrs`, dropping `flake-utils` and `systems`), then run `nix flake update ktoolbox` in `nix-dotfiles` and push `main` (`871acfd..HEAD`).
-- [ ] Confirm the single-line Starship prompt interactively in Nushell.
 - [ ] Optional: remove `~/Developer/nix-dotfiles-archive` and `~/Developer/refer` once everything is settled.
