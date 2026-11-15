@@ -17,7 +17,14 @@
   inputs = {
     red-tape.url = "github:leporuid/red-tape";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
+    determinate = {
+      # Share dev tooling and the main package set, not Nix's release build and regression package sets
+      url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
+      inputs = {
+        nix.inputs.git-hooks-nix.follows = "git-hooks";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
     flake-schemas.url = "github:DeterminateSystems/flake-schemas";
     multiverse.url = "github:fzakaria/nixpkgs-multiverse";
 
@@ -94,7 +101,12 @@
     nixcord = {
       url = "github:4evy/nixcord";
       inputs = {
+        # These frameworks are only used by upstream module checks
+        home-manager.follows = "";
+        nix-darwin.follows = "";
         nixpkgs.follows = "nixpkgs";
+        nixpkgs-ci.follows = "nixpkgs";
+        nixpkgs-packages.follows = "nixpkgs";
         treefmt-nix.follows = "treefmt";
       };
     };
@@ -126,13 +138,6 @@
       modules = [
         inputs.red-tape.modules.redTape.darwin
         inputs.red-tape.modules.redTape.hjem
-        {
-          name = "hjem-outputs";
-          outputs.hjemModules = {
-            type = "attrset";
-            scope = "flake";
-          };
-        }
       ];
       systems = [
         "aarch64-darwin"
