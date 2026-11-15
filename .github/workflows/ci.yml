@@ -20,7 +20,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Setup SSH agent for nix-secrets
-        uses: webfactory/ssh-agent@v0.10
+        uses: webfactory/ssh-agent@v0.10.0
         with:
           ssh-private-key: ${{ secrets.NIX_SECRETS_SSH_KEY }}
       - name: Install Determinate Nix
@@ -64,7 +64,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Setup SSH agent for nix-secrets
-        uses: webfactory/ssh-agent@v0.10
+        uses: webfactory/ssh-agent@v0.10.0
         with:
           ssh-private-key: ${{ secrets.NIX_SECRETS_SSH_KEY }}
       - name: Install Determinate Nix
@@ -100,7 +100,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Setup SSH agent for nix-secrets
-        uses: webfactory/ssh-agent@v0.10
+        uses: webfactory/ssh-agent@v0.10.0
         with:
           ssh-private-key: ${{ secrets.NIX_SECRETS_SSH_KEY }}
       - name: Install Determinate Nix
@@ -120,6 +120,13 @@ jobs:
           nix eval --raw .#nixosConfigurations.nixos-vm.config.system.build.toplevel.drvPath
           echo
           nix eval --json .#hjemConfigurations.leporuid.manifest >/dev/null
+      - name: Check standalone Hjem manifest matches the generation
+        run: |
+          nix shell --inputs-from . nixpkgs#fish nixpkgs#jq -c fish -c '
+            set -gx IN_NIX_CONFIG_DEVSHELL 1
+            source run.fish
+            check-links --user leporuid --host MacBook-Pro --target-root /Users/leporuid
+          '
       - name: Run nix flake check (all-systems eval + x86_64-linux builds)
         run: |
           nix flake check --all-systems --no-build
