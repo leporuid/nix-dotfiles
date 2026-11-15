@@ -134,6 +134,7 @@ function install-oci -d "Install NixOS on an OCI instance via nixos-anywhere + n
         --kexec "https://github.com/nix-community/nixos-images/releases/download/nixos-unstable/nixos-kexec-installer-noninteractive-aarch64-linux.tar.gz" \
         --build-on remote \
         --flake .#nixos \
+        --override-input red-tape github:leporuid/red-tape \
         $target $argv[2..]
 end
 
@@ -253,7 +254,10 @@ function nixos -a verb
         echo (set_color --dim --italics)"on nixos, using sudo..."(set_color normal)
     end
 
-    _run $maybe_sudo nixos-rebuild $target_verb --flake .#nixos $rebuild_args $argv[2..]
+    _run $maybe_sudo nixos-rebuild $target_verb \
+        --flake .#nixos \
+        --override-input red-tape github:leporuid/red-tape \
+        $rebuild_args $argv[2..]
 end
 
 function MacBook-Pro -a verb
@@ -262,13 +266,19 @@ function MacBook-Pro -a verb
         set maybe_sudo sudo
     else if test $verb = check
         # Fast pure evaluation check (instantiates derivation without building packages or closures)
-        _run nix eval --raw .#darwinConfigurations.MacBook-Pro.config.system.build.toplevel.drvPath $argv[2..]
+        _run nix eval --raw \
+            .#darwinConfigurations.MacBook-Pro.config.system.build.toplevel.drvPath \
+            --override-input red-tape github:leporuid/red-tape \
+            $argv[2..]
         or return $status
         echo
         return 0
     end
 
-    _run $maybe_sudo darwin-rebuild $verb --flake .#MacBook-Pro $argv[2..]
+    _run $maybe_sudo darwin-rebuild $verb \
+        --flake .#MacBook-Pro \
+        --override-input red-tape github:leporuid/red-tape \
+        $argv[2..]
 end
 
 # The logic below defines the commands used to build/switch configurations for
