@@ -1,9 +1,14 @@
-{ inputs, ... }:
+{
+  inputs,
+  ...
+}:
 {
   imports = [
-    ./hjem.nix
-    ../common/vars.nix
+    inputs.self.nixosModules.hjem
+    inputs.self.modules.common.vars
   ];
 
-  nixpkgs.overlays = import ../../overlays { inherit inputs; };
+  nixpkgs.overlays = [
+    inputs.self.overlays.default
+  ];
 }

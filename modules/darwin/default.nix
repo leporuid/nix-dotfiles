@@ -1,11 +1,11 @@
 { inputs, ... }:
 {
   imports = [
-    ./hjem.nix
-    ../common/vars.nix
-    ./system-defaults.nix
-    ./applications.nix
+    inputs.self.darwinModules.hjem
+    inputs.self.modules.common.vars
+    inputs.self.darwinModules.system-defaults
+    inputs.self.darwinModules.applications
   ];
 
-  nixpkgs.overlays = import ../../overlays { inherit inputs; };
+  nixpkgs.overlays = [ inputs.self.overlays.default ];
 }

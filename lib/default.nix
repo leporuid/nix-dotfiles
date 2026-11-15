@@ -10,6 +10,7 @@ let
   darwin = import ./darwin.nix { };
   hjem = import ./hjem.nix { };
   hosts = import ./hosts.nix { inherit inputs lib; };
+  nixSettings = import ./nix-settings.nix;
 in
 {
   inherit
@@ -17,6 +18,7 @@ in
     formats
     hjem
     hosts
+    nixSettings
     ;
   inherit (formats)
     mkIni

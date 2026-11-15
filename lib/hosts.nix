@@ -17,7 +17,7 @@
     inputs.nix-darwin.lib.darwinSystem {
       modules = [
         inputs.determinate.darwinModules.default
-        ../modules/darwin
+        inputs.self.darwinModules.aggregate
         {
           networking.hostName = lib.mkDefault hostName;
           nixpkgs.hostPlatform = lib.mkDefault system;
@@ -44,7 +44,7 @@
     inputs.nixpkgs.lib.nixosSystem {
       modules = [
         inputs.determinate.nixosModules.default
-        ../modules/nixos
+        inputs.self.nixosModules.aggregate
         {
           networking.hostName = lib.mkDefault hostName;
           nixpkgs.hostPlatform = lib.mkDefault system;

@@ -6,7 +6,7 @@
 }:
 {
   imports = [
-    ../../modules/darwin
+    inputs.self.darwinModules.aggregate
   ];
   my = {
     darwin = {

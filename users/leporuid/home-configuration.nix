@@ -11,7 +11,7 @@ in
 {
   # 1. Modular feature imports in moni-dz style
   imports = [
-    ../../modules/hjem
+    inputs.self.hjemModules.aggregate
     ../../config/nvim/plugins.nix
   ];
   my = {

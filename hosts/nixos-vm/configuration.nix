@@ -1,4 +1,5 @@
 {
+  inputs,
   pkgs,
   modulesPath,
   vars,
@@ -8,7 +9,7 @@
   imports = [
     (modulesPath + "/profiles/qemu-guest.nix")
     (modulesPath + "/virtualisation/qemu-vm.nix")
-    ../../modules/nixos
+    inputs.self.nixosModules.aggregate
   ];
   nixpkgs.hostPlatform = "aarch64-linux";
   networking = {

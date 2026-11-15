@@ -5,6 +5,6 @@
 {
   imports = [
     inputs.hjem.nixosModules.default
-    ../common/hjem.nix
+    inputs.self.modules.common.hjem
   ];
 }

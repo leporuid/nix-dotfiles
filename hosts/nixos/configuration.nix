@@ -7,10 +7,10 @@
   vars,
   ...
 }:
+let
+  inherit (inputs) nix-secrets;
+in
 {
-  # =========================================================================
-  # 1. Imports
-  # =========================================================================
   imports = [
     ./hardware-configuration.nix
     ./disk-config.nix
@@ -18,18 +18,17 @@
     inputs.agenix.nixosModules.default
     inputs.disko.nixosModules.disko
     inputs.determinate.nixosModules.default
-
-    ../../modules/nixos
+    inputs.self.nixosModules.aggregate
     "${inputs.nixpkgs}/nixos/modules/virtualisation/oci-image.nix"
   ]
   ++ lib.optional (inputs ? nixos-facter-modules) inputs.nixos-facter-modules.nixosModules.facter;
+
   hardware.facter.reportPath = lib.mkIf (
     (inputs ? nixos-facter-modules) && builtins.pathExists ./facter.json
   ) ./facter.json;
-  # =========================================================================
-  # 2. Boot, Kernel & OCI Architecture (BBR & Jumbo Frames)
-  # =========================================================================
+
   oci.efi = true;
+
   boot = {
     loader = {
       systemd-boot = {
@@ -45,25 +44,17 @@
     };
 
     kernel.sysctl = {
-      # Allow unprivileged processes to bind ports 80/443 without root
       "net.ipv4.ip_unprivileged_port_start" = 80;
-
-      # BBR congestion control & FQ scheduler for optimal latency on Oracle Cloud
       "net.core.default_qdisc" = "fq";
       "net.ipv4.tcp_congestion_control" = "bbr";
-
-      # Networking forwarding
       "net.core.devconf_inherit_init_net" = 1;
       "net.ipv4.conf.all.forwarding" = true;
       "net.ipv4.conf.all.route_localnet" = lib.mkDefault 1;
       "net.ipv6.conf.all.forwarding" = lib.mkDefault 1;
-
-      # Network buffer tuning for throughput bursts (from ThomasRitaine)
       "net.core.rmem_default" = 2097152;
       "net.core.rmem_max" = 16777216;
     };
 
-    # APFS case-hack collision workaround for ncurses terminfo in initrd
     initrd.systemd.contents."/etc/terminfo/l/linux".source = lib.mkForce (
       pkgs.runCommand "initrd-terminfo-linux" { } ''
         if [ -f "${pkgs.ncurses}/share/terminfo/l/linux" ]; then
@@ -74,20 +65,22 @@
       ''
     );
   };
+
   fileSystems = {
-    # Filesystem mounts managed via disko
     "/".device = lib.mkForce "/dev/disk/by-label/nixos";
+
     "/boot" = {
       device = lib.mkForce "/dev/disk/by-label/ESP";
       options = [ "umask=0077" ];
     };
   };
+
   systemd = {
     targets.multi-user.enable = true;
+
     services = {
-      # Mask phantom PL011 UART devices on Oracle Cloud ARM A1 (prevents 90s boot timeout)
       "serial-getty@ttyAMA0".enable = false;
-      # Restart even after a clean exit (code 0), and never give up (from ThomasRitaine)
+
       tailscaled = {
         serviceConfig = {
           Restart = lib.mkForce "always";
@@ -95,36 +88,43 @@
         };
         startLimitIntervalSec = 0;
       };
+
       tailscale-ethtool = {
-        description = "Configure UDP GRO forwarding for Tailscale on default network interface";
+        description = "Configure UDP GRO forwarding for Tailscale";
         after = [ "network-online.target" ];
         wants = [ "network-online.target" ];
         wantedBy = [ "multi-user.target" ];
+
         path = with pkgs; [
           iproute2
           ethtool
           gawk
         ];
+
         serviceConfig = {
           Type = "oneshot";
           RemainAfterExit = true;
         };
+
         script = ''
           IFACE="$(ip -4 route show default | awk '{print $5; exit}')"
           if [ -n "$IFACE" ]; then
-            ethtool -K "$IFACE" rx-udp-gro-forwarding on rx-gro-list off || true
+            ethtool -K "$IFACE" \
+              rx-udp-gro-forwarding on \
+              rx-gro-list off || true
           fi
         '';
       };
-      # Clan-inspired NAT-traversing out-of-band P2P SSH access via Iroh
+
       iroh-ssh = {
-        description = "Iroh P2P SSH Server (NAT-traversing backup access)";
+        description = "Iroh P2P SSH Server";
         after = [
           "network-online.target"
           "sshd.service"
         ];
         wants = [ "network-online.target" ];
         wantedBy = [ "multi-user.target" ];
+
         serviceConfig = {
           ExecStart = "${pkgs.iroh-ssh}/bin/iroh-ssh server --persist --key-dir /var/lib/iroh-ssh";
           Restart = "always";
@@ -134,33 +134,35 @@
         };
       };
     };
+
     oomd.enable = true;
+
     network = {
       enable = true;
       wait-online.anyInterface = true;
+
       networks."10-eth" = {
         matchConfig = {
           Name = "ens*";
           Type = "ether";
         };
+
         networkConfig = {
           DHCP = "yes";
           IPv6AcceptRA = true;
         };
-        # Enable Jumbo Frames for Oracle Cloud VCN internal network
+
         linkConfig.MTUBytes = "9000";
       };
     };
   };
-  # Memory & Process Resilience (ZRAM swap & OOMD from junghan0611)
+
   zramSwap = {
     enable = true;
     algorithm = "zstd";
     memoryPercent = 50;
   };
-  # =========================================================================
-  # 3. Networking, Firewall, Tailscale & Timesync
-  # =========================================================================
+
   networking = {
     hostName = "nixos";
     useNetworkd = true;
@@ -171,27 +173,27 @@
     firewall = {
       enable = true;
       checkReversePath = "loose";
+
       allowedTCPPorts = [
         22
         80
         443
         8090
       ];
+
       allowedUDPPorts = [ 41641 ];
       trustedInterfaces = [ "tailscale0" ];
     };
   };
+
   services = {
     tailscale = {
       enable = true;
       openFirewall = true;
       useRoutingFeatures = "both";
-      authKeyFile = lib.mkIf (
-        config.age.secrets ? "tailscale-oracle"
-      ) config.age.secrets."tailscale-oracle".path;
+      authKeyFile = config.age.secrets.tailscale-oracle.path;
       authKeyParameters.preauthorized = true;
 
-      # Used at first login
       extraUpFlags = [
         "--reset"
         "--advertise-exit-node"
@@ -202,7 +204,6 @@
         "--advertise-tags=tag:all"
       ];
 
-      # Reapplied on every activation via `tailscale set`
       extraSetFlags = [
         "--advertise-exit-node"
         "--accept-routes"
@@ -212,13 +213,16 @@
         "--advertise-tags=tag:all"
       ];
     };
+
     timesyncd = {
       enable = lib.mkForce true;
       servers = [ "169.254.169.254" ];
       fallbackServers = [ "pool.ntp.org" ];
     };
+
     resolved = {
       enable = true;
+
       settings.Resolve = {
         DNSSEC = "false";
         Domains = [ "~." ];
@@ -228,12 +232,12 @@
         ];
       };
     };
+
     vnstat.enable = true;
-    # =========================================================================
-    # 4. Security & Hardening (SSH, Fail2ban, Secrets)
-    # =========================================================================
+
     openssh = {
       enable = true;
+
       settings = {
         PasswordAuthentication = false;
         KbdInteractiveAuthentication = false;
@@ -241,6 +245,7 @@
         ClientAliveInterval = 60;
         ClientAliveCountMax = 3;
         X11Forwarding = false;
+
         AcceptEnv = [
           "COLORTERM"
           "TERM_PROGRAM"
@@ -248,6 +253,7 @@
         ];
       };
     };
+
     fail2ban = {
       enable = true;
       maxretry = 5;
@@ -255,29 +261,45 @@
       bantime-increment.enable = true;
       ignoreIP = [ "100.0.0.0/8" ];
     };
+
     journald.settings.Journal = {
       SystemMaxUse = "500M";
       MaxRetentionSec = "2week";
     };
+
     getty.autologinUser = null;
+
+    fstrim = {
+      enable = true;
+      interval = "weekly";
+    };
   };
+
   age = {
     identityPaths = [
       "/etc/ssh/ssh_host_ed25519_key"
     ];
-    secrets = lib.optionalAttrs (inputs ? nix-secrets) {
-      tailscale-oracle.file = "${inputs.nix-secrets}/hosts/nixos/tailscale-oracle.age";
+
+    secrets.tailscale-oracle = {
+      file = "${nix-secrets}/hosts/nixos/tailscale-oracle.age";
+      owner = "root";
+      group = "root";
+      mode = "0400";
     };
   };
+
   security = {
     sudo = {
       wheelNeedsPassword = false;
+
       extraConfig = ''
         Defaults env_keep += "SSH_AUTH_SOCK"
       '';
+
       extraRules = [
         {
           users = [ vars.username ];
+
           commands = [
             {
               command = "ALL";
@@ -288,13 +310,16 @@
       ];
     };
   };
+
   programs = {
     ssh.knownHosts = {
       "github.com".publicKey =
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5A9WykxjBQj48tkmV";
     };
+
     bash = {
       completion.enable = true;
+
       interactiveShellInit = ''
         export HISTFILE="$HOME/.local/share/bash/.bash_history"
         export HISTSIZE=10000
@@ -318,17 +343,25 @@
         add_to_path "$HOME/.local/bin"
         export PATH
 
-        if [[ $(${pkgs.procps}/bin/ps --no-header --pid=$PPID --format=comm) != "nu" && -z ''${BASH_EXECUTION_STRING:-} ]] && tty -s; then
+        if [[ $(${pkgs.procps}/bin/ps --no-header --pid=$PPID --format=comm) != "nu" &&
+          -z ''${BASH_EXECUTION_STRING:-} ]] && tty -s; then
           if command -v nu >/dev/null 2>&1; then
-            shopt -q login_shell && LOGIN_OPTION="--login" || LOGIN_OPTION=""
+            if shopt -q login_shell; then
+              LOGIN_OPTION="--login"
+            else
+              LOGIN_OPTION=""
+            fi
+
             exec "${pkgs.nushell}/bin/nu" $LOGIN_OPTION
           fi
         fi
       '';
     };
+
     fish = {
       enable = true;
       useBabelfish = true;
+
       interactiveShellInit = ''
         if test "$TERM" = "dumb"
           function fish_prompt
@@ -342,14 +375,14 @@
       '';
     };
   };
-  # =========================================================================
-  # 5. User & Interactive Shells (Bash Login -> Nushell Interactive)
-  # =========================================================================
+
   time.timeZone = vars.timezone;
   i18n.defaultLocale = vars.locale;
+
   users = {
     mutableUsers = false;
     defaultUserShell = pkgs.bashInteractive;
+
     users = {
       root = {
         hashedPassword = "!";
@@ -365,19 +398,18 @@
       };
     };
   };
+
   environment = {
     etc = {
-      # Expose the deployed system flake at /etc/nixos
       nixos.source = inputs.self;
+
       configuration-revision.text = inputs.self.rev or inputs.self.dirtyRev or "dirty";
 
-      # Configure determinate-nixd GC and disable Sentry telemetry
       "determinate/config.json".text = builtins.toJSON {
         garbageCollector.strategy = "automatic";
         telemetry.sentry.endpoint = null;
       };
 
-      # Enforce a clean and standard /etc/shells without /nix/store clutter
       shells.text = lib.mkForce ''
         /bin/sh
         /run/current-system/sw/bin/sh
@@ -386,31 +418,21 @@
         /run/current-system/sw/bin/nu
       '';
     };
-    # =========================================================================
-    # 6. System Packages, Observability & Nix Core
-    # =========================================================================
+
     systemPackages = with pkgs; [
       age
       rage
-      (
-        (inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
-          ageBin = "${pkgs.rage}/bin/rage";
-        }).overrideAttrs
-          (_: {
-            doCheck = false;
-            doInstallCheck = false;
-          })
-      )
-      ethtool
 
-      # Observability & diagnostic tools
+      (inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
+        ageBin = "${pkgs.rage}/bin/rage";
+      })
+
+      ethtool
       lsof
       inetutils
       dig
       traceroute
       tcpdump
-
-      # System & login shell essentials (user CLI tools are managed via Hjem)
       bashInteractive
       fish
       nushell
@@ -427,6 +449,7 @@
       vim
     ];
   };
+
   system = {
     autoUpgrade = {
       enable = true;
@@ -436,26 +459,31 @@
       allowReboot = true;
       operation = "switch";
     };
-    stateVersion = "25.05";
+
+    stateVersion = "26.05";
   };
+
   determinate.enable = true;
-  services.fstrim = {
-    enable = true;
-    interval = "weekly";
-  };
+
   nix = {
-    settings = import ../../lib/nix-settings.nix { inherit (vars) username; } // {
-      auto-optimise-store = true;
-    };
+    settings =
+      inputs.self.lib.nixSettings {
+        inherit (vars) username;
+      }
+      // {
+        auto-optimise-store = true;
+      };
+
     optimise.automatic = true;
-    # Garbage collection is managed continuously by determinate-nixd
     channel.enable = false;
     nixPath = [ ];
+
     registry = {
       nixpkgs.flake = inputs.nixpkgs;
       self.flake = inputs.self;
     };
   };
+
   documentation.man.cache.enable = false;
   nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
 }
