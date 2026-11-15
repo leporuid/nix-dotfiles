@@ -344,6 +344,7 @@ function check-links -d "Verify the standalone Hjem manifest matches a host's ge
     if test $is_nixos -eq 1
         set platform_filter sed -E \
             -e '/^\.config\/(btt|foot|github-copilot\/[^\t]*|helix|kitty|raycast|zed)\t/d' \
+            -e '/^Library\/Application Support\/nushell\/(config|env|local)\.nu\t/d' \
             -e 's#^Library/Application Support/jj\t#.config/jj\t#' \
             -e 's#^(\.config/ghostty/os-config\tconfig:/ghostty/)os-config-darwin$#\1os-config-linux#'
     end
