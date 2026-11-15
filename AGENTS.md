@@ -13,14 +13,14 @@ This repository collects project-specific expectations, tool contracts, and arch
 | `formatter.nix` | Root `treefmt-nix` formatter entrypoint delegating to `treefmt.nix`. |
 | `treefmt.nix` | Unified formatter and linter rules (`deadnix`, `statix`, `nixfmt`, `fish_indent`, `shfmt`, `taplo`, `yamlfmt`). |
 | `pedantix.toml` | Nix code style and argument sorting rules enforced across the repository. |
-| `lib/` | Shared Nix helpers (`darwin.nix`, `formats.nix`, `hjem.nix`, `nix-settings.nix`). |
+| `lib/` | Shared Nix helpers (`caches.nix`, `darwin.nix`, `nix-settings.nix`). |
 | `overlays/` | Nixpkgs overlays (`default.nix`) applied to hosts and exposed via `flake.overlays.default`. |
 | `hosts/MacBook-Pro/` | Darwin host configuration (`darwin-configuration.nix`) and user profile bridge. |
 | `hosts/nixos/` | Self-contained native NixOS configuration for Oracle Cloud / server (`configuration.nix`). |
 | `hosts/nixos-vm/` | Lightweight NixOS VM configuration (imports `modules/nixos` and shared Hjem profile). |
-| `modules/darwin/` | Darwin system modules (`default.nix`, `aggregate.nix`, `agenix.nix`, `applications.nix`, `system-defaults.nix`, `hjem.nix`, `determinate/`). |
-| `modules/nixos/` | NixOS system modules (`default.nix`, `aggregate.nix`, `hjem.nix`). |
-| `modules/hjem/` | User-level Hjem modules (`default.nix`, `aggregate.nix`, `my-config.nix`, `themes.nix`, `fish.nix`, `neovim.nix`, `helix.nix`, `ghostty.nix`, `starship.nix`, `nushell.nix`, `tmux.nix`, `zellij.nix`, `atuin.nix`, `direnv.nix`, `direnv-instant.nix`, `jujutsu.nix`, `nixcord.nix`). |
+| `modules/darwin/` | Darwin system modules (`aggregate.nix`, `agenix.nix`, `applications.nix`, `system-defaults.nix`, `hjem.nix`, `determinate/`). |
+| `modules/nixos/` | NixOS system modules (`aggregate.nix`, `hjem.nix`). |
+| `modules/hjem/` | User-level Hjem modules (`aggregate.nix`, `my-config.nix`, `themes.nix`, `fish.nix`, `neovim.nix`, `helix.nix`, `ghostty.nix`, `starship.nix`, `nushell.nix`, `tmux.nix`, `zellij.nix`, `atuin.nix`, `direnv.nix`, `direnv-instant.nix`, `jujutsu.nix`). |
 | `modules/common/` | Shared platform configurations (`vars.nix`, `hjem.nix`, `dix.nix`). |
 | `packages/*.nix` | Custom derivations and package wrappers consumed via `inputs.self.packages.<system>.<name>`; prefer `lib.fileset.toSource` for clean local source whitelisting. |
 | `users/leporuid/` | Shared user profile (`home-configuration.nix`) managing packages and files. |
@@ -136,6 +136,8 @@ Automated agents operating on this repository have access to modular skills loca
 | :--- | :--- | :--- |
 | `@developer-workflow` | `.agents/skills/developer-workflow/SKILL.md` | Master orchestrator enforcing source-grounding, active context inspection, and multi-skill execution. |
 | `@nix-dotfiles-workflow` | `.agents/skills/nix-dotfiles-workflow/SKILL.md` | Core Nix architecture guardrails (no `flake.lock` reading, `pedantix.toml` module headers, hjem/hjem-rum, `nix-secrets` keys, out-of-store symlinks, verification matrix). |
+| `@hjem-module-scaffolder` | `.agents/skills/hjem-module-scaffolder/SKILL.md` | Hjem / Hjem-Rum module boilerplate generator adhering to `pedantix.toml`, RFC 166 `nixfmt`, Manifest v3, and collision guards. |
+| `@nixos-cloud-deploy` | `.agents/skills/nixos-cloud-deploy/SKILL.md` | Pre-flight evaluation, zero-lockout SSH/Tailscale audit, remote builder, and `nixos-anywhere` / `nixos-rebuild` deployment workflow. |
 | `@fast-repo-reader` | `.agents/skills/fast-repo-reader/SKILL.md` | Non-intrusive remote inspection of external Git/GitHub repositories without shell network prompts. |
 | `@tiered-agent-workflow` | `.agents/skills/tiered-agent-workflow/SKILL.md` | Quota-aware three-phase strategy: Phase 0 Scout (Flash/CLI) $\rightarrow$ Phase 1 Architect (Pro 3.1) $\rightarrow$ Phase 2 Builder (Flash). |
 | `@get-more-perspectives` | `.agents/skills/get-more-perspectives/SKILL.md` | Simulated 5-role advisory panel for evaluating trade-offs and architecture decisions. |
