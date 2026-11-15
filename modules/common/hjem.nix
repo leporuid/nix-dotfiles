@@ -3,10 +3,20 @@
   inputs,
   config,
   lib,
+  pkgs,
   ...
 }:
 let
   isDarwin = config.nixpkgs.hostPlatform.isDarwin or false;
+  system = pkgs.stdenv.hostPlatform.system;
+  perSystem = lib.mapAttrs (
+    _: input:
+    if builtins.isAttrs input then
+      (input.legacyPackages.${system} or { })
+      // (input.packages.${system} or { })
+    else
+      input
+  ) inputs;
   hostName = config.networking.hostName or "";
 
   hostUsersDir = ../../hosts + "/${hostName}/users";
@@ -37,7 +47,7 @@ in
 {
   hjem = {
     clobberByDefault = true;
-    specialArgs = { inherit inputs; };
+    specialArgs = { inherit inputs perSystem; };
     extraModules = [
       inputs.hjem-rum.hjemModules.default
       inputs.self.hjemModules.aggregate
