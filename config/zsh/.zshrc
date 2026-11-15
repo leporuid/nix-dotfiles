@@ -61,5 +61,6 @@ fi
 unset sheldon_cache sheldon_toml
 
 eval "$(starship init zsh)"
+(( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
 
 HISTFILE=$HOME/.local/share/zsh/.zsh_history
