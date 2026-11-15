@@ -1,5 +1,6 @@
 # Shared host, user variables, and binary caches across macOS (nix-darwin) and Oracle (NixOS).
 {
+  inputs,
   lib,
   pkgs,
   ...
@@ -44,22 +45,18 @@ in
         warn-dirty = false;
       };
 
-      sshKeys = [
-        # SSH ID - @leporuid
-        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBC/CoiKLL0z+HwqsGgfaBzt2wxuXbf/qBzldpIrPj7n7G8v2VXJPbATbSgZBRZV0Ss+peT2hkMNKvdnHC95XWfo="
-        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBDjpuPuSa1+ds+Nd34aF38YgU5E8QIGDAyP3NpIlODxCMS4/BgWtUORoQJiTqW1yWAnyomN/g4eqVt6XczCm6Sk="
-        # My iPhone, blink terminal
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGr7upNdIAAtGkiQaUkCaj5g6QW843fL3bbsJyP/0tAB"
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDrcoI6oOTch+FI7XVlJ5eYJaGx4ZO2noO9GcXVFMhn9"
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAyz8c5h0/9ejDcYYkUZ568FUw0OAQEPfRnIbbbd4xGe"
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAAIJNFFaMxFGkxbzGvTtFfu+DPlxtqK0NoaExRVDvCt"
-      ];
+      sshKeys = [ ];
 
-      sshKeyFiles = [
-        ../../hosts/MacBook-Pro/users/leporuid/id_ed25519.pub
-        ../../hosts/MacBook-Pro/id_ed25519.pub
-        ../../hosts/nixos/id_ed25519.pub
-      ];
+      # Public device keys are provided by the private nix-secrets input
+      sshKeyFiles = lib.optionals (inputs ? nix-secrets) (
+        [
+          "${inputs.nix-secrets}/keys/MacBook-Pro-user.pub"
+          "${inputs.nix-secrets}/keys/MacBook-Pro-system.pub"
+          "${inputs.nix-secrets}/keys/nixos-system.pub"
+        ]
+        ++ lib.optional (inputs.nix-secrets ? sshKeys) inputs.nix-secrets.sshKeys
+        ++ lib.optional (inputs.nix-secrets ? authorizedKeys) inputs.nix-secrets.authorizedKeys
+      );
     };
   };
 }

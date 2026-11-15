@@ -801,14 +801,15 @@
     },
     "nix-secrets": {
       "inputs": {
-        "nixpkgs": "nixpkgs_5"
+        "nixpkgs": "nixpkgs_5",
+        "ssh-keys": "ssh-keys"
       },
       "locked": {
-        "lastModified": 1794200134,
-        "narHash": "sha256-Sa7Gz/3OWdmbaeCcZGDF1rxmsMpiySNZ2SskSTVZSD0=",
+        "lastModified": 1794720547,
+        "narHash": "sha256-sUu8V3yMu5JOIwbBDspyVc4AWEHr3CDMhxr/zFFH85U=",
         "ref": "refs/heads/main",
-        "rev": "f2d4e4db196c963be3755b6a015a31698546086c",
-        "revCount": 9,
+        "rev": "ee30381d5e1e0698d133add66a5fb3c37345cfbe",
+        "revCount": 12,
         "type": "git",
         "url": "ssh://git@github.com/leporuid/nix-secrets.git"
       },
@@ -979,11 +980,11 @@
     },
     "nixpkgs_5": {
       "locked": {
-        "lastModified": 1794042290,
-        "narHash": "sha256-ziZn2PvCJE5JEEpqTdxXwJpPB+L3YqoCpTAMCzyaP3U=",
+        "lastModified": 1794386569,
+        "narHash": "sha256-x9sADJvoVG0L6RejZB+/BB4YiGZFBZrfTlhF4uBq1tQ=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "f4a03c008967841f2a0b3cb7c436fc6fc31671f6",
+        "rev": "d4f25a3e562008648d45bcf2d70bcc7422cad84e",
         "type": "github"
       },
       "original": {
@@ -1143,6 +1144,18 @@
         "owner": "oxalica",
         "repo": "rust-overlay",
         "type": "github"
+      }
+    },
+    "ssh-keys": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-g69ZoCgt00T0s16gewW3QBuXWqSr4UqK1vPRJm4891M=",
+        "type": "file",
+        "url": "https://sshid.io/leporuid/ECDSA-SK"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://sshid.io/leporuid/ECDSA-SK"
       }
     },
     "systems": {
