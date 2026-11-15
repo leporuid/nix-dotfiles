@@ -52,6 +52,8 @@ in
         })
       ];
       enableAllTerminfo = true;
+      # Make Nushell (and other XDG-aware tools) read ~/.config instead of ~/Library/Application Support
+      variables.XDG_CONFIG_HOME = "/Users/${config.system.primaryUser}/.config";
       # Exclude ~/.nix-profile from PATH and keep strictly per-user and system profiles
       profiles = lib.mkForce [
         "/etc/profiles/per-user/${config.system.primaryUser}"

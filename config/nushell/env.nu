@@ -1,8 +1,3 @@
-$env.__NIX_DARWIN_SET_ENVIRONMENT_DONE = 1
-
-# Set theme for bat
-$env.BAT_THEME = "Catppuccin Macchiato"
-
 $env.config = {
   show_banner: false
   hooks: {

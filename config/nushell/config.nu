@@ -8,7 +8,6 @@ alias ks = ktoolbox sync_creator
 alias cat = bat
 alias find = fd
 
-source ($nu.default-config-dir | path join 'env.nu')
 mkdir ($nu.default-config-dir | path join 'vendor/autoload')
 
 if not ($nu.default-config-dir | path join 'vendor/autoload/atuin.nu' | path exists) {

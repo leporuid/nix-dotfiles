@@ -20,13 +20,19 @@ in
   };
 
   config = mkIf cfg.enable {
+    rum.programs.nushell = {
+      enable = true;
+      inherit (cfg) package;
+      extraConfig = "source ($nu.default-config-dir | path join 'local.nu')";
+    };
+
     packages = [
-      cfg.package
       pkgs.carapace
     ];
 
     my.config.source = {
-      ".config/nushell" = "nushell";
+      ".config/nushell/env.nu" = "nushell/env.nu";
+      ".config/nushell/local.nu" = "nushell/config.nu";
     };
   };
 }
