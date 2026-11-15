@@ -490,4 +490,23 @@ in
 
   documentation.man.cache.enable = false;
   nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
+
+  # Safe local VM testing overrides (keeps production Oracle config untouched)
+  virtualisation.vmVariant = {
+    virtualisation = {
+      memorySize = 4096;
+      cores = 4;
+    };
+
+    users.users = lib.mapAttrs (_: _: {
+      initialPassword = lib.mkForce "test";
+      password = lib.mkForce null;
+      hashedPassword = lib.mkForce null;
+      hashedPasswordFile = lib.mkForce null;
+      initialHashedPassword = lib.mkForce null;
+    }) (lib.filterAttrs (_: user: user.isNormalUser) config.users.users);
+
+    age.secrets = lib.mapAttrs (_: _: { enable = lib.mkForce false; }) config.age.secrets;
+    services.tailscale.enable = lib.mkForce false;
+  };
 }
