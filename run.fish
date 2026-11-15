@@ -316,47 +316,71 @@ function check-links -d "Verify the standalone Hjem manifest matches a host's ge
     set -q _flag_host; and set host $_flag_host
     set -q _flag_target_root; and set target_root $_flag_target_root
 
+    set -l config_attr
+    set -l is_nixos 0
+    if test -f "hosts/$host/darwin-configuration.nix"
+        set config_attr darwinConfigurations
+    else if test -f "hosts/$host/configuration.nix"
+        set config_attr nixosConfigurations
+        set is_nixos 1
+    else
+        echo "$(set_color brred)Unknown host '$host': expected hosts/$host/{darwin-configuration,configuration}.nix.$(set_color normal)" >&2
+        return 1
+    end
+
     _require jq
     set -l tmp (mktemp -d)
     # Both sides are compared home-relative, so the result does not depend on
     # where the check runs: the generation keys already are, and the manifest's
-    # absolute targets simply get target_root stripped. Flake source copies also
-    # land under different store hashes, hence the prefix normalization.
-    set -l normalize 's#/nix/store/[a-z0-9]+-source/#repo:/#g'
+    # absolute targets simply get target_root stripped. Flake source copies,
+    # config store copies, out-of-store symlinks, and cross-platform store
+    # derivations also land under different paths/hashes, hence normalization.
+    set -l normalize 's#/nix/store/[a-z0-9]+-source/#repo:/#g; s#/nix/store/[a-z0-9]+-config/#config:/#g; s#/Users/[^/]+/Developer/nix-dotfiles/config/#config:/#g; s#/nix/store/[a-z0-9]+-([^/]+)#store:\1#g'
+
+    # The standalone hjemConfigurations.<user>.manifest evaluates on defaultSystem
+    # (aarch64-darwin). When checking a NixOS host, filter Darwin-only targets
+    # and map known Darwin/Linux target or file differences.
+    set -l platform_filter cat
+    if test $is_nixos -eq 1
+        set platform_filter sed -E \
+            -e '/^\.config\/(btt|foot|github-copilot\/[^\t]*|helix|kitty|raycast|zed)\t/d' \
+            -e 's#^Library/Application Support/jj\t#.config/jj\t#' \
+            -e 's#^(\.config/ghostty/os-config\tconfig:/ghostty/)os-config-darwin$#\1os-config-linux#'
+    end
 
     nix eval --json .#hjemConfigurations.$user.manifest \
         | jq -r --arg root "$target_root/" \
         '.files[] | [(.target | ltrimstr($root)), (.source // ("text:" + (.text | tostring)))] | @tsv' \
-        | sed -E $normalize | sort >$tmp/standalone
+        | sed -E $normalize | $platform_filter | sort >$tmp/standalone
     or begin
-        echo (set_color brred)"Failed to evaluate hjemConfigurations.$user.manifest."(set_color normal) >&2
+        echo "$(set_color brred)Failed to evaluate hjemConfigurations.$user.manifest.$(set_color normal)" >&2
         rm -rf $tmp
         return 1
     end
 
     begin
-        nix eval --json .#darwinConfigurations.$host.config.hjem.users.$user.files \
+        nix eval --json .#$config_attr.$host.config.hjem.users.$user.files \
             | jq -r 'to_entries[] | [.key, (.value.source // ("text:" + (.value.text | tostring)))] | @tsv'
-        nix eval --json .#darwinConfigurations.$host.config.hjem.users.$user.xdg.config.files \
+        nix eval --json .#$config_attr.$host.config.hjem.users.$user.xdg.config.files \
             | jq -r 'to_entries[] | [".config/" + .key, (.value.source // ("text:" + (.value.text | tostring)))] | @tsv'
     end | sed -E $normalize | sort >$tmp/generation
     or begin
-        echo (set_color brred)"Failed to evaluate darwinConfigurations.$host (is --host correct?)."(set_color normal) >&2
+        echo "$(set_color brred)Failed to evaluate $config_attr.$host (is --host correct?).$(set_color normal)" >&2
         rm -rf $tmp
         return 1
     end
 
     if string match -qr '^/' <$tmp/standalone
-        echo (set_color yellow)"warning:"(set_color normal)" some manifest targets are outside $target_root; pass --target-root." >&2
+        echo "$(set_color yellow)warning:$(set_color normal) some manifest targets are outside $target_root; pass --target-root." >&2
     end
 
     if diff -u $tmp/standalone $tmp/generation >$tmp/diff
-        echo (set_color green)"Standalone manifest matches $host's generation ($(wc -l <$tmp/standalone | string trim) files)."(set_color normal)
+        echo "$(set_color green)Standalone manifest matches $host's generation ($(wc -l <$tmp/standalone | string trim) files).$(set_color normal)"
         rm -rf $tmp
         return 0
     end
 
-    echo (set_color brred)"Standalone manifest and $host's generation disagree:"(set_color normal)
+    echo "$(set_color brred)Standalone manifest and $host's generation disagree:$(set_color normal)"
     cat $tmp/diff
     rm -rf $tmp
     return 1
