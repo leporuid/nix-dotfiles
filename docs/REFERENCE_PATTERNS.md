@@ -7,7 +7,7 @@ Distilled architectural patterns and reusable Nix snippets extracted from local 
 ## 1. `moni-dz/nix-config` (`moni-nixcfg`)
 
 - **Closure Diff on Activation (`profiles/dix.nix`)**:
-  - Run `dix diff --full --color=always /run/current-system "$systemConfig" >&2 || true` inside `system.activationScripts.preActivation.text` (Darwin) and `system.activationScripts.dix` with `supportsDryActivation = true` (NixOS) to inspect package upgrades on every rebuild.
+  - Run `dix diff --full --color=always /run/current-system "$systemConfig" >&2 || true` inside `system.activationScripts.preActivation.text` (Darwin) and `system.activationScripts.dix` with `supportsDryActivation = true` (NixOS) to inspect package upgrades on every rebuild. Already adopted in `modules/common/dix.nix`.
 - **Darwin Nushell Path Mirroring (`modules/hjem/nushell-darwin.nix`)**:
   - When `XDG_CONFIG_HOME` is not inherited by GUI-launched tools on macOS, mirror `config.xdg.config.files."nushell/{config.nu,env.nu}".source` into `Library/Application Support/nushell/`.
 - **Integration-Gated Hjem Modules (`modules/hjem/rex.nix`)**:

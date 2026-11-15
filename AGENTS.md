@@ -18,10 +18,10 @@ This repository collects project-specific expectations, tool contracts, and arch
 | `hosts/MacBook-Pro/` | Darwin host configuration (`darwin-configuration.nix`) and user profile bridge. |
 | `hosts/nixos/` | Self-contained native NixOS configuration for Oracle Cloud / server (`configuration.nix`). |
 | `hosts/nixos-vm/` | Lightweight NixOS VM configuration (imports `modules/nixos` and shared Hjem profile). |
-| `modules/darwin/` | Darwin system modules (`applications.nix`, `system-defaults.nix`, `hjem.nix`). |
-| `modules/nixos/` | NixOS system modules (`default.nix`, `hjem.nix`). |
-| `modules/hjem/` | User-level Hjem modules (`default.nix`, `my-config.nix`, `themes.nix`, `fish.nix`, `neovim.nix`, `helix.nix`, `ghostty.nix`, `starship.nix`, `nushell.nix`, `tmux.nix`, `zellij.nix`, `atuin.nix`, `direnv.nix`, `direnv-instant.nix`, `jujutsu.nix`, `nixcord.nix`). |
-| `modules/common/` | Shared platform configurations (`vars.nix`, `hjem.nix`). |
+| `modules/darwin/` | Darwin system modules (`default.nix`, `aggregate.nix`, `agenix.nix`, `applications.nix`, `system-defaults.nix`, `hjem.nix`, `determinate/`). |
+| `modules/nixos/` | NixOS system modules (`default.nix`, `aggregate.nix`, `hjem.nix`). |
+| `modules/hjem/` | User-level Hjem modules (`default.nix`, `aggregate.nix`, `my-config.nix`, `themes.nix`, `fish.nix`, `neovim.nix`, `helix.nix`, `ghostty.nix`, `starship.nix`, `nushell.nix`, `tmux.nix`, `zellij.nix`, `atuin.nix`, `direnv.nix`, `direnv-instant.nix`, `jujutsu.nix`, `nixcord.nix`). |
+| `modules/common/` | Shared platform configurations (`vars.nix`, `hjem.nix`, `dix.nix`). |
 | `packages/*.nix` | Custom derivations and package wrappers consumed via `inputs.self.packages.<system>.<name>`; prefer `lib.fileset.toSource` for clean local source whitelisting. |
 | `users/leporuid/` | Shared user profile (`home-configuration.nix`) managing packages and files. |
 | `config/` | Raw upstream configurations (`fish/`, `ghostty/`, `nushell/`, `starship.toml`, `git/`, `nvim/`, `agents/`, etc.). |
@@ -36,6 +36,7 @@ This repository collects project-specific expectations, tool contracts, and arch
   - **Profile Lifecycle**: Manage profile generations via `nix profile wipe-history [--profile <path>] [--older-than <duration>]`.
   - **Store Management**: Run store garbage collection via `nix store gc --verbose` and hard-link deduplication via `nix store optimise --verbose`.
   - **Build Diagnostics**: Use `nix top` and `nix ps` for active build process inspection and memory monitoring.
+  - **Hash & Upgrade Hygiene**: Use `determinate-nixd fix hashes` for fixing mismatched SRI/FOD hashes in Nix expressions. On both macOS (`determinateNix.enable = true`) and NixOS (`determinate.enable = true`), upgrade `determinate-nixd` and Nix declaratively via `nix flake update determinate` and host rebuilds rather than running `sudo determinate-nixd upgrade`.
 - **Home Management via Hjem**:
   - Replaces heavy Home Manager with ultra-lightweight `hjem`.
   - **Clobber Invariant**: Always ensure `hjem.clobberByDefault = true;` to avoid collisions with existing files. File overrides use the `clobber` attribute (never deprecated `force`).
@@ -92,7 +93,7 @@ This repository collects project-specific expectations, tool contracts, and arch
 - **Login Shell & Interactive Shell**: `zsh` (`users.users.${config.system.primaryUser}.shell = pkgs.zsh;`, `UserShell: /run/current-system/sw/bin/zsh`) bootstrapping interactive **Fish** via `config/zsh/.zshrc` (`programs.fish.enable = true;` in `modules/darwin/system-defaults.nix`).
 - **Remote Builder**: Builds `aarch64-linux` derivations via `hosts/nixos` (`determinateNix.customSettings.builders = "ssh-ng://leporuid@nixos ..."` with `/etc/ssh/ssh_host_ed25519_key` and `programs.ssh.knownHosts.nixos`).
 - **Home Directory**: Explicitly set `directory = "/Users/leporuid";` under `hjem.users.leporuid`.
-- **Determinate Daemon**: `nix.enable = false;` to avoid conflicting with Determinate Nix daemon and launchd services.
+- **Determinate Daemon**: `nix.enable = false;` with `modules/darwin/determinate/` (`determinateNix.enable = true;`) declaratively managing `determinate-nixd` (copied to `/usr/local/libexec/darwin/` for boot-safe APFS mount), `nix.custom.conf`, `/etc/determinate/config.json`, and `systems.determinate.*` launchd services from `inputs.determinate`.
 - **License**: Unfree packages permitted via `nixpkgs.config.allowUnfree = true;`.
 
 ### Linux / Server (`hosts/nixos`)

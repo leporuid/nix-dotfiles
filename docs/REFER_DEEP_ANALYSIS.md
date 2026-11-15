@@ -28,13 +28,14 @@ The largest and most engineering-heavy repository in `refer/` (from the author o
 - **TypeScript + `bun2nix` (`package.nix`)**: Bundles Effect-native CLI/activation tools (`bun build --target=bun --minify`) using `lib.fileset.toSource` (strictly whitelisting only needed files instead of copying the entire repo into the store) and `makeBinaryWrapper`.
 - **Modular `Justfile` (`just/*/*.just`)**: Splits operational workflows into `just/{bun,check,determinate,dotfiles,github,hjem,homebrew,nix,records,renovate,sops,spectrum}/*.just`:
   - `just/hjem/hjem.just`: Pre-renders and validates Hjem homes across `darwin`, `fedora`, and `nixos`, and updates `systemd --user` environment (`PATH`, `XDG_DATA_DIRS`, `MANPATH`, `INFOPATH`) on non-NixOS Linux standalone switches.
-  - `just/determinate/determinate.just`: Wraps `determinate-nixd status` and `sudo determinate-nixd upgrade` (asserting `!path_exists('/etc/NIXOS')` so NixOS upgrades go through `flake.lock`).
+  - `just/determinate/determinate.just` & `fix.just`: Wraps `determinate-nixd status`, `sudo determinate-nixd upgrade` (asserting `!path_exists('/etc/NIXOS')` so NixOS upgrades go through `flake.lock`), and `determinate-nixd fix hashes` for fixing mismatched SRI/FOD hashes.
 - **Standalone Hjem Builder (`nix/flake/hjem.nix`)**: Exposes `flake.lib.hjemHome`, `flake.lib.hjemConfiguration`, and `perSystem.packages.hjem-files`, separating public runtime JSON parameters from private host data.
 
 ### Takeaways for `nix-dotfiles`
 1. **`lib.fileset.toSource` for Custom Packages**: In `packages/*.nix` (e.g., `m3u8dl-protocol`, `ktoolbox`), using `lib.fileset.toSource` guarantees clean, minimal build contexts even when `.DS_Store` or editor artifacts exist.
 2. **Transitive Input Pruning**: Zeroing unused `follows = ""` on inputs like `nixcord` or `direnv-instant` (already partially done in `nix-dotfiles/flake.nix`) keeps evaluation fast.
-3. **Skip the Heavy Bun/TS Layer**: `4evy-dotfiles` relies on Bun/TypeScript scripts (`home/deploy/*.ts`) for orchestration; our `red-tape` + `run.fish` + `adios-flake` setup is already much lighter and pure-Nix.
+3. **Declarative Determinate on macOS**: Unlike `4evy-dotfiles` (which relies on `sudo determinate-nixd upgrade` on macOS), `nix-dotfiles` manages `determinate-nixd` declaratively via `modules/darwin/determinate/` (`nix flake update determinate` + `darwin-rebuild switch`), while `determinate-nixd fix hashes` remains a useful CLI helper for SRI hash updates.
+4. **Skip the Heavy Bun/TS Layer**: `4evy-dotfiles` relies on Bun/TypeScript scripts (`home/deploy/*.ts`) for orchestration; our `red-tape` + `run.fish` + `adios-flake` setup is already much lighter and pure-Nix.
 
 ---
 
