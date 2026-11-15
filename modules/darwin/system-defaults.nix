@@ -11,7 +11,7 @@ let
 in
 {
   imports = [
-    inputs.determinate.darwinModules.default
+    inputs.self.darwinModules.determinate
     inputs.nix-index-database.darwinModules.nix-index
   ];
 
@@ -109,10 +109,6 @@ in
     };
     launchd = {
       daemons = {
-        determinate-nix-daemon.serviceConfig = {
-          SoftResourceLimits.NumberOfFiles = 1048576;
-          HardResourceLimits.NumberOfFiles = 1048576;
-        };
         # macOS default kern.tty.ptmx_max is 511. Heavy developer/Electron tools (VS Code, Cursor, Ghostty)
         # leak PTYs over long sessions, leading to `posix_openpt: Device not configured (ENXIO)`.
         # Raise to XNU's safe upper ceiling (999).
