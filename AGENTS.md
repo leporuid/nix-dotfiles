@@ -8,7 +8,7 @@ This repository collects project-specific expectations, tool contracts, and arch
 
 | Directory / File | Description & Purpose |
 | :--- | :--- |
-| `flake.nix` | Root `red-tape.mkFlake` entrypoint; tracks inputs, system matrix, `hjemModules` output, `flake-schemas`, and `overlays.default`. |
+| `flake.nix` | Root `red-tape.mkFlake` entrypoint; tracks inputs, system matrix, `flake-schemas` (plus `red-tape.hjemSchemas`), and `overlays.default`. |
 | `devshell.nix` | Developer shell toolchain (`mkShellNoCC`: `llm-agents`, `agenix` with `age`, `nixos-rebuild`, `nixos-anywhere`, linters) sourcing `git-hooks.nix`. |
 | `formatter.nix` | Root `treefmt-nix` formatter entrypoint delegating to `treefmt.nix`. |
 | `treefmt.nix` | Unified formatter and linter rules (`deadnix`, `statix`, `nixfmt`, `fish_indent`, `shfmt`, `taplo`, `yamlfmt`). |

@@ -4,7 +4,10 @@ pkgs.stdenv.mkDerivation {
   pname = "has-ancestor";
   version = "0.1.0";
 
-  src = ./.;
+  src = pkgs.lib.fileset.toSource {
+    root = ./.;
+    fileset = ./main.c;
+  };
 
   buildPhase = ''
     $CC -O2 -Wall -Wextra -o has-ancestor main.c

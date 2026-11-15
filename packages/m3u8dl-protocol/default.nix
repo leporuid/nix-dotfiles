@@ -8,7 +8,14 @@ pkgs.stdenv.mkDerivation (finalAttrs: {
   inherit pname;
   version = "1.0.0";
 
-  src = ./.;
+  src = pkgs.lib.fileset.toSource {
+    root = ./.;
+    fileset = pkgs.lib.fileset.unions [
+      ./main.m
+      ./Info.plist
+      ./AppIcon.icns
+    ];
+  };
 
   buildInputs = pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
     pkgs.apple-sdk
