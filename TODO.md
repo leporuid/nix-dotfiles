@@ -13,10 +13,10 @@
 
 ## Post-reboot verification (after `darwin-rebuild switch` at c310995)
 
-- [ ] `nix config show | grep experimental-features` should no longer list `external-builders`. If it still does, find where it is set (`determinate-nixd` vs `/etc/nix/nix.conf`).
-- [ ] In a fresh Ghostty window, `echo $XDG_CONFIG_HOME` should print `/Users/leporuid/.config`.
-- [ ] `nu -c 'print $nu.default-config-dir'` should print `~/.config/nushell`, and the prompt, atuin, and carapace should load.
-- [ ] `echo $BAT_THEME` in Nushell should be `Catppuccin Mocha`.
+- [x] `nix config show | grep experimental-features` no longer lists `external-builders` (fixed via `determinateNixd.builder.state = "disabled"` plus `sudo launchctl kickstart -k system/systems.determinate.nix-daemon`).
+- [x] In a fresh Ghostty window, `echo $XDG_CONFIG_HOME` should print `/Users/leporuid/.config`.
+- [x] `nu -c 'print $nu.default-config-dir'` should print `~/.config/nushell`, and the prompt, atuin, and carapace should load.
+- [x] `echo $BAT_THEME` in Nushell should be `Catppuccin Mocha`.
 
 ## Push
 
