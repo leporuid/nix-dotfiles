@@ -41,6 +41,7 @@ jobs:
           nix shell --inputs-from . \
             nixpkgs#actionlint \
             nixpkgs#deadnix \
+            nixpkgs#nixfmt \
             nixpkgs#pedantix \
             nixpkgs#statix \
             -c bash -euo pipefail -c '
