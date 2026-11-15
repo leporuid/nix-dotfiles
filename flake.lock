@@ -318,24 +318,6 @@
         "type": "github"
       }
     },
-    "flake-utils": {
-      "inputs": {
-        "systems": "systems"
-      },
-      "locked": {
-        "lastModified": 1731533236,
-        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "type": "github"
-      }
-    },
     "gallery-ai": {
       "flake": false,
       "locked": {
@@ -471,7 +453,6 @@
     },
     "ktoolbox": {
       "inputs": {
-        "flake-utils": "flake-utils",
         "nixpkgs": [
           "nixpkgs"
         ],
@@ -480,11 +461,11 @@
         "uv2nix": "uv2nix"
       },
       "locked": {
-        "lastModified": 1793830294,
-        "narHash": "sha256-rv7H6pGh8QXEVH4LeiVoPdJMUK5Ph8eq1PDpllSdgPc=",
+        "lastModified": 1794762308,
+        "narHash": "sha256-w/NNdttDfjv3Bt04V33w80TxBtNSvd1oVRY3oKguBH4=",
         "owner": "leporuid",
         "repo": "KToolBox",
-        "rev": "3fb79c49692f5ce9849e00bcff2a624811da674d",
+        "rev": "29432544f0716e128a288cf09d7702a0b09a7f94",
         "type": "github"
       },
       "original": {
@@ -501,7 +482,7 @@
         "nixpkgs": [
           "nixpkgs"
         ],
-        "systems": "systems_2",
+        "systems": "systems",
         "treefmt-nix": [
           "treefmt"
         ]
@@ -894,21 +875,6 @@
       }
     },
     "systems": {
-      "locked": {
-        "lastModified": 1681028828,
-        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
-        "owner": "nix-systems",
-        "repo": "default",
-        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-systems",
-        "repo": "default",
-        "type": "github"
-      }
-    },
-    "systems_2": {
       "locked": {
         "lastModified": 1791244623,
         "narHash": "sha256-uuanbkFk8a313Zfrxdcz8Us/yQtaxNnKJtX8v0ZPpd8=",

@@ -22,8 +22,8 @@
 - [x] Extend `check-links` in `run.fish` to compare NixOS host Hjem generations (`nixos`, `nixos-vm`) against the standalone manifest.
 - [x] Add `dix` closure diff activation module (`modules/common/dix.nix`, wired into `darwinModules.aggregate` and `nixosModules.aggregate`); `hjemSchemas` unit tests already exist in `red-tape/tests/hjem.nix`.
 - [x] Confirm the single-line Starship prompt interactively in Nushell.
+- [x] Replace `flake-utils` with `nixpkgs.lib.genAttrs` in `ktoolbox` (`2943254`), run `nix flake update ktoolbox` (dropping `ktoolbox/flake-utils` and `ktoolbox/flake-utils/systems`), and sync `AGENTS.md` / `docs/*.md` before removing `~/Developer/refer`.
 
 ## Next Session
 
-- [ ] Push `ktoolbox` (`uv2nix` branch: replaced `flake-utils` with `nixpkgs.lib.genAttrs`, dropping `flake-utils` and `systems`), then run `nix flake update ktoolbox` in `nix-dotfiles` and push `main` (`871acfd..HEAD`).
-- [ ] Optional: remove `~/Developer/nix-dotfiles-archive` and `~/Developer/refer` once everything is settled.
+- [ ] Optional: remove `~/Developer/nix-dotfiles-archive` once everything is settled.
