@@ -3,7 +3,7 @@
 command_timeout = 1000
 add_newline = false
 continuation_prompt = "[▸▹ ](dimmed white)"
-palette = "catppuccin_mocha"
+palette = "soft_violet_claude"
 
 format = """($nix_shell$container$hostname\n)\
 $sudo\
@@ -12,43 +12,42 @@ $character"""
 # move the rest of the prompt to the right
 right_format = """$all"""
 
-[palettes.catppuccin_mocha]
-rosewater = "#f5e0dc"
-flamingo = "#f2cdcd"
-pink = "#f5c2e7"
-mauve = "#cba6f7"
-red = "#f38ba8"
-maroon = "#eba0ac"
-peach = "#fab387"
-yellow = "#f9e2af"
-green = "#a6e3a1"
-teal = "#94e2d5"
-sky = "#89dceb"
-sapphire = "#74c7ec"
-blue = "#89b4fa"
-lavender = "#b4befe"
-text = "#cdd6f4"
-subtext1 = "#bac2de"
-subtext0 = "#a6adc8"
-overlay2 = "#9399b2"
-overlay1 = "#7f849c"
-overlay0 = "#6c7086"
-surface2 = "#585b70"
-surface1 = "#45475a"
-surface0 = "#313244"
-base = "#1e1e2e"
-mantle = "#181825"
-crust = "#11111b"
+[palettes.soft_violet_claude]
+text = "#E8E6DC"
+subtext1 = "#B0AEA5"
+subtext0 = "#A06E86"
+overlay2 = "#A06E86"
+overlay1 = "#62536E"
+overlay0 = "#3F0474"
+surface2 = "#62536E"
+surface1 = "#3F0474"
+surface0 = "#24113A"
+base = "#141413"
+mantle = "#170032"
+crust = "#170032"
+mauve = "#8924CE"
+pink = "#FF36D9"
+lavender = "#A06E86"
+peach = "#D97757"
+red = "#C15F3C"
+maroon = "#C15F3C"
+yellow = "#D97757"
+green = "#788C5D"
+teal = "#A06E86"
+blue = "#6A9BCC"
+sapphire = "#6A9BCC"
+sky = "#8BB2D9"
+rosewater = "#EAD7FF"
+flamingo = "#D97757"
 
 [fill]
 symbol = ' '
 
 [character]
 format = "$symbol "
-success_symbol = "[◎](bold italic yellow)"
+success_symbol = "[◎](bold italic peach)"
 error_symbol = "[⊘](italic red)"
 vimcmd_symbol = "[■](italic green)"
-# not supported in zsh
 vimcmd_replace_one_symbol = "◌"
 vimcmd_replace_symbol = "□"
 vimcmd_visual_symbol = "▼"
@@ -59,7 +58,7 @@ style = 'green italic'
 
 [sudo]
 format = "[$symbol]($style)"
-style = "bold italic mauve"
+style = "bold italic pink"
 symbol = "⋈┈"
 disabled = false
 

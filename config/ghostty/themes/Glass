@@ -1,40 +1,40 @@
 
 # ==========================================
-# Soft Neon Violet
+# Soft Violet × Claude Warm
 # ==========================================
 
 # Background & Foreground
-background = #170032
-foreground = #EAD7FF
+background = #260D35
+foreground = #E8E6DC
 
 # ANSI Normal (0-7)
-palette = 0=#170D20
-palette = 1=#B96F91
-palette = 2=#91AE9A
-palette = 3=#C8AB86
-palette = 4=#8176B8
-palette = 5=#C026D3
-palette = 6=#8FA5B9
-palette = 7=#DCCBEA
+palette = 0=#141413
+palette = 1=#C15F3C
+palette = 2=#788C5D
+palette = 3=#D97757
+palette = 4=#6A9BCC
+palette = 5=#8924CE
+palette = 6=#A06E86
+palette = 7=#B0AEA5
 
 # ANSI Bright (8-15)
 palette = 8=#62536E
-palette = 9=#D58AAA
-palette = 10=#AAC5B0
-palette = 11=#E0C39E
-palette = 12=#A99AE0
-palette = 13=#D65CDE
-palette = 14=#B4C6D8
-palette = 15=#F8EEFF
+palette = 9=#D97757
+palette = 10=#94A875
+palette = 11=#FAF9F5
+palette = 12=#8BB2D9
+palette = 13=#FF36D9
+palette = 14=#A9879B
+palette = 15=#FAF9F5
 
 # Cursor
-cursor-color = #C026D3
+cursor-color = #D97757
 cursor-text = #170032
 cursor-style = underline
 
 # Selection
 selection-background = #3F0474
-selection-foreground = #F8EEFF
+selection-foreground = #FAF9F5
 
 # Appearance
 background-opacity = 0.92

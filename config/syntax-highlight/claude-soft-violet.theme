@@ -1,0 +1,39 @@
+
+-- ==========================================
+-- Soft Violet × Claude Warm
+-- Andre Simon Highlight / SourceCodeSyntaxHighlight
+-- Matches Ghostty & Starship
+-- ==========================================
+
+Description = "Soft Violet Claude Warm"
+
+-- Background & Foreground
+Canvas = { Colour = "#170032" }
+Default = { Colour = "#E8E6DC" }
+
+-- Syntax Colors
+Number = { Colour = "#D97757" }
+Operator = { Colour = "#A9879B" }
+
+String = { Colour = "#94A875" }
+Escape = { Colour = "#FF36D9" }
+StringPreProc = Escape
+Interpolation = { Colour = "#FF36D9" }
+
+-- Comments
+LineComment = { Colour = "#62536E", Italic = true }
+BlockComment = { Colour = "#62536E", Italic = true }
+
+-- Line Numbers
+LineNum = { Colour = "#62536E" }
+
+-- Preprocessor
+PreProcessor = { Colour = "#8924CE" }
+
+-- Keywords
+Keywords = {
+  { Id=1, Colour="#8924CE", Bold=true },   -- keywords / fn / control flow
+  { Id=2, Colour="#6A9BCC", Bold=false },  -- types / classes
+  { Id=3, Colour="#FF36D9", Bold=false },  -- constants / strong accent
+  { Id=4, Colour="#C15F3C", Bold=false },  -- special / warnings
+}

@@ -1,0 +1,39 @@
+
+-- ==========================================
+-- Enchanted Grimoire
+-- Antique Parchment × Dusty Lavender
+-- Andre Simon Highlight / SourceCodeSyntaxHighlight
+-- ==========================================
+
+Description = "Enchanted Grimoire"
+
+-- Background & Foreground
+Canvas = { Colour = "#E1D8D5" }
+Default = { Colour = "#51404D" }
+
+-- Syntax Colors
+Number = { Colour = "#B69A78" }
+Operator = { Colour = "#80608F" }
+
+String = { Colour = "#788C68" }
+Escape = { Colour = "#A9879C" }
+StringPreProc = Escape
+Interpolation = { Colour = "#A9879C" }
+
+-- Comments
+LineComment = { Colour = "#A99DA1", Italic = true }
+BlockComment = { Colour = "#A99DA1", Italic = true }
+
+-- Line Numbers
+LineNum = { Colour = "#B5A8B0" }
+
+-- Preprocessor
+PreProcessor = { Colour = "#927A9B" }
+
+-- Keywords
+Keywords = {
+  { Id=1, Colour="#795B8B", Bold=true },   -- keywords / fn / control flow
+  { Id=2, Colour="#7189A8", Bold=false },  -- types / classes
+  { Id=3, Colour="#A17F91", Bold=false },  -- constants / strong accent
+  { Id=4, Colour="#B97867", Bold=false },  -- special / warnings
+}

@@ -1,0 +1,36 @@
+# Background & Foreground
+background = #B69BBE
+foreground = #35263D
+
+# ANSI Normal (0-7)
+palette = 0=#35263D
+palette = 1=#A94F3B
+palette = 2=#647A4D
+palette = 3=#B65F43
+palette = 4=#527EAB
+palette = 5=#762C91
+palette = 6=#91677F
+palette = 7=#493C4D
+
+# ANSI Bright (8-15)
+palette = 8=#796681
+palette = 9=#C15F3C
+palette = 10=#819763
+palette = 11=#35263D
+palette = 12=#6A9BCC
+palette = 13=#A64CB9
+palette = 14=#A9879B
+palette = 15=#49364F
+
+# Cursor
+cursor-color = #D97757
+cursor-text = #B69BBE
+cursor-style = underline
+
+# Selection
+selection-background = #8F6A9A
+selection-foreground = #FFFFFF
+
+# Appearance
+background-opacity = 1.0
+window-padding-color = extend
