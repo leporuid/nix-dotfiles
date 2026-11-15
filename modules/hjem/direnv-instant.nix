@@ -1,37 +1,39 @@
 {
-  inputs,
   config,
   lib,
-  pkgs,
+  perSystem,
   ...
 }:
 let
+  inherit (lib.modules) mkIf;
+  inherit (lib.options) mkEnableOption mkOption;
+  inherit (lib) types;
+
   cfg = config.my.programs.direnv-instant;
-  pkg = inputs.direnv-instant.packages.${pkgs.stdenv.hostPlatform.system}.default;
 in
 {
   options.my.programs.direnv-instant = {
-    enable = lib.mkEnableOption "direnv-instant non-blocking shell integration" // {
+    enable = mkEnableOption "direnv-instant non-blocking shell integration" // {
       default = true;
     };
-    package = lib.mkOption {
-      type = lib.types.package;
-      default = pkg;
+    package = mkOption {
+      type = types.package;
+      default = perSystem.direnv-instant.default;
       description = "The direnv-instant package to use.";
     };
-    useCache = lib.mkOption {
-      type = lib.types.bool;
+    useCache = mkOption {
+      type = types.bool;
       default = true;
       description = "Apply cached env instantly on prompt.";
     };
-    muxDelay = lib.mkOption {
-      type = lib.types.int;
+    muxDelay = mkOption {
+      type = types.int;
       default = 4;
       description = "Seconds before opening multiplexer split.";
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = mkIf cfg.enable {
     packages = [ cfg.package ];
 
     # Fish shell integration: auto-loads from vendor_conf.d

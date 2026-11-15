@@ -43,7 +43,6 @@ in
     specialArgs = { inherit inputs perSystem; };
     extraModules = [
       inputs.hjem-rum.hjemModules.default
-      inputs.self.hjemModules.aggregate
     ];
 
     # Automatically attach user configurations found in hosts/<hostname>/users/ or users/

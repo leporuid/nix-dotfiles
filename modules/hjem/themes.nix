@@ -6,6 +6,9 @@
   ...
 }:
 let
+  inherit (lib.modules) mkIf;
+  inherit (lib.options) mkEnableOption;
+
   cfg = config.my.themes;
   batCache =
     pkgs.runCommand "bat-cache"
@@ -18,12 +21,12 @@ let
 in
 {
   options.my.themes = {
-    enable = lib.mkEnableOption "terminal and editor themes" // {
+    enable = mkEnableOption "terminal and editor themes" // {
       default = true;
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = mkIf cfg.enable {
     packages = [
       (pkgs.writeShellApplication {
         name = "bat";

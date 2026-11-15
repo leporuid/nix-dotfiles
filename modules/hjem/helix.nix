@@ -1,5 +1,4 @@
 {
-  inputs,
   config,
   lib,
   pkgs,
@@ -15,9 +14,7 @@ in
   options.my.programs.helix = {
     enable = mkEnableOption "Helix editor configuration via Hjem";
 
-    package = mkPackageOption inputs.helix.packages.${pkgs.stdenv.hostPlatform.system} "helix" {
-      default = "helix";
-    };
+    package = mkPackageOption pkgs "helix" { };
   };
 
   config = mkIf cfg.enable {

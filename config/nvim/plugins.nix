@@ -8,10 +8,9 @@ let
       rev,
       name ? repo,
       opt ? false,
-      recursive ? false,
     }:
     {
-      inherit name recursive;
+      inherit name;
       start = !opt;
       src = pkgs.fetchFromGitHub {
         inherit

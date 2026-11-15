@@ -127,7 +127,10 @@ in
 {
   options.my.config = {
     directory = lib.mkOption {
-      default = "/Users/leporuid/Developer/nix-dotfiles/config";
+      default = "${config.directory}/Developer/nix-dotfiles/config";
+      defaultText = lib.literalExpression ''
+        "''${config.directory}/Developer/nix-dotfiles/config"
+      '';
       type = types.either types.path types.str;
       description = ''
         Local absolute path to the configuration directory when useOutOfStoreSymlinks is enabled.
@@ -170,15 +173,9 @@ in
       '';
     };
 
-    force = lib.mkOption {
-      default = true;
-      type = types.bool;
-      description = "Deprecated alias for clobber.";
-    };
-
     clobber = lib.mkOption {
-      default = cfg.force;
-      defaultText = lib.literalExpression "config.my.config.force";
+      default = config.clobberFiles;
+      defaultText = lib.literalExpression "config.clobberFiles";
       type = types.bool;
       description = "Whether the configuration links should override whatever exists already.";
     };
@@ -194,7 +191,7 @@ in
         ) nonNullSource;
 
         nonNullText = lib.filterAttrs (_: v: v != null) cfg.text;
-        textFiles = builtins.mapAttrs (_: v: {
+        textFiles = lib.mapAttrs (_: v: {
           text = renderConfigText v;
           inherit (cfg) clobber;
         }) nonNullText;

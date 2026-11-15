@@ -6,22 +6,28 @@
   ...
 }:
 let
+  inherit (lib.attrsets) filterAttrs mapAttrs' nameValuePair;
+  inherit (lib.modules) mkIf;
+  inherit (lib.options) mkEnableOption;
+  inherit (lib.strings) hasSuffix;
+  inherit (lib.trivial) pipe;
+
   cfg = config.my.programs.fish;
 
   # Link individual conf.d files so rum-environment-variables.fish is not clobbered
-  confDFiles = lib.pipe (builtins.readDir ../../config/fish/conf.d) [
-    (lib.filterAttrs (name: type: type == "regular" && lib.hasSuffix ".fish" name))
-    (lib.mapAttrs' (name: _: lib.nameValuePair ".config/fish/conf.d/${name}" "fish/conf.d/${name}"))
+  confDFiles = pipe (builtins.readDir ../../config/fish/conf.d) [
+    (filterAttrs (name: type: type == "regular" && hasSuffix ".fish" name))
+    (mapAttrs' (name: _: nameValuePair ".config/fish/conf.d/${name}" "fish/conf.d/${name}"))
   ];
 in
 {
   options.my.programs.fish = {
-    enable = lib.mkEnableOption "Fish shell configuration" // {
+    enable = mkEnableOption "Fish shell configuration" // {
       default = true;
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = mkIf cfg.enable {
     rum.programs.fish.enable = true;
 
     my.config.source = {

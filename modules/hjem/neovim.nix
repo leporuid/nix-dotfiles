@@ -6,6 +6,20 @@
   ...
 }:
 let
+  inherit (lib.attrsets) foldlAttrs;
+  inherit (lib.lists) foldl';
+  inherit (lib.modules) mkIf;
+  inherit (lib.options) mkEnableOption mkOption;
+  inherit (lib.strings) makeBinPath;
+  inherit (lib.types)
+    attrsOf
+    bool
+    listOf
+    path
+    str
+    submodule
+    ;
+
   cfg = config.my.programs.neovim;
 
   neovimWithDependencies = pkgs.symlinkJoin {
@@ -15,7 +29,7 @@ let
     postBuild = ''
       wrapProgram "$out/bin/nvim" \
         --prefix PATH : ${
-          lib.makeBinPath [
+          makeBinPath [
             pkgs.curl
             pkgs.tree-sitter
             pkgs.ripgrep
@@ -33,25 +47,21 @@ let
       ".local/share/nvim/site/pack/${group}/${subdir}/${p.name}".source = p.src;
     };
 
-  links = lib.foldlAttrs (
+  links = foldlAttrs (
     acc: group: plugins:
-    lib.foldl' (acc2: pl: acc2 // mkPluginLink group pl) acc plugins
+    foldl' (acc2: pl: acc2 // mkPluginLink group pl) acc plugins
   ) { } cfg.packages;
 
-  pluginType = lib.types.submodule (_: {
+  pluginType = submodule (_: {
     options = {
-      name = lib.mkOption {
-        type = lib.types.str;
+      name = mkOption {
+        type = str;
       };
-      src = lib.mkOption {
-        type = lib.types.path;
+      src = mkOption {
+        type = path;
       };
-      start = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-      };
-      recursive = lib.mkOption {
-        type = lib.types.bool;
+      start = mkOption {
+        type = bool;
         default = false;
       };
     };
@@ -59,17 +69,17 @@ let
 in
 {
   options.my.programs.neovim = {
-    enable = lib.mkEnableOption "NeoVim plugins via packpath" // {
+    enable = mkEnableOption "NeoVim plugins via packpath" // {
       default = true;
     };
 
-    packages = lib.mkOption {
-      type = lib.types.attrsOf (lib.types.listOf pluginType);
+    packages = mkOption {
+      type = attrsOf (listOf pluginType);
       default = { };
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = mkIf cfg.enable {
     packages = [
       neovimWithDependencies
       pkgs.tree-sitter

@@ -15,6 +15,5 @@
     inputs.self.hjemModules.direnv
     inputs.self.hjemModules.direnv-instant
     inputs.self.hjemModules.jujutsu
-    inputs.self.hjemModules.nixcord
   ];
 }
