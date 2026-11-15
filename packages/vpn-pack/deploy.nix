@@ -16,7 +16,10 @@ let
     Description=Tailscale node agent (UniFi)
     Documentation=https://tailscale.com/kb/
     Wants=network-pre.target
-    After=network-pre.target ubios-udapi-server.service
+    After=network-pre.target ubios-udapi-server.service ubnt-dpkg-restore.service
+    RequiresMountsFor=/persistent/vpn-pack
+    # Disable systemd start rate limiting so boot retries survive slow mount/network init
+    StartLimitIntervalSec=0
 
     [Service]
     EnvironmentFile=/persistent/vpn-pack/tailscaled.defaults
@@ -28,6 +31,7 @@ let
     ExecStopPost=/persistent/vpn-pack/bin/tailscaled --cleanup
 
     Restart=on-failure
+    RestartSec=5
 
     RuntimeDirectory=tailscale
     RuntimeDirectoryMode=0755
@@ -41,14 +45,19 @@ let
     # Tailscale daemon configuration for UniFi devices
     PORT="41641"
     FLAGS=""
+    # Work around UniFi Cloud Gateway LAN TSO stalls on forwarded Tailscale TCP traffic.
+    # Set to "0" or remove if your gateway model is unaffected.
+    TS_TUN_DISABLE_TCP_GRO="1"
   '';
 
   managerService = pkgs.writeText "vpn-pack-manager.service" ''
     [Unit]
     Description=VPN Pack Manager (UniFi)
-    After=tailscaled.service ubios-udapi-server.service unifi-core.service vpn-pack-manager.socket
+    After=tailscaled.service ubios-udapi-server.service unifi-core.service ubnt-dpkg-restore.service vpn-pack-manager.socket
     Wants=tailscaled.service
     Requires=vpn-pack-manager.socket
+    RequiresMountsFor=/persistent/vpn-pack
+    StartLimitIntervalSec=0
 
     [Service]
     ExecStart=/persistent/vpn-pack/bin/vpn-pack-manager \
