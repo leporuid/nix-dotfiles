@@ -25,3 +25,13 @@
 ## Optional follow-ups
 
 - [x] Reconsider `accept-flake-config = true` in `modules/common/vars.nix` (removed; this flake's caches already live in `customSettings`).
+- [x] Remove redundant mac-app-util input and Darwin module (b2c39b1).
+- [x] Configure hosts/nixos (aarch64-linux) as remote builder on MacBook-Pro (verified Trusted: 1).
+- [x] Switch macOS UserShell to /run/current-system/sw/bin/zsh (exec fish via .zshrc) and init zoxide in zsh.
+
+## Next Session
+
+- [ ] Verify GitHub Actions CI with NIX_SECRETS_SSH_KEY configured for private nix-secrets.
+- [ ] Test building nixosConfigurations.nixos-vm / nixos from MacBook-Pro via the nixos remote builder.
+- [ ] Optional: add dix closure diff (from moni-nixcfg) and hjemSchemas unit tests in red-tape.
+- [ ] Optional: remove ~/Developer/nix-dotfiles-archive once migration is fully settled.
