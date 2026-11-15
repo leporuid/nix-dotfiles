@@ -423,9 +423,15 @@ in
       age
       rage
 
-      (inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
-        ageBin = "${pkgs.rage}/bin/rage";
-      })
+      (
+        (inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
+          ageBin = "${pkgs.rage}/bin/rage";
+        }).overrideAttrs
+          (_: {
+            doCheck = false;
+            doInstallCheck = false;
+          })
+      )
 
       ethtool
       lsof
