@@ -76,17 +76,6 @@ in
       fish = {
         enable = true;
         useBabelfish = true;
-        interactiveShellInit = ''
-          if test "$TERM" = "dumb"
-            function fish_prompt
-              echo "\$ "
-            end
-
-            function fish_right_prompt; end
-            function fish_greeting; end
-            function fish_title; end
-          end
-        '';
       };
     };
     users.users.${config.system.primaryUser}.shell = pkgs.zsh;
@@ -168,9 +157,14 @@ in
           FXDefaultSearchScope = "SCcf";
           FXPreferredViewStyle = "clmv";
           FXEnableExtensionChangeWarning = false;
+          FXRemoveOldTrashItems = true;
           NewWindowTarget = "Home";
           QuitMenuItem = true;
+          ShowExternalHardDrivesOnDesktop = true;
+          ShowHardDrivesOnDesktop = false;
+          ShowRemovableMediaOnDesktop = true;
           _FXSortFoldersFirst = true;
+          _FXSortFoldersFirstOnDesktop = true;
         };
 
         dock = {
@@ -180,15 +174,29 @@ in
           expose-animation-duration = 0.1;
           launchanim = false;
           mineffect = "scale";
+          minimize-to-application = true;
           mru-spaces = false;
+          orientation = "right";
           show-process-indicators = true;
           show-recents = false;
           showhidden = true;
+          tilesize = 36;
+          wvous-br-corner = 14;
+        };
+
+        menuExtraClock = {
+          Show24Hour = false;
+          ShowDayOfWeek = true;
         };
 
         trackpad = {
           Clicking = true;
           Dragging = true;
+          TrackpadFourFingerHorizSwipeGesture = 2;
+          TrackpadFourFingerVertSwipeGesture = 2;
+          TrackpadPinch = true;
+          TrackpadRotate = true;
+          TrackpadThreeFingerTapGesture = 2;
         };
 
         NSGlobalDomain = {
@@ -205,11 +213,18 @@ in
           InitialKeyRepeat = 15;
           KeyRepeat = 2;
           "com.apple.sound.beep.feedback" = 0;
+          "com.apple.trackpad.scaling" = 3.0;
         };
 
         CustomUserPreferences = {
           NSGlobalDomain = {
             QLPanelAnimationDuration = 0.0;
+          };
+          "com.apple.AdLib" = {
+            allowApplePersonalizedAdvertising = false;
+          };
+          "com.apple.finder" = {
+            FinderSpawnTab = false;
           };
           "com.apple.symbolichotkeys" = {
             AppleSymbolicHotKeys = {
