@@ -30,7 +30,6 @@ in
           "root"
           username
         ];
-        accept-flake-config = true;
         auto-optimise-store = !isDarwin;
         builders-use-substitutes = true;
         connect-timeout = 10;

@@ -20,8 +20,8 @@
 
 ## Push
 
-- [ ] Push local commits `74380df` (skills and AGENTS.md alignment) and `c310995` (Determinate trim) to `origin/main`.
+- [x] Push local commits `74380df` (skills and AGENTS.md alignment) and `c310995` (Determinate trim) to `origin/main`.
 
 ## Optional follow-ups
 
-- [ ] Reconsider `accept-flake-config = true` in `modules/common/vars.nix` (accepts any flake `nixConfig` without prompting).
+- [x] Reconsider `accept-flake-config = true` in `modules/common/vars.nix` (removed; this flake's caches already live in `customSettings`).
