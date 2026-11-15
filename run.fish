@@ -272,6 +272,13 @@ function MacBook-Pro -a verb
             $argv[2..]
         or return $status
         echo
+
+        # The standalone Hjem manifest and the host generation must describe the
+        # same file set, otherwise they drift apart without anyone noticing.
+        _run check-links --host MacBook-Pro
+        or return $status
+
+        echo
         return 0
     end
 
@@ -297,6 +304,62 @@ for host in $hosts
         echo "function $verb-$host -d '$verb the configuration for $host'; _$host $verb \$argv; end" | source
         test $this_host = $host; and alias $verb-host $verb-$host
     end
+end
+
+function check-links -d "Verify the standalone Hjem manifest matches a host's generation (--user, --host, --target-root)"
+    set -l user leporuid
+    set -l host $this_host
+    set -l target_root /Users/leporuid
+    argparse 'user=' 'host=' 'target-root=' -- $argv
+    or return 1
+    set -q _flag_user; and set user $_flag_user
+    set -q _flag_host; and set host $_flag_host
+    set -q _flag_target_root; and set target_root $_flag_target_root
+
+    _require jq
+    set -l tmp (mktemp -d)
+    # Both sides are compared home-relative, so the result does not depend on
+    # where the check runs: the generation keys already are, and the manifest's
+    # absolute targets simply get target_root stripped. Flake source copies also
+    # land under different store hashes, hence the prefix normalization.
+    set -l normalize 's#/nix/store/[a-z0-9]+-source/#repo:/#g'
+
+    nix eval --json .#hjemConfigurations.$user.manifest \
+        | jq -r --arg root "$target_root/" \
+        '.files[] | [(.target | ltrimstr($root)), (.source // ("text:" + (.text | tostring)))] | @tsv' \
+        | sed -E $normalize | sort >$tmp/standalone
+    or begin
+        echo (set_color brred)"Failed to evaluate hjemConfigurations.$user.manifest."(set_color normal) >&2
+        rm -rf $tmp
+        return 1
+    end
+
+    begin
+        nix eval --json .#darwinConfigurations.$host.config.hjem.users.$user.files \
+            | jq -r 'to_entries[] | [.key, (.value.source // ("text:" + (.value.text | tostring)))] | @tsv'
+        nix eval --json .#darwinConfigurations.$host.config.hjem.users.$user.xdg.config.files \
+            | jq -r 'to_entries[] | [".config/" + .key, (.value.source // ("text:" + (.value.text | tostring)))] | @tsv'
+    end | sed -E $normalize | sort >$tmp/generation
+    or begin
+        echo (set_color brred)"Failed to evaluate darwinConfigurations.$host (is --host correct?)."(set_color normal) >&2
+        rm -rf $tmp
+        return 1
+    end
+
+    if string match -qr '^/' <$tmp/standalone
+        echo (set_color yellow)"warning:"(set_color normal)" some manifest targets are outside $target_root; pass --target-root." >&2
+    end
+
+    if diff -u $tmp/standalone $tmp/generation >$tmp/diff
+        echo (set_color green)"Standalone manifest matches $host's generation ($(wc -l <$tmp/standalone | string trim) files)."(set_color normal)
+        rm -rf $tmp
+        return 0
+    end
+
+    echo (set_color brred)"Standalone manifest and $host's generation disagree:"(set_color normal)
+    cat $tmp/diff
+    rm -rf $tmp
+    return 1
 end
 
 function update-m3u8dl -d "Query latest GitHub Actions artifact ID and update pin.json"
