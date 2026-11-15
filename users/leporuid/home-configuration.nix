@@ -119,6 +119,7 @@ in
       perSystem.packages.self.ccase
       perSystem.packages.self.ktoolbox
       perSystem.packages.llm-agents.herdr
+      perSystem.packages.llm-agents.antigravity-cli
     ])
     ++ lib.optionals isDarwin [
       pkgs.ffmpeg
