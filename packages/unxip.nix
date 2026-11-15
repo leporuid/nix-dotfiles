@@ -4,7 +4,7 @@ pkgs.unxip.overrideAttrs (_: {
   src = pkgs.fetchFromGitHub {
     owner = "ranvel";
     repo = "unxip";
-    rev = "libunxip-patches";
-    hash = "sha256-+DYqb4Y2jqWEMungO+rE1UzMXLuAWAzsx6s0mbtOkR4=";
+    rev = "3182d078f302399700d0d4941dd555bbb3c6af04";
+    hash = "sha256-jFChmKUA7+obHkZnd7ZpqeejZfeA+gTUELo1iYeFMFo=";
   };
 })

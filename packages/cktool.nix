@@ -6,7 +6,7 @@ rustPlatform.buildRustPackage {
   src = fetchFromGitHub {
     owner = "HermesMaker";
     repo = pname;
-    rev = "main";
+    rev = "1c999a1cbe17477d04970d3657f6ecfa9478f56f";
     hash = "sha256-x6UCBbeNGbCEZOUGmGOEcDk22PbYBPKm7QWBenef/zI=";
   };
   cargoHash = "sha256-FEpdc9SL8vPP4GW+meEvZSNf7Kjsi1qn0gmpx7nEgu8=";
