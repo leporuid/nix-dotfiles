@@ -11,6 +11,10 @@ rustPlatform.buildRustPackage {
   };
   cargoHash = "sha256-FEpdc9SL8vPP4GW+meEvZSNf7Kjsi1qn0gmpx7nEgu8=";
 
+  # openssl-sys on Linux requires pkg-config and OpenSSL development headers.
+  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ pkg-config ];
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ openssl ];
+
   meta = {
     description = "Command line interface to convert strings into any case";
     homepage = "https://github.com/HermesMaker/cktool";
