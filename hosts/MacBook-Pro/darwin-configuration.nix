@@ -1,5 +1,4 @@
 {
-  lib,
   vars,
   ...
 }:
@@ -52,12 +51,5 @@
         };
       };
     };
-  };
-  nix = {
-    # Determinate Nix owns the daemon and nix.conf; disable nix-darwin's Nix management
-    # completely to prevent both from competing over /etc/nix/nix.conf and launchd.
-    enable = false;
-    channel.enable = false;
-    nixPath = lib.mkForce [ ];
   };
 }
