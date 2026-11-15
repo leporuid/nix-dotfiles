@@ -57,13 +57,6 @@ if not ($atuin_autoload | path exists) {
     }
 }
 
-let starship_autoload = $autoload_dir | path join 'starship.nu'
-if not ($starship_autoload | path exists) {
-    if not (which starship | is-empty) {
-        starship init nu | save -f $starship_autoload
-    }
-}
-
 let zoxide_autoload = $autoload_dir | path join '.zoxide.nu'
 if not ($zoxide_autoload | path exists) {
     if not (which zoxide | is-empty) {

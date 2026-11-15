@@ -344,3 +344,7 @@ $character
 path = """
 $directory
 """
+
+# Nushell keeps every prompt row in scrollback (there is no transient prompt),
+# so give it a single-line prompt to keep the transcript as compact as Fish's.
+nu = "($nix_shell$container$hostname)$sudo$character"
