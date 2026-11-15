@@ -13,7 +13,7 @@ pkgs.mkShellNoCC {
     pre-commit-check.enabledPackages
     ++ [
       perSystem.self.pre-commit-check.passthru.treefmt
-      perSystem.llm-agents.default
+      perSystem.llm-agents.herdr
       # Agenix uses rage by default which lacks age-plugin support; override with age for age-plugin-se
       (perSystem.agenix.default.override {
         ageBin = "${pkgs.age}/bin/age";

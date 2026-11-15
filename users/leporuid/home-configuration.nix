@@ -118,8 +118,7 @@ in
       perSystem.packages.self.has-ancestor
       perSystem.packages.self.ccase
       perSystem.packages.self.ktoolbox
-      perSystem.packages.llm-agents.copilot-cli
-      perSystem.packages.llm-agents.antigravity-cli
+      perSystem.packages.llm-agents.herdr
     ])
     ++ lib.optionals isDarwin [
       pkgs.ffmpeg
