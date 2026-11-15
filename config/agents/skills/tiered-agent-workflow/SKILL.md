@@ -21,7 +21,7 @@ Before running mutating commands or modifying files, engage deep reasoning:
 
 1. **Context & Trade-Off Analysis**:
    - Ingest reference repositories, issue reports, or system logs.
-   - Map external patterns to local constraints (e.g., Numtide Blueprint, Determinate Nix, macOS vs. NixOS).
+   - Map external patterns to local constraints (e.g., red-tape, hjem, Determinate Nix, macOS vs. NixOS).
    - Evaluate edge cases, potential regressions, and evaluation bottlenecks.
 
 2. **Actionable Implementation Plan**:
@@ -36,7 +36,7 @@ Before running mutating commands or modifying files, engage deep reasoning:
 Once the plan is settled, switch to streamlined, low-overhead execution:
 
 1. **In-Place File Patching**:
-   - Use targeted replacement tools (`replace_file_content`) to apply surgical diffs.
+   - Use targeted replacement tools to apply surgical diffs.
    - Avoid reprinting full files or echoing boilerplate into the conversation.
 
 2. **Git Hygiene & Staging**:

@@ -26,7 +26,7 @@ Enforce a strict "grounding-first, multimodal-aware" standard for all developmen
 
 - **Zero-Ignorance Policy**: When the user provides screenshots, images, logs, or attached files, extract and interpret all visible text, stack traces, line numbers, and file paths before formulating a plan.
 
-- **Never Ask for Re-Uploads**: If the user already shared an image or file in the conversation or connected folder, inspect it directly using `client:view_file`. Never ask the user to re-upload or re-type information already provided.
+- **Never Ask for Re-Uploads**: If the user already shared an image or file in the conversation or connected folder, inspect it directly using the file viewing tool. Never ask the user to re-upload or re-type information already provided.
 
 - **Visual Error Triangulation**: Correlate terminal stack traces from screenshots directly with local source files using line numbers and path references.
 
@@ -37,7 +37,7 @@ Enforce a strict "grounding-first, multimodal-aware" standard for all developmen
   2. Secondary: `README.md` and `docs/*.md` (architecture, build steps, dependencies).
   3. Tertiary: Root entrypoints (`flake.nix`, `package.json`, `Cargo.toml`, `go.mod`).
 
-- **No Speculative Coding**: Never guess build commands or project architecture when local documentation exists. Ground every suggested command in the project's verified conventions (e.g. `run switch-host` instead of generic `nixos-rebuild`).
+- **No Speculative Coding**: Never guess build commands or project architecture when local documentation exists. Ground every suggested command in the project's verified conventions (e.g. `run check-host` instead of generic `nixos-rebuild`).
 
 ### 3. No-Doc Negotiation & Self-Healing
 
@@ -51,9 +51,9 @@ Enforce a strict "grounding-first, multimodal-aware" standard for all developmen
 - **Continuous In-Session Grant**: Once a task is initiated within connected folders (`~/Developer`), treat routine operations (reading files, in-place surgical patches, Git MCP status/diff/staging, local evaluation) as ambiently approved.
 
 - **Suppress Permission Prompts**:
-  - Prefer `client:execute_mcp` for Git operations rather than raw terminal commands to avoid sandbox blocks.
+  - Prefer Git MCP tools for Git operations when available; otherwise use plain `git` commands in the connected folder.
   - Do not set `RequiresNetworkAccess: true` unless network operations are strictly necessary.
-  - Apply in-place edits using surgical file tools (`replace_file_content`) instead of full file rewrites.
+  - Apply in-place edits using surgical edit tools instead of full file rewrites.
   - Pause for explicit confirmation only on truly destructive or irreversible actions (e.g., `git push --force`, `git reset --hard`, branch deletions).
 
 ### 5. Multi-Skill Fusion Matrix
@@ -62,7 +62,7 @@ Automatically identify task characteristics and synthesize the relevant sub-skil
 
 - **Strategic Planning vs. Execution**: Enforce `@tiered-agent-workflow`. Use deep reasoning during Phase 1 (Pro Tier) for context ingestion and diff planning. Switch to minimal-token Phase 2 (Flash Tier) for surgical patches and staging.
 
-- **Nix & System Configurations**: If touching `*.nix`, Darwin, NixOS, or Blueprint configurations, strictly apply `@nix-dotfiles-workflow` rules (never inspect `flake.lock`, enforce single-tier module headers, preserve out-of-store symlinks, and verify with `run check-host` or `nix eval`).
+- **Nix & System Configurations**: If touching `*.nix`, Darwin, NixOS, red-tape, or hjem configurations, strictly apply `@nix-dotfiles-workflow` rules (never inspect `flake.lock`, follow `pedantix.toml` module headers, preserve out-of-store symlinks, keep secrets in `nix-secrets`, and verify with `nix fmt`, `nix flake check`, and host `nix eval`; `AGENTS.md` wins on conflicts).
 
 - **External Repository Analysis**: When comparing external GitHub repositories, NUR packages, or upstream flakes, invoke `@fast-repo-reader` to inspect remote trees non-intrusively without terminal network prompts.
 

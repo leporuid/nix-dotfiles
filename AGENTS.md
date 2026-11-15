@@ -99,6 +99,8 @@ This repository collects project-specific expectations, tool contracts, and arch
 
 1. **Mandatory Skills Loading (`agy` & Automated Agents)**:
    - Automated agents (`agy`, Claude, Gemini, Copilot, Cursor) operating in this repository **must** proactively load and strictly adhere to all skills located in `.agents/skills/` (and `config/agents/skills/`).
+   - **Before reading, editing, or evaluating any `*.nix`, `flake.lock`, `hosts/`, `modules/`, `packages/`, `users/`, or `config/` path, load `@nix-dotfiles-workflow` first.** Load `@developer-workflow` at the start of every task, and `@tiered-agent-workflow` / `@get-more-perspectives` as the task requires.
+   - When a skill and this file disagree, this file wins; update the skill afterwards.
 2. **Token Efficiency & Search-First**:
    - Locate targets using `grep_search` or `find_by_name` first.
    - Read only the specific target range (±20 lines) required; never dump whole directories or entire multi-hundred line files into context.
@@ -124,7 +126,7 @@ Automated agents operating on this repository have access to modular skills loca
 | Skill | Path | Description & When to Load |
 | :--- | :--- | :--- |
 | `@developer-workflow` | `.agents/skills/developer-workflow/SKILL.md` | Master orchestrator enforcing source-grounding, active context inspection, and multi-skill execution. |
-| `@nix-dotfiles-workflow` | `.agents/skills/nix-dotfiles-workflow/SKILL.md` | Core Nix architecture guardrails (no `flake.lock` reading, single-tier module headers, out-of-store symlinks). |
+| `@nix-dotfiles-workflow` | `.agents/skills/nix-dotfiles-workflow/SKILL.md` | Core Nix architecture guardrails (no `flake.lock` reading, `pedantix.toml` module headers, hjem/hjem-rum, `nix-secrets` keys, out-of-store symlinks, verification matrix). |
 | `@fast-repo-reader` | `.agents/skills/fast-repo-reader/SKILL.md` | Non-intrusive remote inspection of external Git/GitHub repositories without shell network prompts. |
 | `@tiered-agent-workflow` | `.agents/skills/tiered-agent-workflow/SKILL.md` | Two-tiered execution strategy: Pro-tier deep reasoning for planning $\rightarrow$ Flash-tier surgical execution. |
 | `@get-more-perspectives` | `.agents/skills/get-more-perspectives/SKILL.md` | Simulated 5-role advisory panel for evaluating trade-offs and architecture decisions. |

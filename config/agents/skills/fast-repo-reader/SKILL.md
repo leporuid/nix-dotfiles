@@ -24,5 +24,5 @@ Efficiently retrieve, analyze, and synthesize external Git/GitHub repositories b
    - Read only the specific target modules relevant to the user request.
 
 3. **Synthesis & Alignment**:
-   - Map discovered patterns to the user's specific architecture (e.g., Numtide Blueprint, Darwin, or NixOS).
+   - Map discovered patterns to the user's specific architecture (e.g., red-tape, hjem, Darwin, or NixOS).
    - Evaluate trade-offs before proposing changes, committing to clear recommendations.
