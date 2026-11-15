@@ -1,4 +1,12 @@
 {
+  "terminal": {
+    "shell": {
+      "with_arguments": {
+        "program": "sh",
+        "args": []
+      }
+    }
+  },
   "project_panel": {
     "dock": "left"
   },

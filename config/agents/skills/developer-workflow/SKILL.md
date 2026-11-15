@@ -1,6 +1,6 @@
 ---
 name: developer-workflow
-description: Comprehensive developer orchestrator that enforces source-grounding, active context and multimodal inspection, ambient authorization, semantic code-pattern distillation, and auto-synthesizes fast-repo-reader, nix-dotfiles-workflow, hjem-module-scaffolder, tiered-agent-workflow, nixos-cloud-deploy, and get-more-perspectives across all projects. Use whenever working on coding, debugging, inspecting repositories, distilling external patterns, reviewing developer tasks, or handling attached code, files, or screenshots in ~/Developer.
+description: Comprehensive developer orchestrator that enforces source-grounding, active context and multimodal inspection, ambient authorization, semantic code-pattern distillation, and auto-synthesizes all ~/Developer dev sub-skills across nix-dotfiles, red-tape, ktoolbox, nix-secrets, Apple/Swift, and Gemini API workflows. Use whenever working on coding, debugging, inspecting repositories, distilling external patterns, reviewing developer tasks, or handling attached code, files, or screenshots in ~/Developer.
 allowed-tools: client
 ---
 # Developer Workflow
@@ -51,11 +51,19 @@ Enforce a strict "grounding-first, multimodal-aware" standard for all developmen
 
 | Task Signal | Sub-Skill(s) to Synthesize | Primary Responsibility |
 | :--- | :--- | :--- |
-| Multi-file / high-risk planning | `@tiered-agent-workflow` | Phase 0 Flash/CLI scout -> Phase 1 Pro/Argon spec -> Phase 2 Flash surgical patch |
+| Multi-file / high-risk planning | `@tiered-agent-workflow` | Phase 0 Flash/CLI scout -> Phase 1 Date-routed Pro/Argon/Carbon spec -> Phase 2 Flash patch |
 | Inspecting external GitHub / local repos | `@fast-repo-reader` | Non-intrusive tree & pattern extraction without terminal network prompts |
-| Any `*.nix`, `hosts/`, `modules/`, `packages/` | `@nix-dotfiles-workflow` | Guardrails (no `flake.lock` reads, `pedantix.toml`, `nix-secrets`, verification matrix) |
+| Any `*.nix`, `hosts/`, `modules/`, `packages/` | `@nix-dotfiles-workflow` | Core guardrails (no `flake.lock` reads, `pedantix.toml`, verification matrix) |
+| `packages/`, `overlays/`, `checks/`, CI | `@nix-packaging-and-overlays` | Custom derivations (`fileset.toSource`, `pin.json`, `uv2nix`), Determinate/Darwin overlays, `schemas.nix` |
+| `hosts/MacBook-Pro/`, `modules/darwin/`, `vpn-pack` | `@darwin-host-and-unifi-dev` | `determinateNix`, `mkAppSyncScript`, `nix-homebrew`, `launchd`, UniFi ARM64 cross-compile |
 | Authoring / refactoring `modules/hjem/*.nix` | `@hjem-module-scaffolder` | `my.programs.<app>` boilerplate, `mkPackageOption`, zero-empty-file & collision guards |
-| NixOS server / VM / Oracle / `nixos-anywhere` | `@nixos-cloud-deploy` | Pre-flight checks, zero-lockout SSH/Tailscale rules, remote builder & `disko` safety |
+| `config/`, `my-config.nix`, `users/`, `run.fish` | `@dotfiles-and-hjem-config` | Out-of-store symlinks, shell handoffs (`zsh`/`fish`/`nushell`), `check-links` parity |
+| NixOS server / VM / Oracle / `nixos-anywhere` | `@nixos-cloud-deploy` | Pre-flight checks, zero-lockout SSH/Tailscale rules, remote builder, OCI & `disko` safety |
+| `~/Developer/red-tape` (`adios-flake`, `contrib/`) | `@red-tape-framework-dev` | DAG topology, `lib/internal.nix`, Manifest v3 `hjemSchemas`, offline `nix-unit` tests |
+| `~/Developer/ktoolbox` (`uv2nix`, FastAPI, WebUI) | `@ktoolbox-fullstack-dev` | Python + `FastMCP` + OpenAPI codegen + React 19/Vite WebUI + `ruff`/`mypy`/`pytest`/`vitest` |
+| `~/Developer/nix-secrets`, `agenix`, `age-plugin-se` | `@nix-secrets-and-enclave` | `agenix-rules.nix`, `age` vs `rage` Secure Enclave invariant, cross-repo secret sync & safety |
+| `~/Developer/MyLibrary`, `Xcode`, `m3u8dl-protocol` | `@apple-swift-cocoa-dev` | Swift 6.2 SwiftPM, `swiftly`, `__noChroot` Xcode SDK builds, Cocoa `.app` bundle + `lsregister` |
+| Gemini SDK / CLI / MCP coding & dev automation | `@gemini-api-dev-bridge` | `google-genai`/`@google/genai` >= 3.2.0, `gemini-api` `--agent-mode`, `gemini-api-docs` MCP |
 | Architectural forks & trade-off evaluations | `@get-more-perspectives` | 5-role advisory panel (Operator, Skeptic, Visionary, Customer Advocate, Performance) |
 
 ### 6. Semantic Code-Pattern Distillation Matrix

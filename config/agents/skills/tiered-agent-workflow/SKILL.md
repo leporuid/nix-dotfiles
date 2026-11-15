@@ -1,6 +1,6 @@
 ---
 name: tiered-agent-workflow
-description: Orchestrates a quota-aware three-phase model execution strategy for coding tasks. Uses fast/cheap retrieval (Phase 0 Scout / Flash), routes Phase 1 deep reasoning to Gemini 4 Argon before 2026-12-01 and automatically reverts to Gemini 3.1 Pro on/after 2026-12-01 (with on-demand Argon escalation to assist 3.1 Pro on high-risk specs or repeated failures), and transitions to Flash (Phase 2) for surgical patching, formatting, Git commits, and verification.
+description: Orchestrates a quota-aware three-phase model execution strategy for coding tasks. Uses fast/cheap retrieval (Phase 0 Scout / Flash / gemini-4-hydrogen / gemini-3.5-flash-lite), routes Phase 1 deep reasoning to Gemini 4 Argon/Carbon before 2026-12-01 and automatically reverts to Gemini 3.1 Pro on/after 2026-12-01 (with on-demand Argon/Carbon escalation on high-risk specs or repeated failures), and transitions to Flash (Phase 2) for surgical patching, formatting, Git commits, and verification.
 ---
 # Tiered Agent Workflow
 
@@ -8,7 +8,7 @@ Enforces a quota-aware three-phase execution model that balances reasoning accur
 
 ## When to Use
 
-- Tackling architectural changes across Nix flakes (`~/Developer/nix-dotfiles`, `~/Developer/red-tape`), Hjem/Hjem-Rum modules, and system hosts.
+- Tackling architectural changes across Nix flakes (`~/Developer/nix-dotfiles`, `~/Developer/red-tape`), Hjem/Hjem-Rum modules, `ktoolbox`, and system hosts.
 - Evaluating multi-repo patterns (e.g., synthesizing `moni-dz`, `Mic92/adios-flake`, `leporuid/red-tape`, `paperdev-code/dendritic-nix`, and `snugnug/hjem-rum` into local modules).
 - Preventing reasoning quota/cost burn and context bloat during brute-force repo scanning, mechanical file patching, formatting (`pedantix.toml` / `statix.toml` / `nixfmt`), Git staging, and committing.
 
@@ -17,29 +17,31 @@ Enforces a quota-aware three-phase execution model that balances reasoning accur
 Never burn Phase 1 reasoning budget on brute-force directory scanning or raw file dumps. Gather and compress context first:
 
 1. **Deterministic & Parallel Retrieval**:
-   - Use `rg`, `fd`, `git diff`, `git status -s`, or parallel Flash subagents for multi-repo/multi-file discovery.
+   - Use `rg`, `fd`, `git diff`, `git status -s`, or lightweight Flash-tier models (`gemini-3.5-flash-lite`, `gemini-4-hydrogen`) for multi-repo/multi-file discovery.
+   - Use `gemini_search_docs` / `gemini_get_doc` MCP tools when querying Gemini API specs (never manually scrape docs URLs when MCP is available).
+   - For scripted log/error extraction in dev/CI shells, prefer `gemini-api generate --agent-mode --stdin` with `--body` JSON schema constraints over pasting raw megabyte logs into context.
    - Read only targeted line ranges (+/- 15 lines), error traces (`2>&1 | tail -n 40`), and `AGENTS.md` / `pedantix.toml` / `statix.toml`.
-   - Never ingest `flake.lock`, `.DS_Store`, or full unrelated modules into reasoning context.
+   - Never ingest `flake.lock`, `.DS_Store`, `node-compile-cache`, or full unrelated modules into reasoning context.
 
 2. **High-Signal Context Pack**:
    - Distill findings into a compact brief: exact file paths, option signatures, failing trace lines, and verified upstream URLs before escalating to Phase 1.
 
-## 1. Phase 1: Strategic Planning & Deep Synthesis (Date-Routed + Argon-Assisted)
+## 1. Phase 1: Strategic Planning & Deep Synthesis (Date-Routed + Argon/Carbon Escalation)
 
 ### Model Routing Policy
 
 1. **Before `2026-12-01` (Promo Window)**:
-   - Default Phase 1 to **Gemini 4 Argon** for complex multi-file coding, terminal reasoning, and low-hallucination synthesis.
-   - Reserve **Gemini 3.1 Pro** only for simple, high-frequency, single-module edits where Argon's ~16-minute latency is unnecessary.
+   - Default Phase 1 to **Gemini 4 Argon** (`gemini-4-argon`) for complex multi-file coding, terminal reasoning, and low-hallucination synthesis; escalate to **Gemini 4 Carbon** (`gemini-4-carbon`) for frontier security auditing, cryptographic boundaries (`nix-secrets`), or deep multi-repo DAG proofs.
+   - Use **Gemini 4 Hydrogen** (`gemini-4-hydrogen`) or **Gemini 3.1 Pro** for standard single-module edits where Argon/Carbon latency is unnecessary.
 
 2. **On/After `2026-12-01` (Post-Promo Revert)**:
-   - Automatically revert the Phase 1 default back to **Gemini 3.1 Pro** to avoid Argon's post-promo ~3x per-task cost ($4/$20 per 1M tokens).
+   - Automatically revert the Phase 1 default back to **Gemini 3.1 Pro** (or **Gemini 4 Hydrogen** when balanced speed is preferred) to avoid Argon's post-promo ~3x per-task cost ($4/$20 per 1M tokens).
 
-3. **Argon-Assists-3.1-Pro Escalation (Post-`2026-12-01`)**:
-   - Keep **3.1 Pro** as the primary Phase 1 planner (drafting the initial Patch Spec quickly), and invoke **Gemini 4 Argon** strictly as an on-demand **Verification / Escalation Advisor** when any of these triggers hit:
-     - **High-Risk Cross-Platform or DAG Changes**: Touching `red-tape` + `adios-flake` DAG wiring, Hjem Manifest v3, or critical NixOS host configs (SSH, Tailscale, `disko`) where misconfiguration risks lockout.
-     - **Multi-Step Failure Recovery**: `nix flake check`, `darwin-rebuild`, or `nixos-rebuild` fails across 2 consecutive 3.1 Pro + Flash iterations.
-     - **Targeted Spec Audit**: Pass only the compact Context Pack + 3.1 Pro's draft Patch Spec to Argon for a single-pass sanity check before Phase 2 execution.
+3. **Argon/Carbon-Assists-3.1-Pro Escalation (Post-`2026-12-01`)**:
+   - Keep **3.1 Pro** as the primary Phase 1 planner (drafting the initial Patch Spec quickly), and invoke **Gemini 4 Argon** / **Gemini 4 Carbon** strictly as an on-demand **Verification / Escalation Advisor** when any of these triggers hit:
+     - **High-Risk Cross-Platform or DAG Changes**: Touching `red-tape` + `adios-flake` DAG wiring, Hjem Manifest v3, or critical NixOS host configs (SSH, Tailscale, `disko`, `nix-secrets`) where misconfiguration risks lockout.
+     - **Multi-Step Failure Recovery**: `nix flake check`, `darwin-rebuild`, `nixos-rebuild`, or `pytest` fails across 2 consecutive 3.1 Pro + Flash iterations.
+     - **Targeted Spec Audit**: Pass only the compact Context Pack + 3.1 Pro's draft Patch Spec to Argon/Carbon for a single-pass sanity check before Phase 2 execution.
 
 ### Synthesis Tasks
 

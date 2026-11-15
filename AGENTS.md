@@ -138,10 +138,18 @@ Automated agents operating on this repository have access to modular skills loca
 | :--- | :--- | :--- |
 | `@developer-workflow` | `.agents/skills/developer-workflow/SKILL.md` | Master orchestrator enforcing source-grounding, active context inspection, and multi-skill execution. |
 | `@nix-dotfiles-workflow` | `.agents/skills/nix-dotfiles-workflow/SKILL.md` | Core Nix architecture guardrails (no `flake.lock` reading, `pedantix.toml` module headers, hjem/hjem-rum, `nix-secrets` keys, out-of-store symlinks, verification matrix). |
+| `@nix-packaging-and-overlays` | `.agents/skills/nix-packaging-and-overlays/SKILL.md` | Custom derivations (`packages/`, `fileset.toSource`, `pin.json`, `uv2nix`), `overlays/default.nix`, `checks/schemas.nix`, and CI lint compliance. |
+| `@darwin-host-and-unifi-dev` | `.agents/skills/darwin-host-and-unifi-dev/SKILL.md` | `hosts/MacBook-Pro`, `modules/darwin/` (`determinateNix`, `mkAppSyncScript`, `nix-homebrew`, `launchd`), and `packages/vpn-pack` UniFi ARM64 cross-builds. |
 | `@hjem-module-scaffolder` | `.agents/skills/hjem-module-scaffolder/SKILL.md` | Hjem / Hjem-Rum module boilerplate generator adhering to `pedantix.toml`, RFC 166 `nixfmt`, Manifest v3, and collision guards. |
+| `@dotfiles-and-hjem-config` | `.agents/skills/dotfiles-and-hjem-config/SKILL.md` | `my.config` synthesis, `config/` tool setups (`zsh`/`fish`/`nushell`/`nvim`/`helix`/`ghostty`/`jj`), and `check-links` Manifest v3 parity. |
 | `@nixos-cloud-deploy` | `.agents/skills/nixos-cloud-deploy/SKILL.md` | Pre-flight evaluation, zero-lockout SSH/Tailscale audit, remote builder, and `nixos-anywhere` / `nixos-rebuild` deployment workflow. |
+| `@red-tape-framework-dev` | `.agents/skills/red-tape-framework-dev/SKILL.md` | `~/Developer/red-tape` `adios-flake` DAG, `lib/internal.nix` discovery, `contrib/hjem.nix` Manifest v3, `hjemSchemas`, and offline `nix-unit` tests. |
+| `@ktoolbox-fullstack-dev` | `.agents/skills/ktoolbox-fullstack-dev/SKILL.md` | `~/Developer/ktoolbox` (`uv2nix`, FastAPI, `FastMCP`, OpenAPI codegen, React 19/Vite WebUI, `ruff`/`mypy`/`pytest`/`vitest`/`playwright`, `uv-pawchive` rebase). |
+| `@nix-secrets-and-enclave` | `.agents/skills/nix-secrets-and-enclave/SKILL.md` | `~/Developer/nix-secrets`, `agenix-rules.nix`, Apple Secure Enclave `age-plugin-se` (`age` vs `rage`), and cross-repo secret hygiene. |
+| `@apple-swift-cocoa-dev` | `.agents/skills/apple-swift-cocoa-dev/SKILL.md` | Swift 6.2 SwiftPM (`~/Developer/MyLibrary`, `swiftly`), Xcode MCP, `__noChroot` SDK builds (`age-plugin-se`), and Objective-C Cocoa bundles (`m3u8dl-protocol`). |
+| `@gemini-api-dev-bridge` | `.agents/skills/gemini-api-dev-bridge/SKILL.md` | Cross-harness Gemini API dev bridge (`google-genai`/`@google/genai` >= 3.2.0, `gemini-api` CLI dev/CI workflows, `gemini-api-docs` MCP). |
 | `@fast-repo-reader` | `.agents/skills/fast-repo-reader/SKILL.md` | Non-intrusive remote inspection of external Git/GitHub repositories without shell network prompts. |
-| `@tiered-agent-workflow` | `.agents/skills/tiered-agent-workflow/SKILL.md` | Quota-aware three-phase strategy: Phase 0 Scout (Flash/CLI) $\rightarrow$ Phase 1 Architect (Pro 3.1) $\rightarrow$ Phase 2 Builder (Flash). |
+| `@tiered-agent-workflow` | `.agents/skills/tiered-agent-workflow/SKILL.md` | Quota-aware three-phase strategy: Phase 0 Scout (Flash/CLI) $\rightarrow$ Phase 1 Date-Routed Reasoning $\rightarrow$ Phase 2 Builder (Flash). |
 | `@get-more-perspectives` | `.agents/skills/get-more-perspectives/SKILL.md` | Simulated 5-role advisory panel for evaluating trade-offs and architecture decisions. |
 
 Agents must consult the relevant `SKILL.md` before executing multi-repo analyses or structural modifications.

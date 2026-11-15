@@ -25,7 +25,7 @@ in
       ".claude/settings.json" = "claude/settings.json";
       ".agents/skills" = "agents/skills";
       ".claude/skills" = "agents/skills";
-      ".gemini/skills" = "gemini/skills";
+      ".gemini/skills" = "agents/skills";
     };
 
     # Unified agent instructions distribution across harnesses
