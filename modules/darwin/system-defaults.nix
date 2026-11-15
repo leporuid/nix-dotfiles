@@ -30,9 +30,6 @@ in
         "resolver/ts.net".text = ''
           nameserver 100.100.100.100
         '';
-
-        # Clear Determinate CLI Sentry endpoint to eliminate telemetry leakage
-        "nix/sentry-endpoint".text = "";
       };
       systemPackages = with pkgs; [
         (writeShellApplication {

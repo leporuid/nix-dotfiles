@@ -111,6 +111,8 @@ let
   nixBin = "${cfg.package}/bin";
   # Copy determinate-nixd outside /nix/store so the early-boot init job can mount the APFS store volume
   bootstrapPath = builtins.unsafeDiscardStringContext "/usr/local/libexec/darwin/${baseNameOf cfg.daemon.package}/determinate-nixd";
+  # Default determinate-nixd config path; a real file so both boot-time init and the daemon can read it before /nix mounts
+  configPath = "/etc/determinate/config.json";
   initArguments = [
     bootstrapPath
     "--nix-bin"
@@ -146,12 +148,12 @@ let
   daemonPlist = pkgs.writeText "${daemonLabel}.plist" (
     lib.generators.toPlist { escape = true; } {
       Label = daemonLabel;
+      # Use the off-store copy so launchd can exec it at boot before /nix is mounted;
+      # config is read from the default configPath, which is also outside /nix.
       ProgramArguments = [
-        "${cfg.daemon.package}/bin/determinate-nixd"
+        bootstrapPath
         "--nix-bin"
-        nixBin
-        "--config-file"
-        (toString daemonConfig)
+        (builtins.unsafeDiscardStringContext nixBin)
         "daemon"
       ];
       RunAtLoad = true;
@@ -391,6 +393,22 @@ let
         trap - EXIT
       fi
 
+      # Install the Nixd config as a real file so boot-time init honors it (builder, telemetry, ...)
+      install --directory --mode=755 --owner=0 --group=0 -- ${command [ (dirOf configPath) ]}
+      if ! cmp --silent -- ${
+        command [
+          daemonConfig
+          configPath
+        ]
+      } 2>/dev/null; then
+        install --mode=644 --owner=0 --group=0 --no-target-directory -- ${
+          command [
+            daemonConfig
+            configPath
+          ]
+        }
+      fi
+
       # Regenerate /etc/nix/nix.conf for the pinned runtime before restarting nix-daemon
       ${command (
         initArguments
@@ -493,7 +511,13 @@ let
         /bin/launchctl enable system/${hookLabel}
         /bin/launchctl bootstrap system "/Library/LaunchDaemons/${hookLabel}.plist"
 
-        rm -f -- ${command [ managedMarker ]} ${command [ customConfStamp ]}
+        rm -f -- ${
+          command [
+            managedMarker
+            customConfStamp
+            configPath
+          ]
+        }
         ${lib.getExe checkHandbackDaemon}
       fi
     '';
@@ -555,10 +579,9 @@ in
           cfg.package
           cfg.daemon.package
         ];
-        etc = {
-          "nix/nix.custom.conf".source = customConfig;
-          "determinate/config.json".source = daemonConfig;
-        };
+        # determinate/config.json is installed as a real file by postActivation (see configPath);
+        # an /etc/static symlink is unreadable at boot before /nix mounts.
+        etc."nix/nix.custom.conf".source = customConfig;
       };
 
       system.activationScripts = {
