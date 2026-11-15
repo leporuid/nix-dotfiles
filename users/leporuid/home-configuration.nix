@@ -41,13 +41,6 @@ in
         ".config/zsh" = "zsh";
         ".zshenv" = "zsh/home_zshenv";
 
-        # Development & Editors
-        ".config/zed" = "zed";
-
-        # Terminals
-        ".config/foot" = "foot";
-        ".config/kitty" = "kitty";
-
         # Version Control & Tools
         ".config/git" = "git";
         ".config/mise" = "mise";
@@ -62,7 +55,10 @@ in
         ".gemini/skills" = "gemini/skills";
       }
       // lib.optionalAttrs isDarwin {
-        # macOS Utilities
+        # macOS GUI & Utilities
+        ".config/foot" = "foot";
+        ".config/kitty" = "kitty";
+        ".config/zed" = "zed";
         ".config/btt" = "btt";
         ".config/github-copilot/versions.json" = "github-copilot/versions.json";
         ".config/github-copilot/xcode/mcp.json" = "github-copilot/xcode/mcp.json";
