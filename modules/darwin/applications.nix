@@ -82,14 +82,18 @@ in
         postActivation.text = ''
           rm -rf "/Applications/Nix Apps"
 
-          ${inputs.self.lib.mkAppCloneScript "${
-            inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re
-          }/Applications/M3U8DLProtocol.app"}
-
-          ${inputs.self.lib.mkAppCloneScript "${
-            config.programs.nixcord.discord.finalPackage or config.programs.nixcord.finalPackage.discord
-              or config.programs.nixcord.discord.package
-          }/Applications/Discord.app"}
+          ${inputs.self.lib.darwin.mkAppSyncScript {
+            inherit pkgs;
+            apps = [
+              "${
+                inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re
+              }/Applications/M3U8DLProtocol.app"
+              "${
+                config.programs.nixcord.discord.finalPackage or config.programs.nixcord.finalPackage.discord
+                  or config.programs.nixcord.discord.package
+              }/Applications/Discord.app"
+            ];
+          }}
 
           userHome="/Users/${config.system.primaryUser}"
           if [ -d "$userHome/.config/Vencord" ] && [ ! -e "$userHome/Library/Application Support/Vencord" ]; then
