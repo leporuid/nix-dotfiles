@@ -92,7 +92,7 @@ in
         '';
       };
     };
-    users.users.${config.system.primaryUser}.shell = pkgs.fish;
+    users.users.${config.system.primaryUser}.shell = pkgs.zsh;
     documentation.doc.enable = false;
     determinateNix = {
       enable = true;

@@ -1,4 +1,6 @@
 {
+  inputs,
+  lib,
   vars,
   ...
 }:
@@ -39,6 +41,10 @@
     openssh.authorizedKeys.keyFiles = vars.sshKeyFiles;
   };
   services.openssh.enable = true;
+  determinateNix.customSettings.builders = "ssh-ng://${vars.username}@nixos aarch64-linux /etc/ssh/ssh_host_ed25519_key 4 1 big-parallel,benchmark -";
+  programs.ssh.knownHosts = lib.optionalAttrs (inputs ? nix-secrets) {
+    nixos.publicKeyFile = "${inputs.nix-secrets}/keys/nixos-system.pub";
+  };
   security = {
     pam = {
       services = {
