@@ -1,50 +1,65 @@
 ---
 name: tiered-agent-workflow
-description: Orchestrates a quota-aware three-phase model execution strategy for coding tasks. Uses fast/cheap retrieval (Phase 0 Scout) to gather and compact diffs, traces, and symbol slices, dispatches deep reasoning (Phase 1 Pro 3.1) strictly on curated high-signal context for architecture and patch specs, and transitions to token-efficient execution (Phase 2 Flash) for surgical patching, formatting, Git commits, and verification.
+description: Orchestrates a quota-aware three-phase model execution strategy for coding tasks. Uses fast/cheap retrieval (Phase 0 Scout / Flash), routes Phase 1 deep reasoning to Gemini 4 Argon before 2026-12-01 and automatically reverts to Gemini 3.1 Pro on/after 2026-12-01 (with on-demand Argon escalation to assist 3.1 Pro on high-risk specs or repeated failures), and transitions to Flash (Phase 2) for surgical patching, formatting, Git commits, and verification.
 ---
 # Tiered Agent Workflow
 
-Enforces a quota-aware three-phase execution model that protects Pro 3.1 reasoning budget while keeping mechanical retrieval and patching fast and token-efficient across `~/Developer`.
+Enforces a quota-aware three-phase execution model that balances reasoning accuracy, latency, and token cost across `~/Developer` (`Phase 0 Flash` -> `Phase 1 Date-Routed Reasoning` -> `Phase 2 Flash`).
 
 ## When to Use
 
 - Tackling architectural changes across Nix flakes (`~/Developer/nix-dotfiles`, `~/Developer/red-tape`), Hjem/Hjem-Rum modules, and system hosts.
 - Evaluating multi-repo patterns (e.g., synthesizing `moni-dz`, `Mic92/adios-flake`, `leporuid/red-tape`, `paperdev-code/dendritic-nix`, and `snugnug/hjem-rum` into local modules).
-- Preventing Pro quota burn and context bloat during brute-force repo scanning, mechanical file patching, formatting (`pedantix.toml` / `statix.toml` / `nixfmt`), Git staging, and committing.
+- Preventing reasoning quota/cost burn and context bloat during brute-force repo scanning, mechanical file patching, formatting (`pedantix.toml` / `statix.toml` / `nixfmt`), Git staging, and committing.
 
 ## 0. Phase 0: Scout & Context Compaction (Flash Tier / CLI First)
 
-Never burn Pro 3.1 quota on brute-force directory scanning or raw file dumps. Gather and compress context first:
+Never burn Phase 1 reasoning budget on brute-force directory scanning or raw file dumps. Gather and compress context first:
 
 1. **Deterministic & Parallel Retrieval**:
    - Use `rg`, `fd`, `git diff`, `git status -s`, or parallel Flash subagents for multi-repo/multi-file discovery.
-   - Read only targeted line ranges (±15 lines), error traces (preserving exit codes), and `AGENTS.md` / `pedantix.toml` / `statix.toml`.
+   - Read only targeted line ranges (+/- 15 lines), error traces (`2>&1 | tail -n 40`), and `AGENTS.md` / `pedantix.toml` / `statix.toml`.
    - Never ingest `flake.lock`, `.DS_Store`, or full unrelated modules into reasoning context.
 
 2. **High-Signal Context Pack**:
    - Distill findings into a compact brief: exact file paths, option signatures, failing trace lines, and verified upstream URLs before escalating to Phase 1.
 
-## 1. Phase 1: Strategic Planning & Deep Synthesis (Pro 3.1 Tier)
+## 1. Phase 1: Strategic Planning & Deep Synthesis (Date-Routed + Argon-Assisted)
 
-Spend Pro 3.1 budget strictly on high-leverage reasoning over the curated Context Pack:
+### Model Routing Policy
+
+1. **Before `2026-12-01` (Promo Window)**:
+   - Default Phase 1 to **Gemini 4 Argon** for complex multi-file coding, terminal reasoning, and low-hallucination synthesis.
+   - Reserve **Gemini 3.1 Pro** only for simple, high-frequency, single-module edits where Argon's ~16-minute latency is unnecessary.
+
+2. **On/After `2026-12-01` (Post-Promo Revert)**:
+   - Automatically revert the Phase 1 default back to **Gemini 3.1 Pro** to avoid Argon's post-promo ~3x per-task cost ($4/$20 per 1M tokens).
+
+3. **Argon-Assists-3.1-Pro Escalation (Post-`2026-12-01`)**:
+   - Keep **3.1 Pro** as the primary Phase 1 planner (drafting the initial Patch Spec quickly), and invoke **Gemini 4 Argon** strictly as an on-demand **Verification / Escalation Advisor** when any of these triggers hit:
+     - **High-Risk Cross-Platform or DAG Changes**: Touching `red-tape` + `adios-flake` DAG wiring, Hjem Manifest v3, or critical NixOS host configs (SSH, Tailscale, `disko`) where misconfiguration risks lockout.
+     - **Multi-Step Failure Recovery**: `nix flake check`, `darwin-rebuild`, or `nixos-rebuild` fails across 2 consecutive 3.1 Pro + Flash iterations.
+     - **Targeted Spec Audit**: Pass only the compact Context Pack + 3.1 Pro's draft Patch Spec to Argon for a single-pass sanity check before Phase 2 execution.
+
+### Synthesis Tasks
 
 1. **Architecture & Edge-Case Analysis**:
    - Map external patterns to local constraints (`leporuid/red-tape` + `adios-flake` DAG, Determinate Nix, Hjem Manifest v3, macOS `aarch64-darwin` vs. Oracle NixOS `aarch64-linux`).
-   - Evaluate cross-platform edge cases (e.g., `useOutOfStoreSymlinks = isDarwin;`, Linux `systemd` vs. Darwin `launchd` guards, zero-empty-file rules, `meta.platforms` filtering).
+   - Evaluate cross-platform edge cases (e.g., `impure.enable = isDarwin;`, Linux `systemd` vs. Darwin `launchd` guards, zero-empty-file rules, `meta.platforms` filtering).
 
 2. **Exact Patch Specification**:
    - Produce a concrete, file-by-file patch plan (`modules/{common,darwin,nixos,hjem}/`, `lib/`, `contrib/`) with exact option names and expected behavior, then hand off immediately.
 
 ## 2. Phase 2: Surgical Execution & Verification (Flash Tier)
 
-Once the patch spec is settled, execute with minimal token overhead:
+Once the patch spec is settled, execute with minimal token overhead (never use Argon in Phase 2):
 
 1. **In-Place File Patching & Style Compliance**:
-   - Apply surgical edits without reprinting full files in chat.
+   - Apply surgical edits or one-shot comment-free shell scripts without reprinting full files in chat.
    - Pre-format written Nix code to match `pedantix.toml` and `nixfmt` (RFC 166):
-     - Sort module arguments with `["self", "inputs", "config", "lib", "pkgs"]` first, domain args alphabetically, and `["<defaulted>", "..."]` last (omitting unused arguments to satisfy `deadnix`/`statix`).
+     - Sort module arguments with `["self", "inputs", "config", "lib", "pkgs"]` first and `["<defaulted>", "..."]` last (omitting unused arguments to satisfy `statix`).
      - Sort `inherit` lists alphabetically and use location-aliased `let ... in` bindings (`inherit (lib.modules) mkIf;`, `inherit (lib.options) mkEnableOption mkOption mkPackageOption;`).
 
 2. **Git Hygiene & Verification**:
-   - Stage only modified target files (`git add <files>`) and commit using clean English Conventional Commits (`feat(hjem): ...`, `fix(darwin): ...`, `chore(nix): ...`, `docs(agents): ...`).
-   - Run `nix fmt` and `nix flake check --no-write-lock-file` (judging by exit code, never masking `$?`) and deliver a concise Traditional Chinese summary.
+   - Stage only modified target files (`git add`) and commit using clean English Conventional Commits (`feat(hjem): ...`, `fix(darwin): ...`, `chore(nix): ...`, `docs(agents): ...`).
+   - Run `nix fmt` and `nix flake check` (capped with `| tail -n 35`) and deliver a concise Traditional Chinese summary.
