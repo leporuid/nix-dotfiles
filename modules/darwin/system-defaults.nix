@@ -98,6 +98,8 @@ in
       enable = true;
 
       determinateNixd = {
+        # Disable the Native Linux Builder; this also drops `external-builders` from nix.conf.
+        builder.state = "disabled";
         garbageCollector.strategy = "automatic";
         telemetry.sentry.endpoint = null;
       };
