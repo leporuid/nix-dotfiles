@@ -200,7 +200,6 @@ in
         "--accept-routes"
         "--accept-dns=false"
         "--ssh"
-        "--advertise-routes=10.0.50.0/24"
         "--advertise-tags=tag:all"
       ];
 
@@ -209,7 +208,6 @@ in
         "--accept-routes"
         "--accept-dns=false"
         "--ssh"
-        "--advertise-routes=10.0.50.0/24"
         "--advertise-tags=tag:all"
       ];
     };
