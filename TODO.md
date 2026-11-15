@@ -8,8 +8,8 @@
 
 ## hosts/nixos-vm
 
-- [ ] Define `users.users.leporuid` in `hosts/nixos-vm/configuration.nix` (currently only `services.getty.autologinUser = "root"`).
-- [ ] Import `../../modules/nixos` to test the full Hjem environment in the VM.
+- [x] Define `users.users.leporuid` in `hosts/nixos-vm/configuration.nix` (currently only `services.getty.autologinUser = "root"`).
+- [x] Import `../../modules/nixos` to test the full Hjem environment in the VM.
 
 ## Post-reboot verification (after `darwin-rebuild switch` at c310995)
 

@@ -1,11 +1,14 @@
 {
+  pkgs,
   modulesPath,
+  vars,
   ...
 }:
 {
   imports = [
     (modulesPath + "/profiles/qemu-guest.nix")
     (modulesPath + "/virtualisation/qemu-vm.nix")
+    ../../modules/nixos
   ];
   nixpkgs.hostPlatform = "aarch64-linux";
   networking = {
@@ -24,7 +27,15 @@
     device = "/dev/disk/by-label/nixos";
     fsType = "ext4";
   };
-  services.getty.autologinUser = "root";
+  # Throwaway test VM without sshd: passwordless login is acceptable here.
+  users.users.${vars.username} = {
+    isNormalUser = true;
+    shell = pkgs.bashInteractive;
+    extraGroups = [ "wheel" ];
+    hashedPassword = "";
+  };
+  security.sudo.wheelNeedsPassword = false;
+  services.getty.autologinUser = vars.username;
   virtualisation = {
     cores = 2;
     memorySize = 2048;
