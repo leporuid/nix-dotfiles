@@ -74,7 +74,7 @@ format = "[ $ssh_symbol]($style)"
 ssh_symbol = ""
 
 [directory]
-home_symbol = "⌂"
+home_symbol = "⌂ "
 #home_symbol = "󰋞"
 truncation_length = 3
 fish_style_pwd_dir_length = 1                                                                                                                                   # turn on fish directory truncation
