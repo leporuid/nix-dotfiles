@@ -42,7 +42,8 @@ in
         ".zshenv" = "zsh/home_zshenv";
 
         # Version Control & Tools
-        ".config/git" = "git";
+        ".config/git/ignore" = "git/ignore";
+        ".config/git/allowedSignersFile" = "git/allowedSignersFile";
         ".config/mise" = "mise";
         ".config/gallery-dl" = "gallery-dl";
         ".config/syntax-highlight" = "syntax-highlight";
