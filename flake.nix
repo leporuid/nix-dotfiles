@@ -17,6 +17,7 @@
   inputs = {
     red-tape.url = "github:/leporuid/red-tape";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-schemas.url = "github:DeterminateSystems/flake-schemas";
     # Determinate Nix: Determinate Systems' Nix distribution & daemon (do not follow nixpkgs)
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
     hjem = {
@@ -141,6 +142,7 @@
       ];
       flake = {
         overlays.default = inputs.nixpkgs.lib.composeManyExtensions (import ./overlays { inherit inputs; });
+        schemas = inputs.flake-schemas.schemas // inputs.red-tape.hjemSchemas;
       };
     };
 }
