@@ -1,49 +1,50 @@
 ---
 name: tiered-agent-workflow
-description: Orchestrates a two-tiered model execution strategy for coding tasks. Dispatches deep-reasoning (Pro tier) for thorough architectural analysis, multi-repo synthesis, and planning, then transitions to token-efficient execution (Flash tier) for in-place patching, git staging, commits, and verification.
+description: Orchestrates a quota-aware three-phase model execution strategy for coding tasks. Uses fast/cheap retrieval (Phase 0 Scout) to gather and compact diffs, traces, and symbol slices, dispatches deep reasoning (Phase 1 Pro 3.1) strictly on curated high-signal context for architecture and patch specs, and transitions to token-efficient execution (Phase 2 Flash) for surgical patching, formatting, Git commits, and verification.
 ---
 # Tiered Agent Workflow
 
-Enforces a structured two-tiered execution model that balances deep strategic reasoning with token-efficient mechanical execution.
+Enforces a quota-aware three-phase execution model that protects Pro 3.1 reasoning budget while keeping mechanical retrieval and patching fast and token-efficient across `~/Developer`.
 
 ## When to Use
 
-- Tackling complex architectural changes across Nix configurations, flakes, and dotfiles.
-- Evaluating multi-repo patterns (e.g. comparing external configurations before modifying local dotfiles).
-- Tasks requiring heavy planning, trade-off evaluation, and structured synthesis before touching code.
-- Preventing context bloating during mechanical tasks like file patching, staging (`git add`), and committing.
+- Tackling architectural changes across Nix flakes (`~/Developer/nix-dotfiles`, `~/Developer/red-tape`), Hjem/Hjem-Rum modules, and system hosts.
+- Evaluating multi-repo patterns (e.g., synthesizing `moni-dz`, `Mic92/adios-flake`, `leporuid/red-tape`, `paperdev-code/dendritic-nix`, and `snugnug/hjem-rum` into local modules).
+- Preventing Pro quota burn and context bloat during brute-force repo scanning, mechanical file patching, formatting (`pedantix.toml` / `statix.toml` / `nixfmt`), Git staging, and committing.
 
----
+## 0. Phase 0: Scout & Context Compaction (Flash Tier / CLI First)
 
-## 1. Phase 1: Strategic Planning & Deep Analysis (Pro Tier)
+Never burn Pro 3.1 quota on brute-force directory scanning or raw file dumps. Gather and compress context first:
 
-Before running mutating commands or modifying files, engage deep reasoning:
+1. **Deterministic & Parallel Retrieval**:
+   - Use `rg`, `fd`, `git diff`, `git status -s`, or parallel Flash subagents for multi-repo/multi-file discovery.
+   - Read only targeted line ranges (±15 lines), error traces (preserving exit codes), and `AGENTS.md` / `pedantix.toml` / `statix.toml`.
+   - Never ingest `flake.lock`, `.DS_Store`, or full unrelated modules into reasoning context.
 
-1. **Context & Trade-Off Analysis**:
-   - Ingest reference repositories, issue reports, or system logs.
-   - Map external patterns to local constraints (e.g., red-tape, hjem, Determinate Nix, macOS vs. NixOS).
-   - Evaluate edge cases, potential regressions, and evaluation bottlenecks.
+2. **High-Signal Context Pack**:
+   - Distill findings into a compact brief: exact file paths, option signatures, failing trace lines, and verified upstream URLs before escalating to Phase 1.
 
-2. **Actionable Implementation Plan**:
-   - Formulate a concrete, file-by-file patch plan.
-   - Specify the exact targets, expected diffs, and validation commands.
-   - Do not emit speculative or fragmented code edits during the planning phase.
+## 1. Phase 1: Strategic Planning & Deep Synthesis (Pro 3.1 Tier)
 
----
+Spend Pro 3.1 budget strictly on high-leverage reasoning over the curated Context Pack:
 
-## 2. Phase 2: Token-Efficient Execution (Flash Tier)
+1. **Architecture & Edge-Case Analysis**:
+   - Map external patterns to local constraints (`leporuid/red-tape` + `adios-flake` DAG, Determinate Nix, Hjem Manifest v3, macOS `aarch64-darwin` vs. Oracle NixOS `aarch64-linux`).
+   - Evaluate cross-platform edge cases (e.g., `useOutOfStoreSymlinks = isDarwin;`, Linux `systemd` vs. Darwin `launchd` guards, zero-empty-file rules, `meta.platforms` filtering).
 
-Once the plan is settled, switch to streamlined, low-overhead execution:
+2. **Exact Patch Specification**:
+   - Produce a concrete, file-by-file patch plan (`modules/{common,darwin,nixos,hjem}/`, `lib/`, `contrib/`) with exact option names and expected behavior, then hand off immediately.
 
-1. **In-Place File Patching**:
-   - Use targeted replacement tools to apply surgical diffs.
-   - Avoid reprinting full files or echoing boilerplate into the conversation.
+## 2. Phase 2: Surgical Execution & Verification (Flash Tier)
 
-2. **Git Hygiene & Staging**:
-   - Stage only the modified files: `git add <file1> <file2>`.
-   - Never use indiscriminate `git add -A` or `git add .` that might capture untracked artifacts.
-   - Commit using Conventional Commits with concise, imperative messages.
+Once the patch spec is settled, execute with minimal token overhead:
 
-3. **Validation & Handoff**:
-   - Run minimal verification commands (e.g. `git diff --stat`, `nix eval`).
-   - Deliver a concise summary of applied changes and actionable next steps.
+1. **In-Place File Patching & Style Compliance**:
+   - Apply surgical edits without reprinting full files in chat.
+   - Pre-format written Nix code to match `pedantix.toml` and `nixfmt` (RFC 166):
+     - Sort module arguments with `["self", "inputs", "config", "lib", "pkgs"]` first, domain args alphabetically, and `["<defaulted>", "..."]` last (omitting unused arguments to satisfy `deadnix`/`statix`).
+     - Sort `inherit` lists alphabetically and use location-aliased `let ... in` bindings (`inherit (lib.modules) mkIf;`, `inherit (lib.options) mkEnableOption mkOption mkPackageOption;`).
+
+2. **Git Hygiene & Verification**:
+   - Stage only modified target files (`git add <files>`) and commit using clean English Conventional Commits (`feat(hjem): ...`, `fix(darwin): ...`, `chore(nix): ...`, `docs(agents): ...`).
+   - Run `nix fmt` and `nix flake check --no-write-lock-file` (judging by exit code, never masking `$?`) and deliver a concise Traditional Chinese summary.

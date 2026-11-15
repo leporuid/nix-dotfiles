@@ -8,17 +8,18 @@ This repository collects project-specific expectations, tool contracts, and arch
 
 | Directory / File | Description & Purpose |
 | :--- | :--- |
-| `flake.nix` | Root `red-tape.mkFlake` entrypoint; tracks inputs, system matrix, `hjemModules` output, and `overlays.default`. |
+| `flake.nix` | Root `red-tape.mkFlake` entrypoint; tracks inputs, system matrix, `hjemModules` output, `flake-schemas`, and `overlays.default`. |
 | `devshell.nix` | Developer shell toolchain (`mkShellNoCC`: `llm-agents`, `agenix` with `age`, `nixos-rebuild`, `nixos-anywhere`, linters) sourcing `git-hooks.nix`. |
 | `formatter.nix` | Root `treefmt-nix` formatter entrypoint delegating to `treefmt.nix`. |
 | `treefmt.nix` | Unified formatter and linter rules (`deadnix`, `statix`, `nixfmt`, `fish_indent`, `shfmt`, `taplo`, `yamlfmt`). |
 | `pedantix.toml` | Nix code style and argument sorting rules enforced across the repository. |
+| `lib/` | Shared Nix helpers (`darwin.nix`, `formats.nix`, `hjem.nix`, `hosts.nix`, `nix-settings.nix`). |
 | `overlays/` | Nixpkgs overlays (`default.nix`) applied to hosts and exposed via `flake.overlays.default`. |
 | `hosts/MacBook-Pro/` | Darwin host configuration (`darwin-configuration.nix`) and user profile bridge. |
 | `hosts/nixos/` | Self-contained native NixOS configuration for Oracle Cloud / server (`configuration.nix`). |
-| `hosts/nixos-vm/` | Lightweight NixOS VM configuration. |
+| `hosts/nixos-vm/` | Lightweight NixOS VM configuration (imports `modules/nixos` and shared Hjem profile). |
 | `modules/darwin/` | Darwin system modules (`applications.nix`, `system-defaults.nix`, `hjem.nix`). |
-| `modules/nixos/` | NixOS system modules (`hjem.nix`). |
+| `modules/nixos/` | NixOS system modules (`default.nix`, `hjem.nix`). |
 | `modules/hjem/` | User-level Hjem modules (`default.nix`, `my-config.nix`, `themes.nix`, `fish.nix`, `neovim.nix`, `helix.nix`, `ghostty.nix`, `starship.nix`, `nushell.nix`, `tmux.nix`, `zellij.nix`, `atuin.nix`, `direnv.nix`, `direnv-instant.nix`, `jujutsu.nix`, `nixcord.nix`). |
 | `modules/common/` | Shared platform configurations (`vars.nix`, `hjem.nix`). |
 | `packages/*.nix` | Custom derivations and package wrappers consumed via `inputs.self.packages.<system>.<name>`. |
@@ -128,7 +129,7 @@ Automated agents operating on this repository have access to modular skills loca
 | `@developer-workflow` | `.agents/skills/developer-workflow/SKILL.md` | Master orchestrator enforcing source-grounding, active context inspection, and multi-skill execution. |
 | `@nix-dotfiles-workflow` | `.agents/skills/nix-dotfiles-workflow/SKILL.md` | Core Nix architecture guardrails (no `flake.lock` reading, `pedantix.toml` module headers, hjem/hjem-rum, `nix-secrets` keys, out-of-store symlinks, verification matrix). |
 | `@fast-repo-reader` | `.agents/skills/fast-repo-reader/SKILL.md` | Non-intrusive remote inspection of external Git/GitHub repositories without shell network prompts. |
-| `@tiered-agent-workflow` | `.agents/skills/tiered-agent-workflow/SKILL.md` | Two-tiered execution strategy: Pro-tier deep reasoning for planning $\rightarrow$ Flash-tier surgical execution. |
+| `@tiered-agent-workflow` | `.agents/skills/tiered-agent-workflow/SKILL.md` | Quota-aware three-phase strategy: Phase 0 Scout (Flash/CLI) $\rightarrow$ Phase 1 Architect (Pro 3.1) $\rightarrow$ Phase 2 Builder (Flash). |
 | `@get-more-perspectives` | `.agents/skills/get-more-perspectives/SKILL.md` | Simulated 5-role advisory panel for evaluating trade-offs and architecture decisions. |
 
 Agents must consult the relevant `SKILL.md` before executing multi-repo analyses or structural modifications.
