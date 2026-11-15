@@ -1,15 +1,10 @@
 # lib/default.nix — Shared functional library for nix-dotfiles
 # Exported by red-tape as `flake.lib`
-{
-  inputs ? { },
-  lib ? inputs.nixpkgs.lib or null,
-  ...
-}:
+_:
 let
   formats = import ./formats.nix { };
   darwin = import ./darwin.nix { };
   hjem = import ./hjem.nix { };
-  hosts = import ./hosts.nix { inherit inputs lib; };
   nixSettings = import ./nix-settings.nix;
 in
 {
@@ -17,7 +12,6 @@ in
     darwin
     formats
     hjem
-    hosts
     nixSettings
     ;
   inherit (formats)
@@ -28,9 +22,28 @@ in
     ;
   inherit (darwin) mkAppCloneScript;
   inherit (hjem) mkProgramModule;
-  inherit (hosts) mkDarwinSystem mkNixosSystem;
 
-  # Blueprint compatibility aliases
-  loadNixDarwin = hosts.mkDarwinSystem;
-  loadNixOS = hosts.mkNixosSystem;
+  # Builds the `perSystem` view ({ system, packages.<input> }) that host
+  # evaluations normally inject as a special argument. Needed where nothing is
+  # injected, such as standalone Hjem configurations, so both paths resolve
+  # packages identically.
+  mkPerSystem =
+    {
+      inputs,
+      lib,
+      system,
+      packages ? [
+        "self"
+        "llm-agents"
+      ],
+    }:
+    {
+      inherit system;
+      packages = lib.genAttrs packages (
+        name:
+        (lib.attrByPath [ "legacyPackages" system ] { } inputs.${name})
+        // (lib.attrByPath [ "packages" system ] { } inputs.${name})
+      );
+    };
+
 }

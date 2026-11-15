@@ -94,6 +94,7 @@ in
     };
     users.users.${config.system.primaryUser}.shell = pkgs.zsh;
     documentation.doc.enable = false;
+    nix.enable = false;
     determinateNix = {
       enable = true;
 

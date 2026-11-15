@@ -3,11 +3,16 @@
   config,
   lib,
   pkgs,
-  perSystem,
   ...
 }:
 let
   isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
+  # Host evaluations receive perSystem as a special arg, standalone Hjem
+  # configurations do not; derive it here so both evaluate identically.
+  perSystem = inputs.self.lib.mkPerSystem {
+    inherit inputs lib;
+    system = pkgs.stdenv.hostPlatform.system;
+  };
 in
 {
   # 1. Modular feature imports in moni-dz style
@@ -43,8 +48,7 @@ in
         ".zshenv" = "zsh/home_zshenv";
 
         # Version Control & Tools
-        ".config/git/ignore" = "git/ignore";
-        ".config/git/allowedSignersFile" = "git/allowedSignersFile";
+        ".config/git" = "git";
         ".config/mise" = "mise";
         ".config/gallery-dl" = "gallery-dl";
         ".config/syntax-highlight" = "syntax-highlight";
@@ -111,23 +115,23 @@ in
       nerd-fonts.roboto-mono
 
       # Custom / specialized derivations from flake
-      perSystem.self.has-ancestor
-      perSystem.self.ccase
-      perSystem.self.ktoolbox
-      perSystem.llm-agents.copilot-cli
-      perSystem.llm-agents.antigravity-cli
+      perSystem.packages.self.has-ancestor
+      perSystem.packages.self.ccase
+      perSystem.packages.self.ktoolbox
+      perSystem.packages.llm-agents.copilot-cli
+      perSystem.packages.llm-agents.antigravity-cli
     ])
     ++ lib.optionals isDarwin [
       pkgs.ffmpeg
       pkgs.gnused
       pkgs.mas
       pkgs.qpdf
-      perSystem.self.age-plugin-se
-      perSystem.self.gallery-dl
-      perSystem.self.kumono
-      perSystem.self.megabasterd
-      perSystem.self.unxip
-      perSystem.self.yt-dlp
+      perSystem.packages.self.age-plugin-se
+      perSystem.packages.self.gallery-dl
+      perSystem.packages.self.kumono
+      perSystem.packages.self.megabasterd
+      perSystem.packages.self.unxip
+      perSystem.packages.self.yt-dlp
     ];
   # 6. Session environment variables (POSIX script via Hjem environment.loadEnv)
   environment.sessionVariables = {

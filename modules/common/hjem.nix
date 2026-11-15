@@ -9,14 +9,7 @@
 let
   isDarwin = config.nixpkgs.hostPlatform.isDarwin or false;
   system = pkgs.stdenv.hostPlatform.system;
-  perSystem = lib.mapAttrs (
-    _: input:
-    if builtins.isAttrs input then
-      (input.legacyPackages.${system} or { })
-      // (input.packages.${system} or { })
-    else
-      input
-  ) inputs;
+  perSystem = inputs.self.lib.mkPerSystem { inherit inputs lib system; };
   hostName = config.networking.hostName or "";
 
   hostUsersDir = ../../hosts + "/${hostName}/users";

@@ -8,23 +8,66 @@ alias ks = ktoolbox sync_creator
 alias cat = bat
 alias find = fd
 
-mkdir ($nu.default-config-dir | path join 'vendor/autoload')
+def _linux-distribution [] {
+    if $nu.os-info.name != 'Linux' {
+        return 'Not available on macOS'
+    }
 
-if not ($nu.default-config-dir | path join 'vendor/autoload/atuin.nu' | path exists) {
+    if not ('/etc/os-release' | path exists) {
+        return 'Unknown (missing /etc/os-release)'
+    }
+
+    let values = open --raw /etc/os-release
+        | lines
+        | where {|line| $line =~ '^[A-Za-z_][A-Za-z0-9_]*='}
+        | each {|line|
+            let parts = $line | split column '=' 2
+            {
+                key: $parts.column1
+                value: ($parts.column2 | str trim -c '"')
+            }
+        }
+        | reduce -f {} {|item, acc| $acc | upsert $item.key $item.value }
+
+    $values.PRETTY_NAME? | default ($values.NAME? | default 'Unknown Linux distribution')
+}
+
+def os-info [] {
+    let host = sys host
+    let shell_path = $nu | get -o shell-path | default $nu.current-exe
+
+    {
+        shell: ($shell_path | path basename)
+        shell_path: $shell_path
+        login_shell: ($nu | get -o loginshell-path | default 'Unknown')
+        os: $host.name
+        kernel: $host.kernel_version
+        hostname: $host.hostname
+        distribution: (_linux-distribution)
+    }
+}
+
+let autoload_dir = $nu.data-dir | path join 'vendor/autoload'
+mkdir $autoload_dir
+
+let atuin_autoload = $autoload_dir | path join 'atuin.nu'
+if not ($atuin_autoload | path exists) {
     if not (which atuin | is-empty) {
-        atuin init nu | save -f ($nu.default-config-dir | path join 'vendor/autoload/atuin.nu')
+        atuin init nu | save -f $atuin_autoload
     }
 }
 
-if not ($nu.default-config-dir | path join 'vendor/autoload/starship.nu' | path exists) {
+let starship_autoload = $autoload_dir | path join 'starship.nu'
+if not ($starship_autoload | path exists) {
     if not (which starship | is-empty) {
-        starship init nu | save -f ($nu.default-config-dir | path join 'vendor/autoload/starship.nu')
+        starship init nu | save -f $starship_autoload
     }
 }
 
-if not ($nu.default-config-dir | path join 'vendor/autoload/.zoxide.nu' | path exists) {
+let zoxide_autoload = $autoload_dir | path join '.zoxide.nu'
+if not ($zoxide_autoload | path exists) {
     if not (which zoxide | is-empty) {
-        zoxide init nushell | save -f ($nu.default-config-dir | path join 'vendor/autoload/.zoxide.nu')
+        zoxide init nushell | save -f $zoxide_autoload
     }
 }
 

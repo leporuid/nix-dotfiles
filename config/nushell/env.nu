@@ -31,6 +31,6 @@ def --env cx [arg] {
 }
 
 # Auto-source atuin if initialized
-if ($nu.default-config-dir | path join 'vendor/autoload/atuin.nu' | path exists) {
-    source ($nu.default-config-dir | path join 'vendor/autoload/atuin.nu')
+if ($nu.data-dir | path join 'vendor/autoload/atuin.nu' | path exists) {
+    source ($nu.data-dir | path join 'vendor/autoload/atuin.nu')
 }

@@ -13,7 +13,7 @@ This repository collects project-specific expectations, tool contracts, and arch
 | `formatter.nix` | Root `treefmt-nix` formatter entrypoint delegating to `treefmt.nix`. |
 | `treefmt.nix` | Unified formatter and linter rules (`deadnix`, `statix`, `nixfmt`, `fish_indent`, `shfmt`, `taplo`, `yamlfmt`). |
 | `pedantix.toml` | Nix code style and argument sorting rules enforced across the repository. |
-| `lib/` | Shared Nix helpers (`darwin.nix`, `formats.nix`, `hjem.nix`, `hosts.nix`, `nix-settings.nix`). |
+| `lib/` | Shared Nix helpers (`darwin.nix`, `formats.nix`, `hjem.nix`, `nix-settings.nix`). |
 | `overlays/` | Nixpkgs overlays (`default.nix`) applied to hosts and exposed via `flake.overlays.default`. |
 | `hosts/MacBook-Pro/` | Darwin host configuration (`darwin-configuration.nix`) and user profile bridge. |
 | `hosts/nixos/` | Self-contained native NixOS configuration for Oracle Cloud / server (`configuration.nix`). |
@@ -76,6 +76,8 @@ This repository collects project-specific expectations, tool contracts, and arch
 - **Raw Application Configurations (`config/`)**:
   - Keep application configurations directly under root `config/`.
   - Linked via Hjem `files` (`my.config.source`) and managed live on macOS via `my.config.useOutOfStoreSymlinks = isDarwin;`.
+  - Nushell configuration must remain native Nushell syntax in `config/nushell/config.nu` and `config/nushell/env.nu`; do not translate Termius Bash/POSIX injection scripts into compatibility layers.
+  - Termius shell integration is client-side input and cannot be disabled or corrected by NixOS or Hjem. Configure Termius separately when it injects Bash/POSIX snippets into Nushell.
 
 ---
 
