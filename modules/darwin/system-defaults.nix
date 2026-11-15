@@ -104,7 +104,7 @@ in
         telemetry.sentry.endpoint = null;
       };
 
-      inherit (vars) customSettings;
+      customSettings = import ../../lib/nix-settings.nix { inherit (vars) username; };
     };
     launchd = {
       daemons = {

@@ -34,14 +34,13 @@ in
       cfg.package
       cfg.nixDirenvPackage
     ];
-
-    my.config.source = {
-      ".config/direnv/direnv.toml" = "direnv/direnv.toml";
+    my = {
+      config.source = {
+        ".config/direnv/direnv.toml" = "direnv/direnv.toml";
+      };
+      programs.direnv-instant.enable = mkDefault cfg.instant.enable;
     };
-
     files.".config/direnv/lib/nix-direnv.sh".source =
       "${cfg.nixDirenvPackage}/share/nix-direnv/direnvrc";
-
-    my.programs.direnv-instant.enable = mkDefault cfg.instant.enable;
   };
 }

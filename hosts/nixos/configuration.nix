@@ -162,7 +162,7 @@
   # 3. Networking, Firewall, Tailscale & Timesync
   # =========================================================================
   networking = {
-    hostName = vars.hostname;
+    hostName = "nixos";
     useNetworkd = true;
     useDHCP = true;
     iproute2.enable = true;
@@ -353,10 +353,7 @@
     users = {
       root = {
         hashedPassword = "!";
-        openssh.authorizedKeys = {
-          keys = vars.sshKeys;
-          keyFiles = vars.sshKeyFiles;
-        };
+        openssh.authorizedKeys.keyFiles = vars.sshKeyFiles;
       };
 
       ${vars.username} = {
@@ -364,10 +361,7 @@
         shell = pkgs.bashInteractive;
         extraGroups = [ "wheel" ];
         hashedPassword = "!";
-        openssh.authorizedKeys = {
-          keys = vars.sshKeys;
-          keyFiles = vars.sshKeyFiles;
-        };
+        openssh.authorizedKeys.keyFiles = vars.sshKeyFiles;
       };
     };
   };
@@ -450,7 +444,9 @@
     interval = "weekly";
   };
   nix = {
-    settings = vars.customSettings;
+    settings = import ../../lib/nix-settings.nix { inherit (vars) username; } // {
+      auto-optimise-store = true;
+    };
     optimise.automatic = true;
     # Garbage collection is managed continuously by determinate-nixd
     channel.enable = false;

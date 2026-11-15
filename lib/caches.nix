@@ -1,4 +1,4 @@
-# Pure static binary cache configuration shared by flake.nix (nixConfig) and modules/common/vars.nix
+# Pure static binary cache configuration used by lib/nix-settings.nix (mirrors flake.nix nixConfig)
 {
   extra-substituters = [
     "https://cache.numtide.com"

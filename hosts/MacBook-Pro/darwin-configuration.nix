@@ -16,9 +16,9 @@
     };
   };
   networking = {
-    hostName = vars.hostname;
+    hostName = "MacBook-Pro";
     computerName = "🐰MacBook Pro";
-    localHostName = vars.hostname;
+    localHostName = "MacBook-Pro";
     knownNetworkServices = [
       "Wi-Fi"
       "Thunderbolt Bridge"
@@ -36,10 +36,7 @@
   users.users.${vars.username} = {
     inherit (vars) description;
     home = vars.homeDirectory;
-    openssh.authorizedKeys = {
-      keys = vars.sshKeys;
-      keyFiles = vars.sshKeyFiles;
-    };
+    openssh.authorizedKeys.keyFiles = vars.sshKeyFiles;
   };
   services.openssh.enable = true;
   security = {
