@@ -7,6 +7,9 @@
   ...
 }:
 let
+  inherit (lib.modules) mkForce mkIf;
+  inherit (lib.options) mkEnableOption;
+
   cfg = config.my.darwin.system;
 in
 {
@@ -16,12 +19,12 @@ in
   ];
 
   options.my.darwin.system = {
-    enable = lib.mkEnableOption "Darwin system defaults, launchd daemons, and core settings" // {
+    enable = mkEnableOption "Darwin system defaults, launchd daemons, and core settings" // {
       default = true;
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = mkIf cfg.enable {
     environment = {
       # =========================================================================
       # 1. Environment, System Packages, and Local DNS Settings
@@ -31,8 +34,8 @@ in
           nameserver 100.100.100.100
         '';
       };
-      systemPackages = with pkgs; [
-        (writeShellApplication {
+      systemPackages = [
+        (pkgs.writeShellApplication {
           name = "tailscale";
           text = ''
             export TAILSCALE_BE_CLI=1
@@ -40,7 +43,7 @@ in
           '';
         })
 
-        (writeShellApplication {
+        (pkgs.writeShellApplication {
           name = "apfs-purge";
           text = ''
             date
@@ -52,7 +55,7 @@ in
       # Make Nushell (and other XDG-aware tools) read ~/.config instead of ~/Library/Application Support
       variables.XDG_CONFIG_HOME = "/Users/${config.system.primaryUser}/.config";
       # Exclude ~/.nix-profile from PATH and keep strictly per-user and system profiles
-      profiles = lib.mkForce [
+      profiles = mkForce [
         "/etc/profiles/per-user/${config.system.primaryUser}"
         "/run/current-system/sw"
         "/nix/var/nix/profiles/default"

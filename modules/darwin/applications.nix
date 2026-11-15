@@ -6,6 +6,10 @@
   ...
 }:
 let
+  inherit (lib.lists) unique;
+  inherit (lib.modules) mkBefore mkForce mkIf;
+  inherit (lib.options) mkEnableOption;
+
   cfg = config.my.darwin.applications;
   extraTaps = [
     "aninsomniacy/homebrew-rayburst"
@@ -18,12 +22,12 @@ in
   ];
 
   options.my.darwin.applications = {
-    enable = lib.mkEnableOption "Darwin applications, nixcord, and Homebrew management" // {
+    enable = mkEnableOption "Darwin applications, nixcord, and Homebrew management" // {
       default = true;
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = mkIf cfg.enable {
     environment = {
       # =========================================================================
       # 1. System Packages & Applications
@@ -77,7 +81,7 @@ in
       # 4. Application Trampolines & Native Clones (Activation Scripts)
       # =========================================================================
       activationScripts = {
-        applications.text = lib.mkForce "";
+        applications.text = mkForce "";
 
         postActivation.text = ''
           rm -rf "/Applications/Nix Apps"
@@ -106,7 +110,7 @@ in
       # =========================================================================
       # 5. Homebrew & Casks Declarative Management
       # =========================================================================
-      activationScripts.homebrew.text = lib.mkBefore ''
+      activationScripts.homebrew.text = mkBefore ''
         set +e
       '';
     };
@@ -130,7 +134,7 @@ in
       taps = map (name: {
         inherit name;
         trusted = true;
-      }) (lib.unique (extraTaps ++ builtins.attrNames config.nix-homebrew.taps));
+      }) (unique (extraTaps ++ builtins.attrNames config.nix-homebrew.taps));
 
       casks = [
         "adguard-vpn"

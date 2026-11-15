@@ -1,10 +1,12 @@
 { pkgs, pname, ... }:
-with pkgs;
-rustPlatform.buildRustPackage {
+let
+  inherit (pkgs.lib) licenses;
+in
+pkgs.rustPlatform.buildRustPackage {
   inherit pname;
   version = "0.5.1";
 
-  src = fetchFromGitHub {
+  src = pkgs.fetchFromGitHub {
     owner = "rutrum";
     repo = pname;
     rev = "4542911256deee7a5bca7e20778f5ef81c20c121";
@@ -15,7 +17,8 @@ rustPlatform.buildRustPackage {
   meta = {
     description = "Command line interface to convert strings into any case";
     homepage = "https://github.com/rutrum/ccase";
-    license = lib.licenses.mit;
+    license = licenses.mit;
+    mainProgram = pname;
     maintainers = [ ];
   };
 }

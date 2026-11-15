@@ -5,9 +5,11 @@
   ...
 }:
 let
+  inherit (lib.meta) getExe;
+
   dixScript = ''
     if [ -e /run/current-system ]; then
-      ${lib.getExe pkgs.dix} diff --full --color=always /run/current-system "$systemConfig" >&2 || true
+      ${getExe pkgs.dix} diff --full --color=always /run/current-system "$systemConfig" >&2 || true
     fi
   '';
 in

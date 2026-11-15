@@ -1,9 +1,11 @@
 { pkgs, pname, ... }:
-with pkgs;
-rustPlatform.buildRustPackage {
+let
+  inherit (pkgs.lib) licenses optionals;
+in
+pkgs.rustPlatform.buildRustPackage {
   inherit pname;
   version = "main";
-  src = fetchFromGitHub {
+  src = pkgs.fetchFromGitHub {
     owner = "HermesMaker";
     repo = pname;
     rev = "1c999a1cbe17477d04970d3657f6ecfa9478f56f";
@@ -12,13 +14,14 @@ rustPlatform.buildRustPackage {
   cargoHash = "sha256-FEpdc9SL8vPP4GW+meEvZSNf7Kjsi1qn0gmpx7nEgu8=";
 
   # openssl-sys on Linux requires pkg-config and OpenSSL development headers.
-  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ pkg-config ];
-  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ openssl ];
+  nativeBuildInputs = optionals pkgs.stdenv.hostPlatform.isLinux [ pkgs.pkg-config ];
+  buildInputs = optionals pkgs.stdenv.hostPlatform.isLinux [ pkgs.openssl ];
 
   meta = {
     description = "Command line interface to convert strings into any case";
     homepage = "https://github.com/HermesMaker/cktool";
-    license = lib.licenses.mit;
+    license = licenses.mit;
+    mainProgram = pname;
     maintainers = [ ];
   };
 }

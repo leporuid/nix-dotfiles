@@ -1,5 +1,7 @@
 { pkgs, ... }:
-
+let
+  inherit (pkgs.lib) licenses platforms;
+in
 pkgs.stdenv.mkDerivation {
   pname = "has-ancestor";
   version = "0.1.0";
@@ -18,9 +20,10 @@ pkgs.stdenv.mkDerivation {
     cp has-ancestor $out/bin/
   '';
 
-  meta = with pkgs.lib; {
+  meta = {
     description = "A tool to check ancestor relationships";
     license = licenses.mit;
+    mainProgram = "has-ancestor";
     maintainers = [ ];
     platforms = platforms.unix;
   };

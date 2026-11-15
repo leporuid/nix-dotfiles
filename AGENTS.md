@@ -20,7 +20,7 @@ This repository collects project-specific expectations, tool contracts, and arch
 | `hosts/nixos-vm/` | Lightweight NixOS VM configuration (imports `modules/nixos` and shared Hjem profile). |
 | `modules/darwin/` | Darwin system modules (`aggregate.nix`, `agenix.nix`, `applications.nix`, `system-defaults.nix`, `hjem.nix`, `determinate/`). |
 | `modules/nixos/` | NixOS system modules (`aggregate.nix`, `hjem.nix`). |
-| `modules/hjem/` | User-level Hjem modules (`aggregate.nix`, `my-config.nix`, `themes.nix`, `fish.nix`, `neovim.nix`, `helix.nix`, `ghostty.nix`, `starship.nix`, `nushell.nix`, `tmux.nix`, `zellij.nix`, `atuin.nix`, `direnv.nix`, `direnv-instant.nix`, `jujutsu.nix`). |
+| `modules/hjem/` | User-level Hjem modules (`aggregate.nix`, `agents.nix`, `my-config.nix`, `themes.nix`, `fish.nix`, `git.nix`, `zsh.nix`, `neovim.nix`, `helix.nix`, `ghostty.nix`, `starship.nix`, `nushell.nix`, `tmux.nix`, `zellij.nix`, `atuin.nix`, `direnv.nix`, `direnv-instant.nix`, `jujutsu.nix`). |
 | `modules/common/` | Shared platform configurations (`vars.nix`, `hjem.nix`, `dix.nix`). |
 | `packages/*.nix` | Custom derivations and package wrappers consumed via `inputs.self.packages.<system>.<name>`; prefer `lib.fileset.toSource` for clean local source whitelisting. |
 | `users/leporuid/` | Shared user profile (`home-configuration.nix`) managing packages and files. |
@@ -125,6 +125,8 @@ This repository collects project-specific expectations, tool contracts, and arch
    - Prefer specialized filesystem tools and git MCP tools over raw shell commands to prevent unnecessary permission prompts.
 6. **Git Hygiene**:
    - Stage only modified target files (`git add <files>`), review `git status --short`, and write concise Conventional Commits.
+7. **Context & Quota Handoff Guard (93% Threshold)**:
+   - When session context or model quota usage reaches **93%**, immediately stop starting new stages, verify and checkpoint current edits, and record completed progress plus remaining tasks into `TODO.md` for seamless handoff.
 
 ---
 
