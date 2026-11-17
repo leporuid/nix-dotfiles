@@ -473,11 +473,11 @@
         "uv2nix": "uv2nix"
       },
       "locked": {
-        "lastModified": 1794907810,
-        "narHash": "sha256-e941HBHuHzNcp0/2VP/KZVDtqs0T1qsRjuBeiJAYgac=",
+        "lastModified": 1794934305,
+        "narHash": "sha256-XbYnDaQpqPGrBQ74TYp0DvtezARYr11zT4LjfptM1qA=",
         "owner": "leporuid",
         "repo": "KToolBox",
-        "rev": "ff9f772c4fa216c6431eeccd3cdb0c9618ac7a07",
+        "rev": "a7f386673d1d2eeb3c77098ded84b3a101763609",
         "type": "github"
       },
       "original": {
@@ -856,11 +856,11 @@
         "nixpkgs": "nixpkgs_5"
       },
       "locked": {
-        "lastModified": 1794881642,
-        "narHash": "sha256-7/7aDC/TAYIFDHngb9k/1d8o7R9Jl3eVhNA2UXXol2Y=",
+        "lastModified": 1794934939,
+        "narHash": "sha256-GyLwlL+LX/OenWoFZMtqnxpQ50uf1fLmelblisv5ObE=",
         "owner": "leporuid",
         "repo": "red-tape",
-        "rev": "f8b2cc5dabfec6a692af5b6913086d47ef84360f",
+        "rev": "816ec630b85f97ff16d5295253673be7ee6dad04",
         "type": "github"
       },
       "original": {
