@@ -24,7 +24,7 @@ This repository collects project-specific expectations, tool contracts, and arch
 | `modules/common/` | Shared platform configurations (`vars.nix`, `hjem.nix`, `dix.nix`). |
 | `packages/*.nix` | Custom derivations and package wrappers consumed via `inputs.self.packages.<system>.<name>`; prefer `lib.fileset.toSource` for clean local source whitelisting. |
 | `users/leporuid/` | Shared user profile (`home-configuration.nix`) managing packages and files. |
-| `config/` | Raw upstream configurations (`fish/`, `ghostty/`, `nushell/`, `starship.toml`, `git/`, `nvim/`, `agents/`, etc.). |
+| `config/` | Raw upstream configurations (`fish/`, `ghostty/`, `nushell/`, `starship.toml`, `git/`, `nvim/`, `llms/`, etc.). |
 | `docs/` | Distilled architectural references (`REFERENCE_PATTERNS.md`, `REFER_DEEP_ANALYSIS.md`, `ai/` progressive-disclosure guides). |
 
 ---
@@ -107,7 +107,7 @@ This repository collects project-specific expectations, tool contracts, and arch
 ## 5. Agent Workflow & Execution Rules
 
 1. **Mandatory Skills Loading (`agy` & Automated Agents)**:
-   - Automated agents (`agy`, Claude, Gemini, Copilot, Cursor) operating in this repository **must** proactively load and strictly adhere to all skills located in `.agents/skills/` (and `config/agents/skills/`).
+   - Automated agents (`agy`, Claude, Gemini, Copilot, Cursor) operating in this repository **must** proactively load and strictly adhere to all skills located in `.agents/skills/` (and `config/llms/skills/`).
    - **Before reading, editing, or evaluating any `*.nix`, `flake.lock`, `hosts/`, `modules/`, `packages/`, `users/`, or `config/` path, load `@nix-dotfiles-workflow` first.** Load `@developer-workflow` at the start of every task, and `@tiered-agent-workflow` / `@get-more-perspectives` as the task requires.
    - When a skill and this file disagree, this file wins; update the skill afterwards.
 2. **Token Efficiency & Search-First**:
@@ -132,7 +132,7 @@ This repository collects project-specific expectations, tool contracts, and arch
 
 ## 6. Available Skills & Agent Instructions
 
-Automated agents operating on this repository have access to modular skills located in `config/agents/skills/` (symlinked from `.agents/skills/`):
+Automated agents operating on this repository have access to modular skills located in `config/llms/skills/` (symlinked from `.agents/skills/`):
 
 | Skill | Path | Description & When to Load |
 | :--- | :--- | :--- |
@@ -148,8 +148,17 @@ Automated agents operating on this repository have access to modular skills loca
 | `@nix-secrets-and-enclave` | `.agents/skills/nix-secrets-and-enclave/SKILL.md` | `~/Developer/nix-secrets`, `agenix-rules.nix`, Apple Secure Enclave `age-plugin-se` (`age` vs `rage`), and cross-repo secret hygiene. |
 | `@apple-swift-cocoa-dev` | `.agents/skills/apple-swift-cocoa-dev/SKILL.md` | Swift 6.2 SwiftPM (`~/Developer/MyLibrary`, `swiftly`), Xcode MCP, `__noChroot` SDK builds (`age-plugin-se`), and Objective-C Cocoa bundles (`m3u8dl-protocol`). |
 | `@gemini-api-dev-bridge` | `.agents/skills/gemini-api-dev-bridge/SKILL.md` | Cross-harness Gemini API dev bridge (`google-genai`/`@google/genai` >= 3.2.0, `gemini-api` CLI dev/CI workflows, `gemini-api-docs` MCP). |
-| `@fast-repo-reader` | `.agents/skills/fast-repo-reader/SKILL.md` | Non-intrusive remote inspection of external Git/GitHub repositories without shell network prompts. |
-| `@tiered-agent-workflow` | `.agents/skills/tiered-agent-workflow/SKILL.md` | Quota-aware three-phase strategy: Phase 0 Scout (Flash/CLI) $\rightarrow$ Phase 1 Date-Routed Reasoning $\rightarrow$ Phase 2 Builder (Flash). |
+| `@fast-repo-reader` | `.agents/skills/fast-repo-reader/SKILL.md` | Non-intrusive remote inspection of external Git/GitHub Nix/repo architectures without shell network prompts (use `@read` for general URLs/PDFs). |
+| `@tiered-agent-workflow` | `.agents/skills/tiered-agent-workflow/SKILL.md` | Quota-aware three-phase strategy: Phase 0 Scout (Flash/CLI) $\rightarrow$ Phase 1 Date-Routed Reasoning $\rightarrow$ Phase 2 Builder (Flash) (use `@think` for general requirement breakdown). |
 | `@get-more-perspectives` | `.agents/skills/get-more-perspectives/SKILL.md` | Simulated 5-role advisory panel for evaluating trade-offs and architecture decisions. |
+| `@mole` | `.agents/skills/mole/SKILL.md` | Independent macOS disk analysis and read-only-first cleanup via `mo` CLI. |
+| `@think` | `.agents/skills/think/SKILL.md` | Pre-build requirement breakdown, value/viability evaluation, and decision validation (Nix/multi-repo architecture & quota routing stay in `@tiered-agent-workflow`). |
+| `@ui` | `.agents/skills/ui/SKILL.md` | Production UI craft, visual direction lock, and screenshot-grounded visual polish. |
+| `@check` | `.agents/skills/check/SKILL.md` | Diff/PR code review, triage, and release gate (`nix-dotfiles` verification matrix & guardrails in `@nix-dotfiles-workflow` take precedence). |
+| `@hunt` | `.agents/skills/hunt/SKILL.md` | Root-cause diagnosis before any fix, bisect, and regression guardrails. |
+| `@write` | `.agents/skills/write/SKILL.md` | Chinese/English prose polishing, AI-tone removal, and technical copy (respects `zh-Hant-TW` for user-facing Chinese; code comments stay English). |
+| `@learn` | `.agents/skills/learn/SKILL.md` | Six-phase deep research workflow from primary sources to structured output. |
+| `@read` | `.agents/skills/read/SKILL.md` | General URL/PDF fetching, summarization, and DeepSeek web search fallback (use `@fast-repo-reader` for external GitHub Nix repos). |
+| `@health` | `.agents/skills/health/SKILL.md` | Agent config, instruction surface, and AI maintainability audit (`nix-dotfiles` guardrails take precedence; `@mole` handles disk cleanup). |
 
-Agents must consult the relevant `SKILL.md` before executing multi-repo analyses or structural modifications.
+Agents must consult the relevant `SKILL.md` (and `config/llms/skills/RESOLVER.md` for Waza workflow routing) before executing multi-repo analyses or structural modifications.

@@ -26,9 +26,9 @@ in
 
     my.config.source = {
       ".claude/settings.json" = "claude/settings.json";
-      ".agents/skills" = "agents/skills";
-      ".claude/skills" = "agents/skills";
-      ".gemini/skills" = "agents/skills";
+      ".agents/skills" = "llms/skills";
+      ".claude/skills" = "llms/skills";
+      ".gemini/skills" = "llms/skills";
     };
 
     # Unified agent instructions and progressive-disclosure docs across harnesses
