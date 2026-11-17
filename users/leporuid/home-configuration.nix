@@ -49,7 +49,6 @@ in
         ".config/foot" = "foot";
         ".config/kitty" = "kitty";
         ".config/zed" = "zed";
-        ".config/github-copilot/versions.json" = "github-copilot/versions.json";
         ".config/github-copilot/xcode/mcp.json" = "github-copilot/xcode/mcp.json";
         ".config/raycast" = "raycast";
       };
@@ -102,6 +101,7 @@ in
       pkgs.mas
       pkgs.oci-cli
       pkgs.qpdf
+      pkgs.xcodegen
       perSystem.self.age-plugin-se
       perSystem.self.gallery-dl
       perSystem.self.kumono
