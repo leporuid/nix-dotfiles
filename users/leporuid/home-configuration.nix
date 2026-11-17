@@ -52,12 +52,6 @@ in
         ".config/github-copilot/versions.json" = "github-copilot/versions.json";
         ".config/github-copilot/xcode/mcp.json" = "github-copilot/xcode/mcp.json";
         ".config/raycast" = "raycast";
-        "Library/Application Support/Syntax Highlight/Themes/claude-soft-violet.theme" =
-          "syntax-highlight/claude-soft-violet.theme";
-        "Library/Application Support/Syntax Highlight/Themes/claude-violet.theme" =
-          "syntax-highlight/claude-violet.theme";
-        "Library/Application Support/Syntax Highlight/Themes/enchant-grimoire.theme" =
-          "syntax-highlight/enchant-grimoire.theme";
       };
     };
   };
