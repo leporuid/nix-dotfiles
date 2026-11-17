@@ -473,11 +473,11 @@
         "uv2nix": "uv2nix"
       },
       "locked": {
-        "lastModified": 1794890236,
-        "narHash": "sha256-PoPKN1h8V5Su6E6pmCT3N0DWOWN9OFbAo4vFcmRnETo=",
+        "lastModified": 1794907810,
+        "narHash": "sha256-e941HBHuHzNcp0/2VP/KZVDtqs0T1qsRjuBeiJAYgac=",
         "owner": "leporuid",
         "repo": "KToolBox",
-        "rev": "e728ec4354825404fcd4a09748127d94a2fef6fe",
+        "rev": "ff9f772c4fa216c6431eeccd3cdb0c9618ac7a07",
         "type": "github"
       },
       "original": {
