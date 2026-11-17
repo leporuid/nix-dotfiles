@@ -29,12 +29,6 @@ When those fixes repair defects that reached users or a published build and the 
 
 Quick check from the project root, reusing `$HEALTH_SCRIPT` resolved in Step 1. Run standalone, it prints the same sections without the `AI MAINTAINABILITY SUMMARY` wrapper, so its first line is `=== PROJECT SHAPE ===`:
 
-```powershell
-& "$POWERSHELL" -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$HEALTH_LAUNCHER" maintainability . summary
-```
-
-On Linux and macOS:
-
 ```bash
 BASH_ENV= ENV= /bin/bash -p "${HEALTH_SCRIPT%/*}/check-maintainability.sh" . summary
 ```
@@ -47,12 +41,6 @@ Keep actions concrete and non-invasive: add or fix the smallest useful routed in
 
 Quick check from the project root, reusing `$HEALTH_SCRIPT` resolved in Step 1:
 
-```powershell
-& "$POWERSHELL" -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$HEALTH_LAUNCHER" doc-refs .
-```
-
-On Linux and macOS:
-
 ```bash
 BASH_ENV= ENV= /bin/bash -p "${HEALTH_SCRIPT%/*}/check-doc-refs.sh" .
 ```
@@ -62,12 +50,6 @@ Report missing references as Structural findings, not Critical, unless the missi
 **Broken Markdown references.** In deep mode, `check-maintainability.sh` also scans repository Markdown links. Report these as Structural findings when they point to missing local files, especially design, security, release, or handoff docs that agents may follow during future work.
 
 **Stale verifier cache output.** If validation output points at a deleted temp worktree or non-existent `/tmp` / `/private/tmp` file, parse the captured log with:
-
-```powershell
-& "$POWERSHELL" -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$HEALTH_LAUNCHER" verifier-output . <log-file>
-```
-
-On Linux and macOS:
 
 ```bash
 BASH_ENV= ENV= /bin/bash -p "${HEALTH_SCRIPT%/*}/check-verifier-output.sh" . <log-file>

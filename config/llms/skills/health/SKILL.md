@@ -123,7 +123,7 @@ For projects that use `/loop`, autonomous agents, or any long-running agent flow
 
 ## Step 2: Analyze
 
-Analyze locally from the summary output by default. When Budget posture escalates, re-run collection with `& "$POWERSHELL" -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$HEALTH_LAUNCHER" collect "$HEALTH_SCOPE" deep` on Windows, or `BASH_ENV= ENV= /bin/bash -p "$HEALTH_SCRIPT" "$HEALTH_SCOPE" deep` on Linux and macOS. Then launch only the relevant inspectors in parallel. Redact credentials to `[REDACTED]`.
+Analyze locally from the summary output by default. When Budget posture escalates, re-run collection with `BASH_ENV= ENV= /bin/bash -p "$HEALTH_SCRIPT" "$HEALTH_SCOPE" deep`. Then launch only the relevant inspectors in parallel. Redact credentials to `[REDACTED]`.
 
 - **Deep inspector routing:**
   - **Agent 1** (Context + Security): Read `agents/inspector-context.md`. Feed `CONVERSATION SIGNALS` section.
@@ -180,12 +180,6 @@ Agent instructions in the wrong layer, missing hooks, oversized descriptions, ve
 **Codex/Claude/Pi instruction drift.** Use `AGENT CONFIG SUMMARY` first. `project_instructions_mode` says which files Claude Code loads: on `claude-md` an `AGENTS.md` alone reaches Codex and Cursor but not Claude, and `nested_agents_md` counted together with a root `CLAUDE.md` means those nested guides reach nobody on Claude, because the root file switches the whole project off the `AGENTS.md` path rather than just its own folder. The exception is `claude-md-and-agents-md`, where both are read and the nested files still load, unless `CLAUDE.md` is the same physical file as `AGENTS.md` and the deduplicated chain is skipped. Report a Structural finding when `AGENTS.md` and runtime-specific files both contain substantial guidance without delegation, when Codex `config.toml` lacks trust for the current project, when Pi settings or package metadata point at missing skill roots, when project agent instructions are missing, or when runtime-specific instructions contradict the shared project source of truth. Also report when important rules live only in ignored or private local instruction overlays but the tracked/public docs lack them; those overlays are private context, not durable project source of truth. Do not print raw config values. Secrets, tokens, keys, and passwords must appear only as `[REDACTED]`.
 
 Quick check from the project root, reusing `$HEALTH_SCRIPT` resolved in Step 1 (standalone output has no `AGENT CONFIG SUMMARY` wrapper):
-
-```powershell
-& "$POWERSHELL" -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$HEALTH_LAUNCHER" agent-context . summary
-```
-
-On Linux and macOS:
 
 ```bash
 BASH_ENV= ENV= /bin/bash -p "${HEALTH_SCRIPT%/*}/check-agent-context.sh" . summary
