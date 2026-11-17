@@ -141,10 +141,6 @@ in
       enable = true;
       global.brewfile = true;
 
-      caskArgs = {
-        no_quarantine = true;
-      };
-
       onActivation = {
         autoUpdate = false;
         upgrade = false;
