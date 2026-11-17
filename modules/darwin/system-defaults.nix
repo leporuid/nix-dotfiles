@@ -154,7 +154,6 @@ in
 
         finder = {
           AppleShowAllFiles = true;
-          AppleShowAllExtensions = true;
           ShowPathbar = true;
           ShowStatusBar = true;
           FXDefaultSearchScope = "SCcf";
@@ -202,6 +201,14 @@ in
           TrackpadThreeFingerTapGesture = 2;
         };
 
+        screencapture = {
+          disable-shadow = true;
+          location = "/Volumes/SDXC/Screenshots";
+          show-thumbnail = false;
+          target = "clipboard";
+          type = "png";
+        };
+
         NSGlobalDomain = {
           AppleKeyboardUIMode = 3;
           ApplePressAndHoldEnabled = true;
@@ -238,13 +245,6 @@ in
           "com.apple.desktopservices" = {
             DSDontWriteNetworkStores = true;
             DSDontWriteUSBStores = true;
-          };
-          "com.apple.screencapture" = {
-            location = "/Volumes/SDXC/Screenshots";
-            type = "png";
-            show-thumbnail = false;
-            target = "clipboard";
-            disable-shadow = true;
           };
         };
       };
