@@ -5,7 +5,7 @@
   ...
 }:
 let
-  inherit (lib.modules) mkDefault mkIf;
+  inherit (lib.modules) mkDefault mkIf mkMerge;
   inherit (lib.options) mkEnableOption mkPackageOption;
 
   cfg = config.my.programs.direnv;
@@ -25,18 +25,20 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
-    packages = [
-      cfg.package
-      cfg.nixDirenvPackage
-    ];
-    my = {
-      config.source = {
+  config = mkMerge [
+    {
+      my.programs.direnv-instant.enable = mkDefault (cfg.enable && cfg.instant.enable);
+    }
+    (mkIf cfg.enable {
+      packages = [
+        cfg.package
+        cfg.nixDirenvPackage
+      ];
+      my.config.source = {
         ".config/direnv/direnv.toml" = "direnv/direnv.toml";
       };
-      programs.direnv-instant.enable = mkDefault cfg.instant.enable;
-    };
-    files.".config/direnv/lib/nix-direnv.sh".source =
-      "${cfg.nixDirenvPackage}/share/nix-direnv/direnvrc";
-  };
+      files.".config/direnv/lib/nix-direnv.sh".source =
+        "${cfg.nixDirenvPackage}/share/nix-direnv/direnvrc";
+    })
+  ];
 }

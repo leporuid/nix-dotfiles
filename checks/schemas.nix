@@ -8,7 +8,7 @@
 let
   inherit (inputs) self;
   # Exclude `checks` itself to avoid infinite recursion when evaluating inside `checks`.
-  outputKeys = [
+  outputKeys = builtins.filter (k: self ? ${k}) [
     "darwinConfigurations"
     "darwinModules"
     "devShells"
@@ -19,6 +19,7 @@ let
     "nixosModules"
     "overlays"
     "packages"
+    "rumModules"
     "schemas"
   ];
 

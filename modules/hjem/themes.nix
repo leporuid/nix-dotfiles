@@ -6,10 +6,11 @@
   ...
 }:
 let
+  inherit (lib.fileset) toSource;
+  inherit (lib.meta) getExe;
   inherit (lib.modules) mkIf;
   inherit (lib.options) mkEnableOption;
   inherit (lib.strings) concatStringsSep;
-  inherit (pkgs.lib.fileset) toSource;
 
   cfg = config.my.themes;
   batSrc = toSource {
@@ -40,7 +41,7 @@ in
         text = ''
           export BAT_THEME="Catppuccin Mocha"
           export BAT_CACHE_PATH="${batCache}"
-          exec bat "$@"
+          exec ${getExe pkgs.bat} "$@"
         '';
       })
       pkgs.bat-extras.batdiff

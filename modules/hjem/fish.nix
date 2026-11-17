@@ -37,12 +37,11 @@ in
     }
     // confDFiles;
 
-    packages = with pkgs; [
-      fish
-      fish-lsp
-      eza
-      fzf
-      ripgrep
+    packages = [
+      pkgs.fish-lsp
+      pkgs.eza
+      pkgs.fzf
+      pkgs.ripgrep
     ];
   };
 }

@@ -6,7 +6,35 @@
   ...
 }:
 let
-  inherit (lib) types;
+  inherit (lib.attrsets)
+    filterAttrs
+    isDerivation
+    mapAttrs
+    mapAttrsToList
+    recursiveUpdate
+    ;
+  inherit (lib.generators) toTOML;
+  inherit (lib.lists) elemAt optional;
+  inherit (lib.options) literalExpression mkOption;
+  inherit (lib.strings)
+    concatMapStringsSep
+    concatStringsSep
+    hasPrefix
+    hasSuffix
+    splitString
+    trim
+    ;
+  inherit (lib.types)
+    anything
+    attrsOf
+    bool
+    either
+    lines
+    nullOr
+    path
+    str
+    ;
+
   cfg = config.my.config;
 
   mkConfigSymlink =
@@ -21,13 +49,13 @@ let
   parseKeyValue =
     text:
     let
-      rawLines = lib.splitString "\n" text;
-      validLines = lib.filter (
+      rawLines = splitString "\n" text;
+      validLines = builtins.filter (
         line:
         let
-          trimmed = lib.trim line;
+          trimmed = trim line;
         in
-        trimmed != "" && !lib.hasPrefix "#" trimmed && !lib.hasPrefix "//" trimmed
+        trimmed != "" && !hasPrefix "#" trimmed && !hasPrefix "//" trimmed
       ) rawLines;
 
       parseLine =
@@ -39,15 +67,15 @@ let
           acc
         else
           let
-            key = lib.trim (builtins.elemAt parts 0);
-            val = lib.trim (builtins.elemAt parts 1);
+            key = trim (elemAt parts 0);
+            val = trim (elemAt parts 1);
           in
           if key == "palette" then
             acc // { palette = (acc.palette or [ ]) ++ [ val ]; }
           else
             acc // { ${key} = val; };
     in
-    lib.foldl parseLine { } validLines;
+    builtins.foldl' parseLine { } validLines;
 
   # Serializes an AttrSet into key-value configuration text (Ghostty/INI).
   # Lists are expanded into repeated `key = item` lines.
@@ -60,7 +88,7 @@ let
         renderEntry =
           key: v:
           if builtins.isList v then
-            lib.concatMapStringsSep "\n" (item: "${key} = ${toString item}") v
+            concatMapStringsSep "\n" (item: "${key} = ${toString item}") v
           else if builtins.isBool v then
             "${key} = ${if v then "true" else "false"}"
           else
@@ -74,28 +102,30 @@ let
               p = val.palette;
             in
             if builtins.isList p then
-              lib.concatMapStringsSep "\n" (item: "palette = ${toString item}") p
+              concatMapStringsSep "\n" (item: "palette = ${toString item}") p
             else
               "palette = ${toString p}"
           else
             null;
 
         otherAttrs = builtins.removeAttrs val [ "palette" ];
-        otherLines = lib.mapAttrsToList renderEntry otherAttrs;
-        allLines = lib.optional (paletteLines != null) paletteLines ++ otherLines;
+        otherLines = mapAttrsToList renderEntry otherAttrs;
+        allLines = optional (paletteLines != null) paletteLines ++ otherLines;
       in
-      lib.concatStringsSep "\n" allLines + "\n"
+      concatStringsSep "\n" allLines + "\n"
     else
       builtins.toString val;
 
   # Renders content for a given target path:
-  # - If string/path: symlink via mkConfigSymlink.
+  # - If string/path/derivation: symlink directly or via mkConfigSymlink.
   # - If AttrSet:
   #   - If it has `base`, read and parse base file (TOML, JSON, or key-value), then merge overrides.
   #   - Automatically serialize to TOML, JSON, or key-value text based on target file extension.
   renderConfigContent =
     targetPath: val:
-    if builtins.isString val || lib.isDerivation val then
+    if builtins.isPath val || isDerivation val then
+      { source = val; }
+    else if builtins.isString val then
       { source = mkConfigSymlink val; }
     else if builtins.isAttrs val then
       let
@@ -106,18 +136,18 @@ let
         baseAttrs =
           if !hasBase then
             { }
-          else if lib.hasSuffix ".toml" val.base then
+          else if hasSuffix ".toml" val.base then
             builtins.fromTOML (builtins.readFile baseFile)
-          else if lib.hasSuffix ".json" val.base then
+          else if hasSuffix ".json" val.base then
             builtins.fromJSON (builtins.readFile baseFile)
           else
             parseKeyValue (builtins.readFile baseFile);
 
-        merged = lib.recursiveUpdate baseAttrs overrides;
+        merged = recursiveUpdate baseAttrs overrides;
       in
-      if lib.hasSuffix ".toml" targetPath then
-        { text = lib.generators.toTOML { } merged; }
-      else if lib.hasSuffix ".json" targetPath then
+      if hasSuffix ".toml" targetPath then
+        { text = toTOML { } merged; }
+      else if hasSuffix ".json" targetPath then
         { text = builtins.toJSON merged; }
       else
         { text = renderConfigText merged; }
@@ -126,36 +156,36 @@ let
 in
 {
   options.my.config = {
-    directory = lib.mkOption {
+    directory = mkOption {
       default = "${config.directory}/Developer/nix-dotfiles/config";
-      defaultText = lib.literalExpression ''
+      defaultText = literalExpression ''
         "''${config.directory}/Developer/nix-dotfiles/config"
       '';
-      type = types.either types.path types.str;
+      type = either path str;
       description = ''
         Local absolute path to the configuration directory when useOutOfStoreSymlinks is enabled.
       '';
     };
 
-    storeDirectory = lib.mkOption {
+    storeDirectory = mkOption {
       default = ../../config;
-      type = types.either types.path types.str;
+      type = either path str;
       description = ''
         Pure repository path to the configuration directory used for store-backed builds and base files.
       '';
     };
 
-    useOutOfStoreSymlinks = lib.mkOption {
+    useOutOfStoreSymlinks = mkOption {
       default = false;
-      type = types.bool;
+      type = bool;
       description = ''
         Whether to link directly to the local checkout directory instead of the Nix store.
       '';
     };
 
-    source = lib.mkOption {
+    source = mkOption {
       default = { };
-      type = with types; attrsOf (nullOr (either (either str path) (attrsOf anything)));
+      type = attrsOf (nullOr (either (either str path) (attrsOf anything)));
       description = ''
         Mapping from target configuration path to:
         - Relative path string: creates symlink to the repo file.
@@ -164,19 +194,19 @@ in
       '';
     };
 
-    text = lib.mkOption {
+    text = mkOption {
       default = { };
-      type = with types; attrsOf (nullOr (either lines (attrsOf anything)));
+      type = attrsOf (nullOr (either lines (attrsOf anything)));
       description = ''
         Mapping from target configuration path to direct string content or structured attribute set.
         Structured attribute sets natively support Nix merging and are automatically rendered.
       '';
     };
 
-    clobber = lib.mkOption {
+    clobber = mkOption {
       default = config.clobberFiles;
-      defaultText = lib.literalExpression "config.clobberFiles";
-      type = types.bool;
+      defaultText = literalExpression "config.clobberFiles";
+      type = bool;
       description = "Whether the configuration links should override whatever exists already.";
     };
   };
@@ -185,16 +215,17 @@ in
     # Seamlessly map outputs to native Hjem file attributes
     files =
       let
-        nonNullSource = lib.filterAttrs (_: v: v != null) cfg.source;
-        sourceFiles = lib.mapAttrs (
-          path: val: (renderConfigContent path val) // { inherit (cfg) clobber; }
+        nonNullSource = filterAttrs (_: v: v != null) cfg.source;
+        sourceFiles = mapAttrs (
+          targetPath: val: (renderConfigContent targetPath val) // { inherit (cfg) clobber; }
         ) nonNullSource;
 
-        nonNullText = lib.filterAttrs (_: v: v != null) cfg.text;
-        textFiles = lib.mapAttrs (_: v: {
+        nonNullText = filterAttrs (_: v: v != null && v != "" && v != { }) cfg.text;
+        renderedTextFiles = mapAttrs (_: v: {
           text = renderConfigText v;
           inherit (cfg) clobber;
         }) nonNullText;
+        textFiles = filterAttrs (_: v: v.text != "") renderedTextFiles;
       in
       sourceFiles // textFiles;
   };

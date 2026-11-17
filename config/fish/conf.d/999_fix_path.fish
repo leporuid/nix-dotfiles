@@ -9,7 +9,7 @@
 # always be moved to the front, even when entering a nested `nix develop`
 # shell, which could result in the wrong program being executed if specified
 # by both the user environment and dev shell.
-if set -q IS_DARWIN; and not set -q __NIX_PROFILES_HAVE_BEEN_MOVED
+if test (uname -s) = Darwin; and not set -q __NIX_PROFILES_HAVE_BEEN_MOVED
     for path in (string split ' ' $NIX_PROFILES)
         if test "$path" != "$HOME/.nix-profile"; and test -d "$path/bin"
             set -g PATH $path/bin $PATH

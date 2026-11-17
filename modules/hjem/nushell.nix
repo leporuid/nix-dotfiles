@@ -45,7 +45,6 @@ in
 
       files."Library/Application Support/nushell/config.nu" = {
         inherit (config.xdg.config.files."nushell/config.nu") source;
-        clobber = true;
       };
     })
   ]);

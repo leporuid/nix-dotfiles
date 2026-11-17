@@ -1,5 +1,6 @@
 {
   inputs,
+  lib,
   pkgs,
   vars,
   ...
@@ -13,7 +14,7 @@
     identityPaths = [
       "${vars.homeDirectory}/.ssh/id_ed25519"
     ];
-    secrets = {
+    secrets = lib.optionalAttrs (inputs ? nix-secrets) {
       tailscale-authkey = {
         file = "${inputs.nix-secrets}/hosts/MacBook-Pro/tailscale-authkey.age";
         owner = vars.username;

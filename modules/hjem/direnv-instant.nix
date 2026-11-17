@@ -5,9 +5,10 @@
   ...
 }:
 let
+  inherit (lib.meta) getExe;
   inherit (lib.modules) mkIf;
   inherit (lib.options) mkEnableOption mkOption;
-  inherit (lib) types;
+  inherit (lib.types) bool int package;
 
   cfg = config.my.programs.direnv-instant;
 in
@@ -17,17 +18,17 @@ in
       default = true;
     };
     package = mkOption {
-      type = types.package;
+      type = package;
       default = perSystem.direnv-instant.default;
       description = "The direnv-instant package to use.";
     };
     useCache = mkOption {
-      type = types.bool;
+      type = bool;
       default = true;
       description = "Apply cached env instantly on prompt.";
     };
     muxDelay = mkOption {
-      type = types.int;
+      type = int;
       default = 4;
       description = "Seconds before opening multiplexer split.";
     };
@@ -41,7 +42,7 @@ in
       if status is-interactive
         set -gx DIRENV_INSTANT_USE_CACHE ${if cfg.useCache then "1" else "0"}
         set -gx DIRENV_INSTANT_MUX_DELAY ${toString cfg.muxDelay}
-        ${cfg.package}/bin/direnv-instant hook fish | source
+        ${getExe cfg.package} hook fish | source
       end
     '';
   };

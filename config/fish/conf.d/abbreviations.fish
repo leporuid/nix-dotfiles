@@ -7,7 +7,7 @@ status is-interactive; or return
 abbr -a d cd
 abbr -a - "cd -"
 abbr -a .. "cd .."
-if not set -q IS_DARWIN
+if test (uname -s) != Darwin
     abbr -a cpr "cp -a --reflink=auto"
     abbr -a cp "cp -a --reflink=auto"
 else
@@ -34,7 +34,7 @@ abbr -a nrsl "npm run start-local"
 
 abbr -a r run
 
-if set -q IS_DARWIN
+if test (uname -s) = Darwin
     abbr -a p pbcopy
     abbr -a pp pbpaste
     abbr -a b brew
