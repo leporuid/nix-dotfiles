@@ -39,6 +39,7 @@ in
       # =========================================================================
       systemPackages = [
         inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re
+        inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.syntax-highlight
         inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.zed-nightly
       ];
       variables = {
@@ -98,6 +99,9 @@ in
               "${
                 inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re
               }/Applications/M3U8DLProtocol.app"
+              "${
+                inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.syntax-highlight
+              }/Applications/Syntax Highlight.app"
               "${
                 config.programs.nixcord.discord.finalPackage or config.programs.nixcord.finalPackage.discord
                   or config.programs.nixcord.discord.package
@@ -174,7 +178,6 @@ in
         "raycast"
         "sf-symbols"
         "suspicious-package"
-        "syntax-highlight"
         "tailscale-app"
         "zen"
       ];

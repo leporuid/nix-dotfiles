@@ -106,6 +106,7 @@ in
       perSystem.self.gallery-dl
       perSystem.self.kumono
       perSystem.self.megabasterd
+      perSystem.self.mole-cleaner
       perSystem.self.oci-import-image
       perSystem.self.unxip
       perSystem.self.yt-dlp
