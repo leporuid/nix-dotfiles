@@ -46,7 +46,7 @@ script will be silenced, functions will not be."
             set file_path "$dir/run.fish"
             break
         end
-        set dir (dirname "$dir")
+        set dir (path dirname -- "$dir")
     end
 
     if not set -q file_path[1]

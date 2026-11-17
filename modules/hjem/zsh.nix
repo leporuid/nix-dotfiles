@@ -34,7 +34,7 @@ in
     };
 
     files = {
-      ".local/share/zsh/hm-session-vars.sh".source = config.environment.loadEnv;
+      ".local/share/zsh/hjem-session-vars.sh".source = config.environment.loadEnv;
     };
   };
 }

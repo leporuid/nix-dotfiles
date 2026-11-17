@@ -6,7 +6,10 @@ $env.config = {
         return
       }
 
-      direnv export json | from json | default {} | load-env
+      let direnv_raw = (direnv export json | str trim)
+      if ($direnv_raw | is-not-empty) {
+        $direnv_raw | from json | default {} | load-env
+      }
       if 'ENV_CONVERSIONS' in $env and 'PATH' in $env.ENV_CONVERSIONS {
         $env.PATH = do $env.ENV_CONVERSIONS.PATH.from_string $env.PATH
       }
@@ -28,9 +31,4 @@ $env.ENV_CONVERSIONS = {
 def --env cx [arg] {
     cd $arg
     ls -l
-}
-
-# Auto-source atuin if initialized
-if ($nu.data-dir | path join 'vendor/autoload/atuin.nu' | path exists) {
-    source ($nu.data-dir | path join 'vendor/autoload/atuin.nu')
 }

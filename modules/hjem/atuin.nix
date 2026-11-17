@@ -20,10 +20,6 @@ in
   config = mkIf cfg.enable {
     packages = [ cfg.package ];
 
-    environment.sessionVariables = {
-      ATUIN_NOBIND = "true";
-    };
-
     my.config.source = {
       ".config/atuin" = "atuin";
     };

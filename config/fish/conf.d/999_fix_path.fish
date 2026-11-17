@@ -1,9 +1,6 @@
-# Standalone Home Manager leaves Fish to reconstruct its own PATH, which
-# takes the existing path from ZSH, puts the contents of /etc/paths and
-# /etc/paths.d first, then appends the existing non-duplicate entries to
-# the end. This results in the Nix entries being at the tail of the PATH,
-# which isn't ideal. The solution is to add all profile bin directories
-# to the front and deduplicate them.
+# On macOS, login/non-login handoffs pass through /etc/paths and /etc/paths.d,
+# which can move Nix profile bin directories behind system paths.
+# Prepend active NIX_PROFILES bin directories and deduplicate PATH.
 #
 # Without the check before executing, the NIX_PROFILES directories will
 # always be moved to the front, even when entering a nested `nix develop`

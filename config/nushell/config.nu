@@ -34,12 +34,12 @@ def _linux-distribution [] {
 
 def os-info [] {
     let host = sys host
-    let shell_path = $nu | get -o shell-path | default $nu.current-exe
+    let shell_path = $nu.shell-path? | default $nu.current-exe
 
     {
         shell: ($shell_path | path basename)
         shell_path: $shell_path
-        login_shell: ($nu | get -o loginshell-path | default 'Unknown')
+        login_shell: ($nu.loginshell-path? | default 'Unknown')
         os: $host.name
         kernel: $host.kernel_version
         hostname: $host.hostname

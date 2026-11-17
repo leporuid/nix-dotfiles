@@ -20,7 +20,16 @@ apply = ["defer"]
 
 [plugins.compinit]
 inline = '''
-autoload -Uz compinit
-[[ -d "${XDG_CACHE_HOME:-$HOME/.cache}/zsh" ]] || mkdir -p "${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
-compinit -d "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump"
+() {
+  setopt local_options extended_glob
+  autoload -Uz compinit
+  local zcompdump="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump"
+  [[ -d "${zcompdump:h}" ]] || mkdir -p "${zcompdump:h}"
+  if [[ -f "$zcompdump"(#qNmh-24) ]]; then
+    compinit -C -d "$zcompdump"
+  else
+    compinit -i -d "$zcompdump"
+    touch "$zcompdump"
+  fi
+}
 '''

@@ -25,6 +25,10 @@ if status is-interactive
         __source direnv hook fish
     end
     __source fzf --fish
+    __source atuin init fish --disable-ctrl-r --disable-up-arrow --disable-ai
+    if functions -q _atuin_search
+        bind alt-r _atuin_search
+    end
 
     functions -e __source
 

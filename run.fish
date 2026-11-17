@@ -166,7 +166,7 @@ function deploy-vpnpack -d "Build and deploy vpn-pack to UniFi Cloud Gateway via
         return 1
     end
 
-    set -l tarball_name (basename $tarball)
+    set -l tarball_name (path basename -- $tarball)
     _run scp $tarball "$target:/root/"
     or return 1
 

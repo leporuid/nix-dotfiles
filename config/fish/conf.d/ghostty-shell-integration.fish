@@ -3,7 +3,7 @@
 # If using a Ghostty-derived terminal on macOS, the variables could be set
 # but not what we expect them to be.
 if set -q GHOSTTY_RESOURCES_DIR GHOSTTY_BIN_DIR
-    and test -d $GHOSTTY_RESOURCES_DIR -a -d $GHOSTTY_BIN_DIR
+    and path is -d -- $GHOSTTY_RESOURCES_DIR $GHOSTTY_BIN_DIR
     and not begin
         test (uname) = Darwin
         and test "$__CFBundleIdentifier" != "com.mitchellh.ghostty"

@@ -37,6 +37,21 @@ fi
 # Let unmatched globs (e.g. Nix flake refs like .#MacBook-Pro) pass through literally
 unsetopt nomatch
 
+# Interactive options & macOS-friendly editing defaults (adopted from tw93/Kaku)
+setopt interactive_comments
+setopt auto_cd auto_pushd pushd_ignore_dups pushdminus
+setopt HIST_IGNORE_ALL_DUPS HIST_FIND_NO_DUPS HIST_REDUCE_BLANKS HIST_IGNORE_SPACE
+setopt SHARE_HISTORY APPEND_HISTORY INC_APPEND_HISTORY EXTENDED_HISTORY
+HISTSIZE=50000
+SAVEHIST=50000
+HISTFILE="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/.zsh_history"
+[[ -d "${HISTFILE:h}" ]] || mkdir -p "${HISTFILE:h}"
+
+bindkey -e
+# Match macOS Cmd+Backspace line-start deletion instead of killing the whole line
+bindkey '^U' backward-kill-line
+export CLICOLOR=1
+
 if [[ -n $GHOSTTY_RESOURCES_DIR ]]; then
   source "$GHOSTTY_RESOURCES_DIR"/shell-integration/zsh/ghostty-integration
 fi
@@ -63,7 +78,117 @@ fi
 [[ -r "$sheldon_cache" ]] && source "$sheldon_cache"
 unset sheldon_cache sheldon_toml
 
-eval "$(starship init zsh)"
-(( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
+# Prefix history search on Up/Down unless another navigator (e.g. atuin) owns ^[[A
+if [[ "$(bindkey '^[[A' 2>/dev/null)" == *" up-line-or-history" ]]; then
+  autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
+  zle -N up-line-or-beginning-search
+  zle -N down-line-or-beginning-search
+  for _zsh_keymap in emacs viins; do
+    bindkey -M "$_zsh_keymap" '^[[A' up-line-or-beginning-search
+    bindkey -M "$_zsh_keymap" '^[[B' down-line-or-beginning-search
+    bindkey -M "$_zsh_keymap" '^[OA' up-line-or-beginning-search
+    bindkey -M "$_zsh_keymap" '^[OB' down-line-or-beginning-search
+  done
+  unset _zsh_keymap
+fi
 
-HISTFILE=$HOME/.local/share/zsh/.zsh_history
+# Cached Starship init (keyed by binary path + mtime) + RPROMPT Ctrl-C fix (from tw93/Kaku)
+if (( $+commands[starship] )); then
+  _zsh_starship_init_ok=0
+  _zsh_starship_cache="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/starship-init.zsh"
+  _zsh_starship_key=""
+  if zmodload -F zsh/stat b:zstat 2>/dev/null; then
+    typeset -a _zsh_starship_stat
+    if zstat -A _zsh_starship_stat +mtime -- "${commands[starship]}" 2>/dev/null; then
+      _zsh_starship_key="# ${commands[starship]} ${_zsh_starship_stat[1]}"
+    fi
+    unset _zsh_starship_stat
+  fi
+  if [[ -n "$_zsh_starship_key" && -r "$_zsh_starship_cache" ]]; then
+    _zsh_starship_cache_key=""
+    IFS= read -r _zsh_starship_cache_key < "$_zsh_starship_cache" 2>/dev/null
+    if [[ "$_zsh_starship_cache_key" == "$_zsh_starship_key" ]]; then
+      builtin source "$_zsh_starship_cache"
+      _zsh_starship_init_ok=1
+    fi
+    unset _zsh_starship_cache_key
+  fi
+  if (( ! _zsh_starship_init_ok )); then
+    _zsh_starship_init="$(starship init zsh --print-full-init)"
+    if [[ -n "$_zsh_starship_init" ]]; then
+      eval "$_zsh_starship_init"
+      if [[ -n "$_zsh_starship_key" ]]; then
+        command mkdir -p "${_zsh_starship_cache:h}" 2>/dev/null
+        if {
+          builtin print -r -- "$_zsh_starship_key"
+          builtin print -r -- "$_zsh_starship_init"
+        } >| "${_zsh_starship_cache}.$$" 2>/dev/null; then
+          command mv -f "${_zsh_starship_cache}.$$" "$_zsh_starship_cache" 2>/dev/null \
+            || command rm -f "${_zsh_starship_cache}.$$" 2>/dev/null
+        fi
+      fi
+    else
+      eval "$(starship init zsh)"
+    fi
+    unset _zsh_starship_init
+  fi
+  unset _zsh_starship_init_ok _zsh_starship_cache _zsh_starship_key
+
+  _zsh_render_starship_rprompt() {
+    command starship prompt --right \
+      --terminal-width="${COLUMNS:-}" \
+      --keymap="${KEYMAP:-}" \
+      --status="${STARSHIP_CMD_STATUS:-}" \
+      --pipestatus="${STARSHIP_PIPE_STATUS[*]:-}" \
+      --cmd-duration="${STARSHIP_DURATION:-}" \
+      --jobs="${STARSHIP_JOBS_COUNT:-0}" 2>/dev/null
+  }
+
+  _zsh_fix_starship_rprompt() {
+    if [[ "${RPROMPT:-}" == *'$('*'starship'*'prompt --right'* ]]; then
+      _zsh_starship_rprompt_cmd="$RPROMPT"
+    fi
+    if [[ -n "${_zsh_starship_rprompt_cmd:-}" ]]; then
+      if [[ "${RPROMPT:-}" == "${_zsh_starship_rprompt_cmd}" ]] || [[ "${RPROMPT:-}" == "${_zsh_last_injected_rprompt:-}" ]]; then
+        local evaled
+        if [[ "${_zsh_starship_rprompt_cmd}" == *starship*'prompt --right'* ]]; then
+          evaled="$(_zsh_render_starship_rprompt)"
+        else
+          local cmd="${_zsh_starship_rprompt_cmd}"
+          if [[ "${cmd[1]}" == '$' && "${cmd[2]}" == '(' && "${cmd[-1]}" == ')' ]]; then
+            cmd="${cmd[3,-2]}"
+          fi
+          evaled="$(eval "$cmd" 2>/dev/null)"
+        fi
+        RPROMPT="$evaled"
+        _zsh_last_injected_rprompt="$evaled"
+      fi
+    fi
+  }
+  if [[ ${precmd_functions[(Ie)_zsh_fix_starship_rprompt]} -eq 0 ]]; then
+    precmd_functions+=(_zsh_fix_starship_rprompt)
+  fi
+fi
+
+# Fallback SSH/Mosh TERM normalization for terminals whose terminfo may be missing remotely (from tw93/Kaku)
+if ! typeset -f ssh >/dev/null 2>&1 && ! alias ssh >/dev/null 2>&1; then
+  function ssh {
+    if [[ -z "${ZSH_SSH_SKIP_TERM_FIX:-}" && ( "${TERM:-}" == "xterm-ghostty" || "${TERM:-}" == "kaku" ) ]]; then
+      TERM=xterm-256color command ssh "$@"
+    else
+      command ssh "$@"
+    fi
+  }
+fi
+
+if (( $+commands[mosh] )) && ! typeset -f mosh >/dev/null 2>&1 && ! alias mosh >/dev/null 2>&1; then
+  function mosh {
+    if [[ -z "${ZSH_SSH_SKIP_TERM_FIX:-}" && ( "${TERM:-}" == "xterm-ghostty" || "${TERM:-}" == "kaku" ) ]]; then
+      TERM=xterm-256color command mosh "$@"
+    else
+      command mosh "$@"
+    fi
+  }
+fi
+
+(( $+commands[zoxide] )) && eval "$(zoxide init zsh)"

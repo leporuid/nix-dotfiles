@@ -39,12 +39,6 @@ function clean-store -d "Clean old system/user profile generations and collect g
     echo (set_color yellow)"==> Wiping user default profile"(test (count $filter_args) -gt 0; and echo " ($filter_args)"; or echo " (all non-current)")"..."(set_color normal)
     announce nix profile wipe-history $filter_args
 
-    # 3. Home Manager profile generations (if present)
-    if test -e $HOME/.local/state/nix/profiles/home-manager
-        echo (set_color yellow)"==> Wiping home-manager profile"(test (count $filter_args) -gt 0; and echo " ($filter_args)"; or echo " (all non-current)")"..."(set_color normal)
-        announce nix profile wipe-history --profile $HOME/.local/state/nix/profiles/home-manager $filter_args
-    end
-
     echo
     # 4. Store garbage collection
     echo (set_color green)"==> Running nix store gc..."(set_color normal)
