@@ -100,11 +100,13 @@ in
       pkgs.ffmpeg
       pkgs.gnused
       pkgs.mas
+      pkgs.oci-cli
       pkgs.qpdf
       perSystem.self.age-plugin-se
       perSystem.self.gallery-dl
       perSystem.self.kumono
       perSystem.self.megabasterd
+      perSystem.self.oci-import-image
       perSystem.self.unxip
       perSystem.self.yt-dlp
     ];

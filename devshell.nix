@@ -21,6 +21,8 @@ pkgs.mkShellNoCC {
       perSystem.self.run
       perSystem.self.nixos-rebuild
       perSystem.self.nixos-anywhere
+      perSystem.self.oci-import-image
+      pkgs.oci-cli
       pkgs.actionlint
       pkgs.age
       pkgs.deadnix
