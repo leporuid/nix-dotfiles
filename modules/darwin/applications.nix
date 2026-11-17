@@ -34,6 +34,7 @@ in
       # =========================================================================
       systemPackages = [
         inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re
+        inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.zed-nightly
       ];
       variables = {
         HOMEBREW_NO_AUTO_UPDATE = "1";
@@ -96,6 +97,9 @@ in
                 config.programs.nixcord.discord.finalPackage or config.programs.nixcord.finalPackage.discord
                   or config.programs.nixcord.discord.package
               }/Applications/Discord.app"
+              "${
+                inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.zed-nightly
+              }/Applications/Zed Nightly.app"
             ];
           }}
 
@@ -157,7 +161,6 @@ in
         "suspicious-package"
         "syntax-highlight"
         "tailscale-app"
-        "zed"
         "zen"
       ];
     };
