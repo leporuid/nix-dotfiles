@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  perSystem,
   ...
 }:
 let
@@ -24,6 +25,7 @@ in
       pkgs.delta
       pkgs.gh
       pkgs.git-open
+      perSystem.self.comview
     ];
 
     my.config.source = {
