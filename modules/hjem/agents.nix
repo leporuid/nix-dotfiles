@@ -40,6 +40,7 @@ in
       ".config/opencode/AGENTS.md".source = ../../AGENTS.md;
       ".config/opencode/docs".source = ../../docs/ai;
       ".gemini/docs".source = ../../docs/ai;
+      ".gemini/GEMINI.md".source = ../../AGENTS.md;
     };
   };
 }

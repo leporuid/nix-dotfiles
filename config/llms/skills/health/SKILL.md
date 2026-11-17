@@ -63,24 +63,7 @@ An absent map, a large file, many skills, or a high TODO count is informational 
 
 ## Step 1: Collect data
 
-Set `HEALTH_SCOPE` to `instructions` for the static-only scope above, otherwise `auto`, and retain it when escalating. Run the collection script in summary mode first. Do not interpret yet. On Windows, use the Health-owned launcher so Git for Windows tools are added only to the Bash child process:
-
-```powershell
-$HEALTH_LAUNCHER = @(
-  "<skill-base-dir>/scripts/run-health.ps1",
-  "<skill-base-dir>/skills/health/scripts/run-health.ps1"
-) | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
-if (-not $HEALTH_LAUNCHER) {
-  throw "Health launcher not found under the installed skill base; reinstall Waza."
-}
-$POWERSHELL = Join-Path ([Environment]::SystemDirectory) "WindowsPowerShell\v1.0\powershell.exe"
-& "$POWERSHELL" -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$HEALTH_LAUNCHER" collect "$HEALTH_SCOPE"
-```
-
-`-ExecutionPolicy Bypass` applies only to this PowerShell process; do not change
-the user's machine or account execution policy.
-
-On Linux and macOS, keep the direct Bash flow:
+Set `HEALTH_SCOPE` to `instructions` for the static-only scope above, otherwise `auto`, and retain it when escalating. Run the collection script in summary mode first. Do not interpret yet:
 
 ```bash
 HEALTH_SCRIPT=""
