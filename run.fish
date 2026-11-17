@@ -134,7 +134,6 @@ function install-oci -d "Install NixOS on an OCI instance via nixos-anywhere + n
         --kexec "https://github.com/nix-community/nixos-images/releases/download/nixos-unstable/nixos-kexec-installer-noninteractive-aarch64-linux.tar.gz" \
         --build-on remote \
         --flake .#nixos \
-        --override-input red-tape github:leporuid/red-tape \
         $target $argv[2..]
 end
 
@@ -256,7 +255,6 @@ function nixos -a verb
 
     _run $maybe_sudo nixos-rebuild $target_verb \
         --flake .#nixos \
-        --override-input red-tape github:leporuid/red-tape \
         $rebuild_args $argv[2..]
 end
 
@@ -268,7 +266,6 @@ function MacBook-Pro -a verb
         # Fast pure evaluation check (instantiates derivation without building packages or closures)
         _run nix eval --raw \
             .#darwinConfigurations.MacBook-Pro.config.system.build.toplevel.drvPath \
-            --override-input red-tape github:leporuid/red-tape \
             $argv[2..]
         or return $status
         echo
@@ -284,7 +281,6 @@ function MacBook-Pro -a verb
 
     _run $maybe_sudo darwin-rebuild $verb \
         --flake .#MacBook-Pro \
-        --override-input red-tape github:leporuid/red-tape \
         $argv[2..]
 end
 
@@ -343,8 +339,9 @@ function check-links -d "Verify the standalone Hjem manifest matches a host's ge
     set -l platform_filter cat
     if test $is_nixos -eq 1
         set platform_filter sed -E \
-            -e '/^\.config\/(btt|foot|github-copilot\/[^\t]*|helix|kitty|raycast|zed)\t/d' \
+            -e '/^\.config\/(btt\/[^\t]*|foot|github-copilot\/[^\t]*|helix|kitty|raycast|zed)\t/d' \
             -e '/^Library\/Application Support\/nushell\/(config|env|local)\.nu\t/d' \
+            -e '/^Library\/Application Support\/Syntax Highlight\/Themes\/[^\t]*\t/d' \
             -e 's#^Library/Application Support/jj\t#.config/jj\t#' \
             -e 's#^(\.config/ghostty/os-config\tconfig:/ghostty/)os-config-darwin$#\1os-config-linux#'
     end

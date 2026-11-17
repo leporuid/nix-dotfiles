@@ -1,24 +1,41 @@
--- Claude Violet Theme for Andre Simon Highlight / SourceCodeSyntaxHighlight
--- Matches Ghostty & Helix (Catppuccin Macchiato / Claude Violet)
+Description="Claude Violet"
 
-Description = "Claude Violet"
+Categories = {}
 
-Canvas = { Colour = "#24212a" }
-Default = { Colour = "#d6d0dd" }
-Number = { Colour = "#e5c07b" }
-Operator = { Colour = "#c084fc" }
-String = { Colour = "#a6c8a1" }
-Escape = { Colour = "#cba6f7" }
-StringPreProc = Escape
-Interpolation = { Colour = "#cba6f7" }
-LineComment = { Colour = "#625b6b", Italic = true }
-BlockComment = { Colour = "#625b6b", Italic = true }
-LineNum = { Colour = "#585b70" }
-PreProcessor = { Colour = "#c084fc" }
+Default = { Colour="#d6d0dd" }
+Canvas = { Colour="#24212a" }
+Number = { Colour="#e5c07b" }
+String = { Colour="#a6c8a1" }
+Escape = { Colour="#cba6f7" }
+PreProcessor = { Colour="#c084fc" }
+StringPreProc = { Colour="#cba6f7" }
+BlockComment = { Colour="#625b6b", Italic=true }
+LineComment = { Colour="#625b6b", Italic=true }
+LineNum = { Colour="#585b70" }
+Operator = { Colour="#c084fc" }
+Interpolation = { Colour="#cba6f7" }
+Hover = { Colour="", Custom = { { Format = "html", Style = "cursor:help;", Override = false } } }
+Error = { Colour="#ff0000" }
+ErrorMessage = { Colour="#ff0000", Custom = { { Format = "html", Style = "border:solid 1px red; margin-left: 3em;", Override = false } } }
 
 Keywords = {
-  { Id=1, Colour="#cba6f7", Bold=true },   -- keywords / fn / control flow
-  { Id=2, Colour="#8fb8d8", Bold=false },  -- types / classes
-  { Id=3, Colour="#c084fc", Bold=false },  -- constants / strong accent
-  { Id=4, Colour="#ec6a88", Bold=false },  -- special / warnings
+	{ Colour="#cba6f7", Bold=true }, 
+	{ Colour="#8fb8d8" }, 
+	{ Colour="#c084fc" }, 
+	{ Colour="#ec6a88" }
+}
+
+
+SemanticTokenTypes = {
+	{ Type = 'keyword', Style = { Colour="#cba6f7", Bold=true } },
+	{ Type = 'type', Style = { Colour="#8fb8d8" } },
+	{ Type = 'function', Style = { Colour="#ec6a88" } },
+	{ Type = 'method', Style = { Colour="#ec6a88" } },
+	{ Type = 'class', Style = { Colour="#cba6f7", Bold=true } },
+	{ Type = 'struct', Style = { Colour="#ec6a88" } },
+	{ Type = 'parameter', Style = { Colour="" } },
+	{ Type = 'variable', Style = { Colour="" } },
+	{ Type = 'number', Style = { Colour="#e5c07b" } },
+	{ Type = 'regexp', Style = { Colour="#a6c8a1" } },
+	{ Type = 'operator', Style = { Colour="#c084fc" } },
 }

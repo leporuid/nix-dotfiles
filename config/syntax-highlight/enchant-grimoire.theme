@@ -1,39 +1,41 @@
+Description="Enchanted Grimoire"
 
--- ==========================================
--- Enchanted Grimoire
--- Antique Parchment × Dusty Lavender
--- Andre Simon Highlight / SourceCodeSyntaxHighlight
--- ==========================================
+Categories = {"light"}
 
-Description = "Enchanted Grimoire"
+Default = { Colour="#51404D" }
+Canvas = { Colour="#E1D8D5" }
+Number = { Colour="#B69A78" }
+String = { Colour="#788C68" }
+Escape = { Colour="#A9879C" }
+PreProcessor = { Colour="#927A9B" }
+StringPreProc = { Colour="#A9879C" }
+BlockComment = { Colour="#A99DA1", Italic=true }
+LineComment = { Colour="#A99DA1", Italic=true }
+LineNum = { Colour="#B5A8B0" }
+Operator = { Colour="#80608F" }
+Interpolation = { Colour="#A9879C" }
+Hover = { Colour="", Custom = { { Format = "html", Style = "cursor:help;", Override = false } } }
+Error = { Colour="#ff0000" }
+ErrorMessage = { Colour="#ff0000", Custom = { { Format = "html", Style = "border:solid 1px red; margin-left: 3em;", Override = false } } }
 
--- Background & Foreground
-Canvas = { Colour = "#E1D8D5" }
-Default = { Colour = "#51404D" }
-
--- Syntax Colors
-Number = { Colour = "#B69A78" }
-Operator = { Colour = "#80608F" }
-
-String = { Colour = "#788C68" }
-Escape = { Colour = "#A9879C" }
-StringPreProc = Escape
-Interpolation = { Colour = "#A9879C" }
-
--- Comments
-LineComment = { Colour = "#A99DA1", Italic = true }
-BlockComment = { Colour = "#A99DA1", Italic = true }
-
--- Line Numbers
-LineNum = { Colour = "#B5A8B0" }
-
--- Preprocessor
-PreProcessor = { Colour = "#927A9B" }
-
--- Keywords
 Keywords = {
-  { Id=1, Colour="#795B8B", Bold=true },   -- keywords / fn / control flow
-  { Id=2, Colour="#7189A8", Bold=false },  -- types / classes
-  { Id=3, Colour="#A17F91", Bold=false },  -- constants / strong accent
-  { Id=4, Colour="#B97867", Bold=false },  -- special / warnings
+	{ Colour="#795B8B", Bold=true }, 
+	{ Colour="#7189A8" }, 
+	{ Colour="#A17F91" }, 
+	{ Colour="#B97867" }
+}
+
+
+SemanticTokenTypes = {
+	{ Type = 'keyword', Style = { Colour="#795B8B", Bold=true } },
+	{ Type = 'type', Style = { Colour="#7189A8" } },
+	{ Type = 'function', Style = { Colour="#B97867" } },
+	{ Type = 'method', Style = { Colour="#B97867" } },
+	{ Type = 'class', Style = { Colour="#795B8B", Bold=true } },
+	{ Type = 'struct', Style = { Colour="#B97867" } },
+	{ Type = 'parameter', Style = { Colour="" } },
+	{ Type = 'variable', Style = { Colour="" } },
+	{ Type = 'number', Style = { Colour="#B69A78" } },
+	{ Type = 'regexp', Style = { Colour="#788C68" } },
+	{ Type = 'operator', Style = { Colour="#80608F" } },
 }

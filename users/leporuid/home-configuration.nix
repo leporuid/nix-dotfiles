@@ -42,7 +42,6 @@ in
       source = {
         ".config/mise" = "mise";
         ".config/gallery-dl" = "gallery-dl";
-        ".config/syntax-highlight" = "syntax-highlight";
         ".npmrc" = "npm/npmrc";
       }
       // lib.optionalAttrs isDarwin {
@@ -50,12 +49,21 @@ in
         ".config/foot" = "foot";
         ".config/kitty" = "kitty";
         ".config/zed" = "zed";
-        ".config/btt" = "btt";
         ".config/github-copilot/versions.json" = "github-copilot/versions.json";
         ".config/github-copilot/xcode/mcp.json" = "github-copilot/xcode/mcp.json";
         ".config/raycast" = "raycast";
+        "Library/Application Support/Syntax Highlight/Themes/claude-soft-violet.theme" =
+          "syntax-highlight/claude-soft-violet.theme";
+        "Library/Application Support/Syntax Highlight/Themes/claude-violet.theme" =
+          "syntax-highlight/claude-violet.theme";
+        "Library/Application Support/Syntax Highlight/Themes/enchant-grimoire.theme" =
+          "syntax-highlight/enchant-grimoire.theme";
       };
     };
+  };
+  files = lib.optionalAttrs isDarwin {
+    ".config/btt/Default.bttpreset".source =
+      "${config.directory}/Library/Mobile Documents/com~apple~CloudDocs/Default.bttpreset";
   };
   # 5. Core developer tools & productivity utilities
   packages =
