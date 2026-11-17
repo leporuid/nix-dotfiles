@@ -13,7 +13,7 @@ This repository collects project-specific expectations, tool contracts, and arch
 | `formatter.nix` | Root `treefmt-nix` formatter entrypoint delegating to `treefmt.nix`. |
 | `treefmt.nix` | Unified formatter and linter rules (`deadnix`, `statix`, `nixfmt`, `fish_indent`, `shfmt`, `taplo`, `yamlfmt`). |
 | `pedantix.toml` | Nix code style and argument sorting rules enforced across the repository. |
-| `lib/` | Shared Nix helpers (`caches.nix`, `darwin.nix`, `nix-settings.nix`). |
+| `lib/` | Shared Nix helpers (`caches.nix`, `credential-guard.nix`, `darwin.nix`, `nix-settings.nix`). |
 | `overlays/` | Nixpkgs overlays (`default.nix`) applied to hosts and exposed via `flake.overlays.default`. |
 | `hosts/MacBook-Pro/` | Darwin host configuration (`darwin-configuration.nix`) and user profile bridge. |
 | `hosts/nixos/` | Self-contained native NixOS configuration for Oracle Cloud / server (`configuration.nix`). |
@@ -25,7 +25,7 @@ This repository collects project-specific expectations, tool contracts, and arch
 | `packages/*.nix` | Custom derivations and package wrappers consumed via `inputs.self.packages.<system>.<name>`; prefer `lib.fileset.toSource` for clean local source whitelisting. |
 | `users/leporuid/` | Shared user profile (`home-configuration.nix`) managing packages and files. |
 | `config/` | Raw upstream configurations (`fish/`, `ghostty/`, `nushell/`, `starship.toml`, `git/`, `nvim/`, `agents/`, etc.). |
-| `docs/` | Distilled architectural references (`REFERENCE_PATTERNS.md`, `REFER_DEEP_ANALYSIS.md`). |
+| `docs/` | Distilled architectural references (`REFERENCE_PATTERNS.md`, `REFER_DEEP_ANALYSIS.md`, `ai/` progressive-disclosure guides). |
 
 ---
 

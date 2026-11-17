@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   perSystem,
   ...
 }:
@@ -9,6 +10,7 @@ let
   inherit (lib.options) mkEnableOption;
 
   cfg = config.my.programs.agents;
+  credentialGuard = import ../../lib/credential-guard.nix { inherit pkgs; };
 in
 {
   options.my.programs.agents = {
@@ -17,8 +19,9 @@ in
 
   config = mkIf cfg.enable {
     packages = [
+      credentialGuard.askpass
       perSystem.llm-agents.herdr
-      perSystem.llm-agents.antigravity-cli
+      (credentialGuard.wrapPackage perSystem.llm-agents.antigravity-cli)
     ];
 
     my.config.source = {
@@ -28,11 +31,15 @@ in
       ".gemini/skills" = "agents/skills";
     };
 
-    # Unified agent instructions distribution across harnesses
+    # Unified agent instructions and progressive-disclosure docs across harnesses
     files = {
       ".claude/CLAUDE.md".source = ../../AGENTS.md;
+      ".claude/docs".source = ../../docs/ai;
       ".codex/AGENTS.md".source = ../../AGENTS.md;
+      ".codex/docs".source = ../../docs/ai;
       ".config/opencode/AGENTS.md".source = ../../AGENTS.md;
+      ".config/opencode/docs".source = ../../docs/ai;
+      ".gemini/docs".source = ../../docs/ai;
     };
   };
 }
