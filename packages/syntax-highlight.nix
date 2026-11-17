@@ -13,11 +13,18 @@ pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
     pkgs.unzip
   ];
 
-  sourceRoot = ".";
-
   dontConfigure = true;
   dontBuild = true;
   dontFixup = true;
+
+  unpackPhase = ''
+    runHook preUnpack
+
+    # Exclude macOS AppleDouble (._*) and __MACOSX entries that break sealed codesign resources.
+    unzip -q "$src" -x '__MACOSX/*' '*/._*' '._*'
+
+    runHook postUnpack
+  '';
 
   installPhase = ''
     runHook preInstall
