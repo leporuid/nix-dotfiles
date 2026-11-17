@@ -1,0 +1,3 @@
+config/llms/** linguist-vendored=true
+config/raycast/extensions/** linguist-vendored=true
+packages/vpn-pack/ui-dist/** linguist-generated=true
