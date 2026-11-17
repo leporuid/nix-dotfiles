@@ -5,3 +5,4 @@ _*
 .DS_Store
 .pre-commit-config.yaml
 TODO.md
+config/github-copilot/versions.json
