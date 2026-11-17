@@ -45,7 +45,7 @@ symbol = ' '
 
 [character]
 format = "$symbol "
-success_symbol = "[◎](bold italic peach)"
+success_symbol = "[◎](bold italic #CDA1FA)"
 error_symbol = "[⊘](italic red)"
 vimcmd_symbol = "[■](italic green)"
 vimcmd_replace_one_symbol = "◌"

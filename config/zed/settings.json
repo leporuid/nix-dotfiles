@@ -6,39 +6,32 @@
   "autosave": "on_focus_change",
   "accessible_mode": true,
   "terminal": {
+    "working_directory": "current_file_directory",
     "toolbar": {
       "breadcrumbs": true
     },
-    "shell": {
-      "with_arguments": {
-        "program": "/bin/sh",
-        "args": [
-          "-c",
-          "/bin/wait4path /nix/store && exec -l \"$SHELL\""
-        ]
-      }
-    }
+    "shell": "system"
   },
   "project_panel": {
-    "dock": "left"
+    "dock": "right"
   },
   "outline_panel": {
-    "dock": "left"
+    "dock": "right"
   },
   "collaboration_panel": {
-    "dock": "left"
+    "dock": "right"
   },
   "agent": {
     "tool_permissions": {
       "default": "allow",
       "tools": {}
     },
-    "dock": "right",
+    "dock": "left",
     "favorite_models": [],
     "model_parameters": []
   },
   "git_panel": {
-    "dock": "left"
+    "dock": "right"
   },
   "helix_mode": true,
   "status_bar": {
@@ -55,7 +48,11 @@
   "buffer_font_size": 14.0,
   "buffer_font_weight": 400.0,
   "ui_font_weight": 390.0,
-  "icon_theme": "Catppuccin Mocha",
+  "icon_theme": {
+    "mode": "light",
+    "light": "Catppuccin Mocha Monochrome",
+    "dark": "Catppuccin Mocha"
+  },
   "theme": {
     "mode": "system",
     "light": "Glass-Day",
