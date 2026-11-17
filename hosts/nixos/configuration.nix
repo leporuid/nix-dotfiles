@@ -20,12 +20,9 @@ in
     inputs.determinate.nixosModules.default
     inputs.self.nixosModules.aggregate
     "${inputs.nixpkgs}/nixos/modules/virtualisation/oci-image.nix"
-  ]
-  ++ lib.optional (inputs ? nixos-facter-modules) inputs.nixos-facter-modules.nixosModules.facter;
+  ];
 
-  hardware.facter.reportPath = lib.mkIf (
-    (inputs ? nixos-facter-modules) && builtins.pathExists ./facter.json
-  ) ./facter.json;
+  hardware.facter.reportPath = lib.mkIf (builtins.pathExists ./facter.json) ./facter.json;
 
   oci.efi = true;
 
@@ -95,10 +92,10 @@ in
         wants = [ "network-online.target" ];
         wantedBy = [ "multi-user.target" ];
 
-        path = with pkgs; [
-          iproute2
-          ethtool
-          gawk
+        path = [
+          pkgs.iproute2
+          pkgs.ethtool
+          pkgs.gawk
         ];
 
         serviceConfig = {
@@ -417,9 +414,9 @@ in
       '';
     };
 
-    systemPackages = with pkgs; [
-      age
-      rage
+    systemPackages = [
+      pkgs.age
+      pkgs.rage
 
       (
         (inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
@@ -431,26 +428,26 @@ in
           })
       )
 
-      ethtool
-      lsof
-      inetutils
-      dig
-      traceroute
-      tcpdump
-      bashInteractive
-      fish
-      nushell
-      iroh-ssh
-      nixos-facter
-      git
-      ghostty.terminfo
-      curl
-      wget
-      yq-go
-      htop
-      btop
-      mosh
-      vim
+      pkgs.ethtool
+      pkgs.lsof
+      pkgs.inetutils
+      pkgs.dig
+      pkgs.traceroute
+      pkgs.tcpdump
+      pkgs.bashInteractive
+      pkgs.fish
+      pkgs.nushell
+      pkgs.iroh-ssh
+      pkgs.nixos-facter
+      pkgs.git
+      pkgs.ghostty.terminfo
+      pkgs.curl
+      pkgs.wget
+      pkgs.yq-go
+      pkgs.htop
+      pkgs.btop
+      pkgs.mosh
+      pkgs.vim
     ];
   };
 
@@ -470,13 +467,9 @@ in
   determinate.enable = true;
 
   nix = {
-    settings =
-      inputs.self.lib.nixSettings {
-        inherit (vars) username;
-      }
-      // {
-        auto-optimise-store = true;
-      };
+    settings = inputs.self.lib.nixSettings {
+      inherit (vars) username;
+    };
 
     optimise.automatic = true;
     channel.enable = false;
