@@ -1,10 +1,4 @@
-extensions/node_modules
-extensions/*/node_modules/
-extensions/*/assets/.raycast/
-extensions/*/index.js
-extensions/*/index.js.map
-extensions/*/package.json
-extensions/*/plugin.json
+extensions/
 ai
 config.json
 node-compile-cache
