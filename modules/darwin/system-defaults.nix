@@ -7,6 +7,7 @@
   ...
 }:
 let
+  inherit (lib.lists) optionals;
   inherit (lib.modules) mkForce mkIf;
   inherit (lib.options) mkEnableOption;
 
@@ -54,12 +55,17 @@ in
       enableAllTerminfo = true;
       # Make Nushell (and other XDG-aware tools) read ~/.config instead of ~/Library/Application Support
       variables.XDG_CONFIG_HOME = "/Users/${config.system.primaryUser}/.config";
-      # Exclude ~/.nix-profile from PATH and keep strictly per-user and system profiles
-      profiles = mkForce [
-        "/etc/profiles/per-user/${config.system.primaryUser}"
-        "/run/current-system/sw"
-        "/nix/var/nix/profiles/default"
-      ];
+      # Exclude ~/.nix-profile and /nix/var/nix/profiles/default when Determinate Nix
+      # is declaratively managed in /run/current-system/sw.
+      profiles = mkForce (
+        [
+          "/etc/profiles/per-user/${config.system.primaryUser}"
+          "/run/current-system/sw"
+        ]
+        ++ optionals (!config.determinateNix.enable) [
+          "/nix/var/nix/profiles/default"
+        ]
+      );
       pathsToLink = [
         "/share/fish/vendor_completions.d"
         "/share/fish/vendor_functions.d"
