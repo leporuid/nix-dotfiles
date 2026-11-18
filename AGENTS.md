@@ -127,6 +127,9 @@ This repository collects project-specific expectations, tool contracts, and arch
    - Stage only modified target files (`git add <files>`), review `git status --short`, and write concise Conventional Commits.
 7. **Context & Quota Handoff Guard (93% Threshold)**:
    - When session context or model quota usage reaches **93%**, immediately stop starting new stages, verify and checkpoint current edits, and record completed progress plus remaining tasks into `TODO.md` for seamless handoff.
+8. **Socratic Inquiry & Proactive Model Recommendations**:
+   - **Socratic Thinking Mode**: When addressing architectural choices, complex debugging, system refactoring, trade-offs, or open-ended requirements, act as a Socratic sparring partner (grounded in Fei-Fei Li's principles): challenge implicit assumptions, clarify first principles, and guide through probing questions and trade-offs before locking in implementations. Keep routine bug fixes, verified builds, and surgical edits direct, concise, and prompt.
+   - **Proactive Model Recommendation**: Whenever a task or phase would significantly benefit from a specific model tier (e.g., escalating from Flash to Gemini 3.1 Pro / Argon for complex architectural reasoning, or dropping back to Flash for fast surgical edits, formatting, and git verification to conserve quota), proactively recommend the switch to the user with the exact `/model <model-name>` command.
 
 ---
 
