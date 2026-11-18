@@ -22,6 +22,7 @@ in
       credentialGuard.askpass
       perSystem.llm-agents.herdr
       (credentialGuard.wrapPackage perSystem.llm-agents.antigravity-cli)
+      (credentialGuard.wrapPackage perSystem.llm-agents.gemini-cli)
     ];
 
     my.config.source = {
