@@ -1,3 +1,5 @@
-config/llms/** linguist-vendored=true
-config/raycast/extensions/** linguist-vendored=true
-packages/vpn-pack/ui-dist/** linguist-generated=true
+config/llms/** linguist-vendored
+config/llms/** -linguist-detectable
+config/raycast/extensions/** linguist-vendored
+config/raycast/extensions/** -linguist-detectable
+packages/vpn-pack/ui-dist/** linguist-generated
