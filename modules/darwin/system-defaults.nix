@@ -97,7 +97,6 @@ in
         # Disable the Native Linux Builder; this also drops `external-builders` from nix.conf.
         builder.state = "disabled";
         garbageCollector.strategy = "automatic";
-        telemetry.sentry.endpoint = null;
       };
 
       customSettings = inputs.self.lib.nixSettings { inherit (vars) username; };
