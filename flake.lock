@@ -856,11 +856,11 @@
         "nixpkgs": "nixpkgs_5"
       },
       "locked": {
-        "lastModified": 1794934939,
-        "narHash": "sha256-GyLwlL+LX/OenWoFZMtqnxpQ50uf1fLmelblisv5ObE=",
+        "lastModified": 1795079304,
+        "narHash": "sha256-JNF3NixfftSQgCZzp0MUR3zpHmPk2DaBJWS0tsoa4Ws=",
         "owner": "leporuid",
         "repo": "red-tape",
-        "rev": "816ec630b85f97ff16d5295253673be7ee6dad04",
+        "rev": "e182ee142fb26195ea42a5d8075d5a01f9adbd1a",
         "type": "github"
       },
       "original": {

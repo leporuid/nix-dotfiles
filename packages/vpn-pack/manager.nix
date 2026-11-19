@@ -7,9 +7,9 @@
       go = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.go_1_27;
     }
   ),
-  gitCommit ? "4549ba8",
-  tailscaleVersion ? "1.104.5",
-  version ? "1.6.4",
+  gitCommit,
+  tailscaleVersion,
+  version,
   ...
 }:
 

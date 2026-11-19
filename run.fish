@@ -147,14 +147,23 @@ function deploy-vpnpack -d "Build and deploy vpn-pack to UniFi Cloud Gateway via
         set target "root@$target"
     end
 
+    set -l allow_tailscale false
     set -l reauth false
     set -l nix_build_args
     for arg in $argv[2..]
         if test $arg = --reauth
             set reauth true
+        else if test $arg = --via-tailscale
+            set allow_tailscale true
         else
             set --append nix_build_args $arg
         end
+    end
+
+    if string match -qr '(@100\.|@.*\.ts\.net)' $target; and test $allow_tailscale = false
+        echo (set_color yellow)"[!] Warning: Deploying vpn-pack over a Tailscale connection ($target) may cause transient disconnects during tailscaled restart."(set_color normal)
+        echo "    Pass --via-tailscale to proceed anyway, or deploy over local LAN IP."
+        return 1
     end
 
     _run nix build .#vpn-pack $nix_build_args
@@ -170,7 +179,7 @@ function deploy-vpnpack -d "Build and deploy vpn-pack to UniFi Cloud Gateway via
     _run scp $tarball "$target:/root/"
     or return 1
 
-    _run ssh $target "cd /root && rm -rf vpn-pack && tar xzf $tarball_name && cd vpn-pack && bash install.sh"
+    _run ssh $target "cd /root && rm -rf vpn-pack && tar xzf $tarball_name && cd vpn-pack && systemd-run --unit=vpnpack-install --wait --collect bash install.sh"
     or return 1
 
     # Check for tailscale-unifi.age secret to auto-authenticate
@@ -210,7 +219,7 @@ function deploy-vpnpack -d "Build and deploy vpn-pack to UniFi Cloud Gateway via
 
             if test $needs_auth = true
                 echo (set_color green --bold)"==> Authenticating Tailscale on $target with tag:unifi..."(set_color normal)
-                echo $authkey | ssh $target 'read -r k; /persistent/vpn-pack/bin/tailscale up --authkey="$k" --advertise-tags=tag:unifi --ssh --hostname=dream-router --reset'
+                echo $authkey | ssh $target 'read -r k; /persistent/vpn-pack/bin/tailscale up --authkey="$k" --advertise-tags=tag:unifi --ssh --hostname=dream-router'
             else
                 echo (set_color cyan)"==> Tailscale is already authenticated on $target. Ensuring tag:unifi is set..."(set_color normal)
                 ssh $target '/persistent/vpn-pack/bin/tailscale set --advertise-tags=tag:unifi --ssh' 2>/dev/null; or true
@@ -270,9 +279,8 @@ function MacBook-Pro -a verb
         or return $status
         echo
 
-        # The standalone Hjem manifest and the host generation must describe the
-        # same file set, otherwise they drift apart without anyone noticing.
-        _run check-links --host MacBook-Pro
+        # Verify Hjem standalone manifest parity and vpn-pack patch freshness via pure Nix checks
+        _run nix build .#checks.aarch64-darwin.hjem-parity .#checks.aarch64-darwin.vpn-pack-patches --no-link
         or return $status
 
         echo
@@ -302,85 +310,8 @@ for host in $hosts
     end
 end
 
-function check-links -d "Verify the standalone Hjem manifest matches a host's generation (--user, --host, --target-root)"
-    set -l user leporuid
-    set -l host $this_host
-    set -l target_root /Users/leporuid
-    argparse 'user=' 'host=' 'target-root=' -- $argv
-    or return 1
-    set -q _flag_user; and set user $_flag_user
-    set -q _flag_host; and set host $_flag_host
-    set -q _flag_target_root; and set target_root $_flag_target_root
-
-    set -l config_attr
-    set -l is_nixos 0
-    if test -f "hosts/$host/darwin-configuration.nix"
-        set config_attr darwinConfigurations
-    else if test -f "hosts/$host/configuration.nix"
-        set config_attr nixosConfigurations
-        set is_nixos 1
-    else
-        echo "$(set_color brred)Unknown host '$host': expected hosts/$host/{darwin-configuration,configuration}.nix.$(set_color normal)" >&2
-        return 1
-    end
-
-    _require jq
-    set -l tmp (mktemp -d)
-    # Both sides are compared home-relative, so the result does not depend on
-    # where the check runs: the generation keys already are, and the manifest's
-    # absolute targets simply get target_root stripped. Flake source copies,
-    # config store copies, out-of-store symlinks, and cross-platform store
-    # derivations also land under different paths/hashes, hence normalization.
-    set -l normalize 's#/nix/store/[a-z0-9]+-source/#repo:/#g; s#/nix/store/[a-z0-9]+-config/#config:/#g; s#/Users/[^/]+/Developer/nix-dotfiles/config/#config:/#g; s#/nix/store/[a-z0-9]+-([^/]+)#store:\1#g'
-
-    # The standalone hjemConfigurations.<user>.manifest evaluates on defaultSystem
-    # (aarch64-darwin). When checking a NixOS host, filter Darwin-only targets
-    # and map known Darwin/Linux target or file differences.
-    set -l platform_filter cat
-    if test $is_nixos -eq 1
-        set platform_filter sed -E \
-            -e '/^\.config\/(btt\/[^\t]*|foot|github-copilot\/[^\t]*|helix|kitty|raycast|zed)\t/d' \
-            -e '/^Library\/Application Support\/nushell\/(config|env|local)\.nu\t/d' \
-            -e 's#^Library/Application Support/jj\t#.config/jj\t#' \
-            -e 's#^(\.config/ghostty/os-config\tconfig:/ghostty/)os-config-darwin$#\1os-config-linux#'
-    end
-
-    nix eval --json .#hjemConfigurations.$user.manifest \
-        | jq -r --arg root "$target_root/" \
-        '.files[] | [(.target | ltrimstr($root)), (.source // ("text:" + (.text | tostring)))] | @tsv' \
-        | sed -E $normalize | $platform_filter | sort >$tmp/standalone
-    or begin
-        echo "$(set_color brred)Failed to evaluate hjemConfigurations.$user.manifest.$(set_color normal)" >&2
-        rm -rf $tmp
-        return 1
-    end
-
-    begin
-        nix eval --json .#$config_attr.$host.config.hjem.users.$user.files \
-            | jq -r 'to_entries[] | [.key, (.value.source // ("text:" + (.value.text | tostring)))] | @tsv'
-        nix eval --json .#$config_attr.$host.config.hjem.users.$user.xdg.config.files \
-            | jq -r 'to_entries[] | [".config/" + .key, (.value.source // ("text:" + (.value.text | tostring)))] | @tsv'
-    end | sed -E $normalize | sort >$tmp/generation
-    or begin
-        echo "$(set_color brred)Failed to evaluate $config_attr.$host (is --host correct?).$(set_color normal)" >&2
-        rm -rf $tmp
-        return 1
-    end
-
-    if string match -qr '^/' <$tmp/standalone
-        echo "$(set_color yellow)warning:$(set_color normal) some manifest targets are outside $target_root; pass --target-root." >&2
-    end
-
-    if diff -u $tmp/standalone $tmp/generation >$tmp/diff
-        echo "$(set_color green)Standalone manifest matches $host's generation ($(wc -l <$tmp/standalone | string trim) files).$(set_color normal)"
-        rm -rf $tmp
-        return 0
-    end
-
-    echo "$(set_color brred)Standalone manifest and $host's generation disagree:$(set_color normal)"
-    cat $tmp/diff
-    rm -rf $tmp
-    return 1
+function check-links -d "Verify Hjem standalone manifest parity against Darwin host generation via pure Nix"
+    _run nix build .#checks.aarch64-darwin.hjem-parity --no-link
 end
 
 function update-m3u8dl -d "Query latest GitHub Actions artifact ID and update pin.json"

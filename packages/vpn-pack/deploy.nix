@@ -4,9 +4,9 @@
   managerBin,
   tailscaleBin,
   vpnPackSrc,
-  gitCommit ? "4549ba8",
-  tailscaleVersion ? "1.104.5",
-  version ? "1.6.4",
+  gitCommit,
+  tailscaleVersion,
+  version,
   ...
 }:
 
@@ -71,7 +71,7 @@ let
     AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW
     NoNewPrivileges=yes
     ProtectSystem=strict
-    ReadWritePaths=/persistent/vpn-pack /run/vpn-pack /proc/nf_dpi /data/unifi-core/config/http
+    ReadWritePaths=/persistent/vpn-pack /run/vpn-pack -/proc/nf_dpi -/data/unifi-core/config/http
     ProtectHome=yes
     PrivateTmp=yes
     PrivateDevices=no
@@ -157,11 +157,12 @@ pkgs.stdenv.mkDerivation {
     cp ${tailscaleBin}/bin/tailscaled $distDir/bin/
     cp ${managerBin}/bin/vpn-pack-manager $distDir/bin/
 
-    # Rewrite interpreter to standard Debian / UniFi OS loader path
+    # Verify all binaries are pure static CGO_ENABLED=0 without dynamic ELF interpreter
     chmod -R u+w $distDir/bin
     for b in $distDir/bin/*; do
       if patchelf --print-interpreter "$b" >/dev/null 2>&1; then
-        patchelf --set-interpreter /lib/ld-linux-aarch64.so.1 "$b"
+        echo "ERROR: binary $b has dynamic ELF interpreter, expected static CGO_ENABLED=0 binary" >&2
+        exit 1
       fi
     done
 

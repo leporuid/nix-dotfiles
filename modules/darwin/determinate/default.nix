@@ -50,9 +50,6 @@ let
     authentication = fields {
       additionalNetrcSources = value: builtins.isList value && lib.all runtimePath value;
     };
-    telemetry = fields {
-      sentry = fields { endpoint = value: value == null || builtins.isString value; };
-    };
     edgeCacheSubstituters = strings;
   });
 
@@ -453,6 +450,20 @@ let
 
       touch ${command [ managedMarker ]}
       ${lib.getExe checkEnabledDaemon}
+
+      # Prune older bootstrap directories, keeping the active copy and at most one previous backup
+      current_dir=${command [ (dirOf bootstrapPath) ]}
+      stale_dirs=()
+      while IFS= read -r d; do
+        if [ -n "$d" ] && [ -d "$d" ] && [ "$d" != "$current_dir" ]; then
+          stale_dirs+=("$d")
+        fi
+      done < <(ls -dt /usr/local/libexec/darwin/*-determinate-nixd-* 2>/dev/null || true)
+      if [ "''${#stale_dirs[@]}" -gt 1 ]; then
+        for (( i=1; i<''${#stale_dirs[@]}; i++ )); do
+          rm -rf -- "''${stale_dirs[$i]}"
+        done
+      fi
     '';
   };
 
@@ -569,6 +580,10 @@ in
             && builtins.match "[^\r\n#]*" (valueString settings.${name}) != null
           ) (builtins.attrNames settings);
           message = "determinateNix.customSettings requires single-line setting names and values and must not override Nixd-managed settings";
+        }
+        {
+          assertion = !(cfg.determinateNixd ? telemetry && cfg.determinateNixd.telemetry ? sentry);
+          message = "determinateNix: telemetry.sentry was removed upstream in Determinate 3.24.3; omit it";
         }
       ];
 

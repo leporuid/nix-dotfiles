@@ -1,8 +1,10 @@
 {
   inputs,
   pkgs,
-  gitCommit ? "4549ba8",
-  version ? "1.6.4",
+  gitCommit ? (
+    inputs.vpn-pack-src.shortRev or (builtins.substring 0 7 (inputs.vpn-pack-src.rev or "4549ba8"))
+  ),
+  version ? (pkgs.lib.strings.trim (builtins.readFile "${inputs.vpn-pack-src}/VERSION")),
   ...
 }:
 
