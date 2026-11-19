@@ -402,7 +402,6 @@ in
 
       "determinate/config.json".text = builtins.toJSON {
         garbageCollector.strategy = "automatic";
-        telemetry.sentry.endpoint = null;
       };
 
       shells.text = lib.mkForce ''

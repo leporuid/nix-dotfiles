@@ -43,7 +43,7 @@ Before running `nixos-rebuild switch` or `nixos-anywhere` on `hosts/nixos`:
 
 - **Dual Remote Access**: Confirm `services.openssh.enable = true` (with `vars.sshKeyFiles` from `nix-secrets`), `services.tailscale.enable = true` (`trustedInterfaces = [ "tailscale0" ]`, Fail2ban `ignoreIP = [ "100.0.0.0/8" ]`), and `iroh-ssh` are active.
 - **Determinate Nix Best Practices**:
-  - Let `determinate-nixd` handle GC (`garbageCollector.strategy = "automatic"`, telemetry `sentry.endpoint = null` in `/etc/determinate/config.json`) — never add a duplicate `nix.gc` timer.
+  - Let `determinate-nixd` handle GC (`garbageCollector.strategy = "automatic"` in `/etc/determinate/config.json`) — never add a duplicate `nix.gc` timer.
   - Keep `nodiscard` + `noatime` on ext4 `/` in `disk-config.nix` paired with weekly `services.fstrim` (prefer `--minimum 1M` to reduce block-device discard overhead).
 - **Hjem Pure Store Fallback**: Ensure `my.config.useOutOfStoreSymlinks = isDarwin;` is active so Linux hosts resolve pure `/nix/store` paths without needing `~/Developer/nix-dotfiles` cloned locally.
 - **Diagnostics**: To profile slow builds or remote builder spans without editing config, set `NIX_DEBUG_OTEL=1` with `OTEL_EXPORTER_OTLP_ENDPOINT`.

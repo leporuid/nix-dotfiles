@@ -18,7 +18,7 @@ Maintains macOS system configuration (`hosts/MacBook-Pro`, `modules/darwin/`, `l
 
 1. **Declarative Determinate Nix (`modules/darwin/determinate/`)**:
    - Keep `nix.enable = false;` and `determinateNix.enable = true;`.
-   - `determinate-nixd` is managed declaratively via `inputs.determinate` (copied to `/usr/local/libexec/darwin/` for boot-safe APFS `/nix` mounting) with `builder.state = "disabled"`, `garbageCollector.strategy = "automatic"`, and `telemetry.sentry.endpoint = null`.
+   - `determinate-nixd` is managed declaratively via `inputs.determinate` (copied to `/usr/local/libexec/darwin/` for boot-safe APFS `/nix` mounting) with `builder.state = "disabled"` and `garbageCollector.strategy = "automatic"` (sentry telemetry omitted in Determinate >= 3.24.3).
    - Upgrade via `nix flake update determinate` + host rebuild, never `sudo determinate-nixd upgrade`.
    - Shared Nix daemon settings come from `lib/nix-settings.nix` (`determinateNix.customSettings`), and `hosts/MacBook-Pro` builds `aarch64-linux` via the `nixos` remote builder (`ssh-ng://leporuid@nixos aarch64-linux /etc/ssh/ssh_host_ed25519_key 4 1 big-parallel,benchmark -`).
 
