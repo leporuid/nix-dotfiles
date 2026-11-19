@@ -94,6 +94,9 @@ in
       perSystem.self.has-ancestor
       perSystem.self.ccase
       perSystem.self.ktoolbox
+
+      # Media & network tools
+      tdl
     ])
     ++ lib.optionals isDarwin [
       pkgs.ffmpeg
