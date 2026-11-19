@@ -6,7 +6,6 @@
   ...
 }:
 let
-  inherit (lib.fileset) fileFilter toSource;
   inherit (lib.lists) unique;
   inherit (lib.modules) mkBefore mkForce mkIf;
   inherit (lib.options) mkEnableOption;
@@ -15,10 +14,6 @@ let
   extraTaps = [
     "aninsomniacy/homebrew-rayburst"
   ];
-  syntaxHighlightThemes = toSource {
-    root = ../../config/syntax-highlight;
-    fileset = fileFilter (file: file.hasExt "theme") ../../config/syntax-highlight;
-  };
 in
 {
   imports = [
@@ -39,7 +34,6 @@ in
       # =========================================================================
       systemPackages = [
         inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re
-        inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.syntax-highlight
         inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.zed-nightly
       ];
       variables = {
@@ -100,9 +94,6 @@ in
                 inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.n-m3u8dl-re
               }/Applications/M3U8DLProtocol.app"
               "${
-                inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.syntax-highlight
-              }/Applications/Syntax Highlight.app"
-              "${
                 config.programs.nixcord.discord.finalPackage or config.programs.nixcord.finalPackage.discord
                   or config.programs.nixcord.discord.package
               }/Applications/Discord.app"
@@ -118,16 +109,6 @@ in
             ln -sfn "$userHome/.config/Vencord" "$userHome/Library/Application Support/Vencord"
             chown -h "${config.system.primaryUser}" "$userHome/Library/Application Support/Vencord" 2>/dev/null || true
           fi
-
-          # Copy real .theme files because sandboxed Syntax Highlight cannot follow symlinks outside Themes/.
-          syntaxThemesDir="$userHome/Library/Application Support/Syntax Highlight/Themes"
-          mkdir -p "$syntaxThemesDir"
-          chown "${config.system.primaryUser}" "$userHome/Library/Application Support/Syntax Highlight" "$syntaxThemesDir" 2>/dev/null || true
-          for theme in "${syntaxHighlightThemes}"/*.theme; do
-            targetTheme="$syntaxThemesDir/$(basename "$theme")"
-            rm -f "$targetTheme"
-            install -m 0644 -o "${config.system.primaryUser}" "$theme" "$targetTheme"
-          done
         '';
       };
       # =========================================================================
