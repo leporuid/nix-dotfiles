@@ -163,5 +163,6 @@ Automated agents operating on this repository have access to modular skills loca
 | `@learn` | `.agents/skills/learn/SKILL.md` | Six-phase deep research workflow from primary sources to structured output. |
 | `@read` | `.agents/skills/read/SKILL.md` | General URL/PDF fetching, summarization, and DeepSeek web search fallback (use `@fast-repo-reader` for external GitHub Nix repos). |
 | `@health` | `.agents/skills/health/SKILL.md` | Agent config, instruction surface, and AI maintainability audit (`nix-dotfiles` guardrails take precedence; `@mole` handles disk cleanup). |
+| `@herdr` | `.agents/skills/herdr/SKILL.md` | Terminal multiplexer and multi-agent orchestrator controller via `herdr` CLI (inspect panes, workspaces, agents, tabs; requires `HERDR_ENV=1`). |
 
 Agents must consult the relevant `SKILL.md` (and `config/llms/skills/RESOLVER.md` for Waza workflow routing) before executing multi-repo analyses or structural modifications.
