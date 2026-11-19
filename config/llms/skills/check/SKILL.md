@@ -1,15 +1,13 @@
 ---
 name: check
-description: "Reviews diffs, PRs, release readiness, and publishing follow-through. Use when asked to review, triage issues or PRs, or ship. Not for debugging root causes or prose."
-when_to_use: "review, 看看代码, 检查一下, 合并前, 看看issue, 看看PR, release, publish, push, 发布, 提交, close issue, 关闭issue, release reaction, 发布表情, before merge, 值得发布, code review, code-review, audit, 项目体检, 项目评分, scorecard"
-dispatch_intent: "Code review, before merge, release gates, generated artifacts, safety sinks, publish/push/reaction follow-through, triage issues/PRs, project-wide code-quality audit scorecard"
+description: Reviews diffs, PRs, release readiness, and publishing follow-through. Use when asked to review, triage issues or PRs, or ship. Not for debugging root causes or prose.
+when_to_use: "review, check diff, before merge, triage issues, triage PRs, release, publish, push, close issue, release gate, code review, audit, scorecard"
+dispatch_intent: "Code review, before merge, release gates, generated artifacts, safety sinks, publish/push follow-through, triage issues/PRs, project-wide code-quality audit"
 ---
 
 # Check: Review Before You Ship
 
-Prefix your first line with 🐰 inline, not as its own paragraph.
-
-> **Boundary with `developer-workflow` / `nix-dotfiles-workflow`:** In `nix-dotfiles` and related repositories, `@developer-workflow` and `@nix-dotfiles-workflow` (including `AGENTS.md`, `nix fmt`, `pedantix --check`, `check-links`, the `flake.lock` read ban, Hjem invariants, and English code comment rules) take strict precedence over generic review/ship steps.
+> **Boundary with `@socratic` & `@nix-dotfiles-workflow`:** In `nix-dotfiles` and related repositories, `@socratic` and `@nix-dotfiles-workflow` (including `AGENTS.md`, `nix fmt`, `pedantix --check`, `check-links`, the `flake.lock` read ban, Hjem invariants, and English code comment rules) take strict precedence over generic review/ship steps.
 
 > Note: on Claude Code `/review` and `/code-review` are the built-in reviewer. Do not call them from inside this skill.
 

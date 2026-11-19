@@ -1,15 +1,13 @@
 ---
 name: health
 description: "Audits or prunes agent config, instruction drift, hooks or MCP, and AI maintainability. Use when Claude, Codex, or Pi setup looks wrong or guidance needs slimming. Not for application bugs or PR review."
-when_to_use: "检查claude, 检查codex, 检查pi, Codex 配置, Pi 配置, agent instructions, 健康度, 配置检查, 配置对不对, AI coding 腐化, 精简规则, 精简 skills, 规则瘦身, Claude ignoring instructions, Pi coding agent, check config, settings not working, audit config, prune guidance, slim AGENTS.md"
+when_to_use: "Claude ignoring instructions, check config, settings not working, audit config, prune guidance, slim AGENTS.md, agent config health"
 dispatch_intent: "Codex/Claude/Pi ignoring instructions, agent config audit, prune or slim agent guidance and skills, hooks/MCP broken, health token usage, AI coding code rot, risk-backed hotspot ownership, unreachable project constraints, unclear context, missing verification, stale verifier output"
 ---
 
 # Health: Agent-Assisted Engineering Health
 
-Prefix your first line with 🐰 inline, not as its own paragraph.
-
-> **Boundary with `developer-workflow` / `nix-dotfiles-workflow` / `mole`:** In `nix-dotfiles` and related repositories, `@developer-workflow` and `@nix-dotfiles-workflow` (`AGENTS.md`, `nix fmt`, `pedantix --check`, `check-links`, `flake.lock` read ban, Hjem invariants) take precedence. For macOS disk usage and cleanup (`mo`), use `@mole` independently.
+> **Boundary with `@socratic` & `@nix-dotfiles-workflow`:** In `nix-dotfiles` and related repositories, `@socratic` and `@nix-dotfiles-workflow` (`AGENTS.md`, `nix fmt`, `pedantix --check`, `check-links`, `flake.lock` read ban, Hjem invariants) take precedence. For macOS disk usage and cleanup (`mo`), use `@mole` independently.
 
 Audit the current project's agent setup and AI coding maintainability against this framework:
 `agent config → instruction surfaces → tools/runtime → verifiers → maintainability`

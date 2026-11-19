@@ -108,7 +108,7 @@ This repository collects project-specific expectations, tool contracts, and arch
 
 1. **Mandatory Skills Loading (`agy` & Automated Agents)**:
    - Automated agents (`agy`, Claude, Gemini, Copilot, Cursor) operating in this repository **must** proactively load and strictly adhere to all skills located in `.agents/skills/` (and `config/llms/skills/`).
-   - **Before reading, editing, or evaluating any `*.nix`, `flake.lock`, `hosts/`, `modules/`, `packages/`, `users/`, or `config/` path, load `@nix-dotfiles-workflow` first.** Load `@developer-workflow` at the start of every task, and `@tiered-agent-workflow` / `@get-more-perspectives` as the task requires.
+   - **Before reading, editing, or evaluating any `*.nix`, `flake.lock`, `hosts/`, `modules/`, `packages/`, `users/`, or `config/` path, load `@nix-dotfiles-workflow` first.** Load `@socratic` at the start of every task, and `@get-more-perspectives` as architectural or viability review requires.
    - When a skill and this file disagree, this file wins; update the skill afterwards.
 2. **Token Efficiency & Search-First**:
    - Locate targets using `grep_search` or `find_by_name` first.
@@ -139,7 +139,8 @@ Automated agents operating on this repository have access to modular skills loca
 
 | Skill | Path | Description & When to Load |
 | :--- | :--- | :--- |
-| `@developer-workflow` | `.agents/skills/developer-workflow/SKILL.md` | Master orchestrator enforcing source-grounding, active context inspection, and multi-skill execution. |
+| `@socratic` | `.agents/skills/socratic/SKILL.md` | Master engineering orchestrator enforcing source-grounding, zero-placeholder pre-build plans, Simplicity Gate, and 3-phase model routing. |
+| `@get-more-perspectives` | `.agents/skills/get-more-perspectives/SKILL.md` | Simulated 5+2 advisory panel for decision trade-offs, single-target viability verdicts, and batch triage. |
 | `@nix-dotfiles-workflow` | `.agents/skills/nix-dotfiles-workflow/SKILL.md` | Core Nix architecture guardrails (no `flake.lock` reading, `pedantix.toml` module headers, hjem/hjem-rum, `nix-secrets` keys, out-of-store symlinks, verification matrix). |
 | `@nix-packaging-and-overlays` | `.agents/skills/nix-packaging-and-overlays/SKILL.md` | Custom derivations (`packages/`, `fileset.toSource`, `pin.json`, `uv2nix`), `overlays/default.nix`, `checks/schemas.nix`, and CI lint compliance. |
 | `@darwin-host-and-unifi-dev` | `.agents/skills/darwin-host-and-unifi-dev/SKILL.md` | `hosts/MacBook-Pro`, `modules/darwin/` (`determinateNix`, `mkAppSyncScript`, `nix-homebrew`, `launchd`), and `packages/vpn-pack` UniFi ARM64 cross-builds. |
@@ -147,22 +148,18 @@ Automated agents operating on this repository have access to modular skills loca
 | `@dotfiles-and-hjem-config` | `.agents/skills/dotfiles-and-hjem-config/SKILL.md` | `my.config` synthesis, `config/` tool setups (`zsh`/`fish`/`nushell`/`nvim`/`helix`/`ghostty`/`jj`), and `check-links` Manifest v3 parity. |
 | `@nixos-cloud-deploy` | `.agents/skills/nixos-cloud-deploy/SKILL.md` | Pre-flight evaluation, zero-lockout SSH/Tailscale audit, remote builder, and `nixos-anywhere` / `nixos-rebuild` deployment workflow. |
 | `@red-tape-framework-dev` | `.agents/skills/red-tape-framework-dev/SKILL.md` | `~/Developer/red-tape` `adios-flake` DAG, `lib/internal.nix` discovery, `contrib/hjem.nix` Manifest v3, `hjemSchemas`, and offline `nix-unit` tests. |
-| `@ktoolbox-fullstack-dev` | `.agents/skills/ktoolbox-fullstack-dev/SKILL.md` | `~/Developer/ktoolbox` (`uv2nix`, FastAPI, `FastMCP`, OpenAPI codegen, React 19/Vite WebUI, `ruff`/`mypy`/`pytest`/`vitest`/`playwright`, `uv-pawchive` rebase). |
+| `@ktoolbox-fullstack-dev` | `.agents/skills/ktoolbox-fullstack-dev/SKILL.md` | `~/Developer/ktoolbox` (`uv2nix`, FastAPI, `FastMCP`, OpenAPI codegen, React 19/Vite WebUI craft, `ruff`/`mypy`/`pytest`/`vitest`/`playwright`, `uv-pawchive` rebase). |
 | `@nix-secrets-and-enclave` | `.agents/skills/nix-secrets-and-enclave/SKILL.md` | `~/Developer/nix-secrets`, `agenix-rules.nix`, Apple Secure Enclave `age-plugin-se` (`age` vs `rage`), and cross-repo secret hygiene. |
 | `@apple-swift-cocoa-dev` | `.agents/skills/apple-swift-cocoa-dev/SKILL.md` | Swift 6.2 SwiftPM (`~/Developer/MyLibrary`, `swiftly`), Xcode MCP, `__noChroot` SDK builds (`age-plugin-se`), and Objective-C Cocoa bundles (`m3u8dl-protocol`). |
 | `@gemini-api-dev-bridge` | `.agents/skills/gemini-api-dev-bridge/SKILL.md` | Cross-harness Gemini API dev bridge (`google-genai`/`@google/genai` >= 3.2.0, `gemini-api` CLI dev/CI workflows, `gemini-api-docs` MCP). |
-| `@fast-repo-reader` | `.agents/skills/fast-repo-reader/SKILL.md` | Non-intrusive remote inspection of external Git/GitHub Nix/repo architectures without shell network prompts (use `@read` for general URLs/PDFs). |
-| `@tiered-agent-workflow` | `.agents/skills/tiered-agent-workflow/SKILL.md` | Quota-aware three-phase strategy: Phase 0 Scout (Flash/CLI) $\rightarrow$ Phase 1 Date-Routed Reasoning $\rightarrow$ Phase 2 Builder (Flash) (use `@think` for general requirement breakdown). |
-| `@get-more-perspectives` | `.agents/skills/get-more-perspectives/SKILL.md` | Simulated 5-role advisory panel for evaluating trade-offs and architecture decisions. |
-| `@mole` | `.agents/skills/mole/SKILL.md` | Independent macOS disk analysis and read-only-first cleanup via `mo` CLI. |
-| `@think` | `.agents/skills/think/SKILL.md` | Pre-build requirement breakdown, value/viability evaluation, and decision validation (Nix/multi-repo architecture & quota routing stay in `@tiered-agent-workflow`). |
-| `@ui` | `.agents/skills/ui/SKILL.md` | Production UI craft, visual direction lock, and screenshot-grounded visual polish. |
+| `@fast-repo-reader` | `.agents/skills/fast-repo-reader/SKILL.md` | Rapidly inspect and synthesize external Git/GitHub Nix/repo architectures, URLs, and PDFs without terminal permission prompts. |
 | `@check` | `.agents/skills/check/SKILL.md` | Diff/PR code review, triage, and release gate (`nix-dotfiles` verification matrix & guardrails in `@nix-dotfiles-workflow` take precedence). |
-| `@hunt` | `.agents/skills/hunt/SKILL.md` | Root-cause diagnosis before any fix, bisect, and regression guardrails. |
-| `@write` | `.agents/skills/write/SKILL.md` | Chinese/English prose polishing, AI-tone removal, and technical copy (respects `zh-Hant-TW` for user-facing Chinese; code comments stay English). |
-| `@learn` | `.agents/skills/learn/SKILL.md` | Six-phase deep research workflow from primary sources to structured output. |
-| `@read` | `.agents/skills/read/SKILL.md` | General URL/PDF fetching, summarization, and DeepSeek web search fallback (use `@fast-repo-reader` for external GitHub Nix repos). |
+| `@hunt` | `.agents/skills/hunt/SKILL.md` | Root-cause diagnosis before any fix, 5-step evidence ladder, bisect, and regression guardrails. |
+| `@write` | `.agents/skills/write/SKILL.md` | Precision prose editor and anti-AI-slop polisher (respects `zh-Hant-TW` for Chinese; code comments and technical copy stay English). |
 | `@health` | `.agents/skills/health/SKILL.md` | Agent config, instruction surface, and AI maintainability audit (`nix-dotfiles` guardrails take precedence; `@mole` handles disk cleanup). |
+| `@mole` | `.agents/skills/mole/SKILL.md` | Independent macOS disk analysis and read-only-first cleanup via `mo` CLI. |
 | `@herdr` | `.agents/skills/herdr/SKILL.md` | Terminal multiplexer and multi-agent orchestrator controller via `herdr` CLI (inspect panes, workspaces, agents, tabs; requires `HERDR_ENV=1`). |
+| `@plato` | `.agents/skills/plato/SKILL.md` | Teaching strategist, target cohort guard, and Miller Mutually Exclusive exam crafting engine for junior/senior high English. |
+| `@ludus` | `.agents/skills/ludus/SKILL.md` | Linguistic, speech-language clinical, and Hermit diagnostic trinity for student error analysis and portfolio authenticity. |
 
-Agents must consult the relevant `SKILL.md` (and `config/llms/skills/RESOLVER.md` for Waza workflow routing) before executing multi-repo analyses or structural modifications.
+Agents must consult the relevant `SKILL.md` (and `config/llms/skills/RESOLVER.md` for workflow routing) before executing multi-repo analyses or structural modifications.

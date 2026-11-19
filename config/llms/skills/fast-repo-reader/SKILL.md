@@ -1,18 +1,17 @@
 ---
 name: fast-repo-reader
-description: Rapidly analyze and extract architecture, module patterns, and configurations from external GitHub repositories without interactive terminal permission prompts. Use when the user shares a GitHub repository, asks to audit, inspect, or compare an external repo, or wants to extract Nix, Hjem, adios-flake, or red-tape patterns.
+description: Rapidly analyze and extract architecture, module patterns, and configurations from external GitHub repositories, general URLs, and PDFs without interactive terminal permission prompts. Use when the user shares an external GitHub repo, URL, or PDF, asks to audit, inspect, or compare architectures, or wants to extract Nix, Hjem, adios-flake, or red-tape patterns.
 ---
-# Fast Repo Reader
+# Fast Repo & Source Reader
 
-Efficiently retrieve, analyze, and synthesize external Git/GitHub repositories and technical articles without triggering intrusive host terminal permission prompts.
+Efficiently retrieve, analyze, and synthesize external Git/GitHub repositories, technical articles, general URLs, and PDFs without triggering intrusive host terminal permission prompts.
 
 ## When to Use
 
 - User provides an external GitHub repository, commit, file URL, or technical blog (e.g., `moni-dz/nix-config`, `Mic92/adios-flake`, `otavio/nix-config`, `paperdev-code/dendritic-nix`, `paperdev-code/hjem`, `snugnug/hjem-rum`, Apribase) and asks to inspect, compare, or adopt its patterns.
 - Comparing external Nix architectures (DAG-based `adios-flake`, convention-based `red-tape`, Dendritic aspect patterns, Hjem Manifest v3, `hjr-wrapped` hermetic wrappers) against local repositories in `~/Developer`.
 - Extracting configurations (`pedantix.toml`, `statix.toml`, `treefmt.nix`), packaging recipes, or module schemas from upstream repositories.
-
-> **Boundary with `@read`:** Use `@fast-repo-reader` for external GitHub Nix/repo structure and pattern extraction; use `@read` for general web URLs, PDFs, articles, and DeepSeek search fallback.
+- General URL and PDF fetching, summarization, or technical whitepaper analysis.
 
 ## Workflow
 
