@@ -29,7 +29,6 @@ in
       ".claude/settings.json" = "claude/settings.json";
       ".agents/skills" = "llms/skills";
       ".claude/skills" = "llms/skills";
-      ".gemini/skills" = "llms/skills";
     };
 
     # Unified agent instructions and progressive-disclosure docs across harnesses
