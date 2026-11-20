@@ -151,7 +151,6 @@ in
         "ghostty"
         "iina"
         "keka"
-        "prettyclean"
         "raycast"
         "sf-symbols"
         "suspicious-package"
