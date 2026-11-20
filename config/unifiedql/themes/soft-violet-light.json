@@ -1,0 +1,24 @@
+{
+  "appearance" : "light",
+  "colors" : {
+    "canvas" : "#FAF7FD",
+    "comment" : "#7D6D8C",
+    "error" : "#C41A16",
+    "escape" : "#C026D3",
+    "function" : "#B65F43",
+    "keyword" : "#762C91",
+    "number" : "#C15F3C",
+    "operator" : "#7E5D75",
+    "selection" : "#E2D2F2",
+    "string" : "#5B7342",
+    "text" : "#2B1B3D",
+    "type" : "#446F9C"
+  },
+  "name" : "soft-violet-light",
+  "typography" : {
+    "fontFamily" : "SF Mono, Menlo, Monaco, monospace",
+    "fontSize" : 13.5,
+    "lineHeight" : 1.45
+  },
+  "version" : "1.0.0"
+}

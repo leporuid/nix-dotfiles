@@ -1,0 +1,24 @@
+{
+  "appearance" : "dark",
+  "colors" : {
+    "canvas" : "#1F1F24",
+    "comment" : "#707F8C",
+    "error" : "#FF4C4C",
+    "escape" : "#DFABFF",
+    "function" : "#5DD8FF",
+    "keyword" : "#FF7AB2",
+    "number" : "#D9C97C",
+    "operator" : "#FFFFFF",
+    "selection" : "#515C6A",
+    "string" : "#FF8170",
+    "text" : "#FFFFFF",
+    "type" : "#DABAFF"
+  },
+  "name" : "xcode-default-dark",
+  "typography" : {
+    "fontFamily" : "SF Mono, Menlo, Monaco, monospace",
+    "fontSize" : 13.5,
+    "lineHeight" : 1.45
+  },
+  "version" : "1.0.0"
+}

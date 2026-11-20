@@ -6,3 +6,4 @@ _*
 .pre-commit-config.yaml
 TODO.md
 config/github-copilot/versions.json
+config/unifiedql/preferences.json

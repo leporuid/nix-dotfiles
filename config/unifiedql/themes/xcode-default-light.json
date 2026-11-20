@@ -1,0 +1,24 @@
+{
+  "appearance" : "light",
+  "colors" : {
+    "canvas" : "#FFFFFF",
+    "comment" : "#5C666A",
+    "error" : "#D91F1A",
+    "escape" : "#78492A",
+    "function" : "#326D74",
+    "keyword" : "#9B2393",
+    "number" : "#1C00CE",
+    "operator" : "#000000",
+    "selection" : "#B3D7FF",
+    "string" : "#C41A16",
+    "text" : "#000000",
+    "type" : "#0B4F79"
+  },
+  "name" : "xcode-default-light",
+  "typography" : {
+    "fontFamily" : "SF Mono, Menlo, Monaco, monospace",
+    "fontSize" : 13.5,
+    "lineHeight" : 1.45
+  },
+  "version" : "1.0.0"
+}
