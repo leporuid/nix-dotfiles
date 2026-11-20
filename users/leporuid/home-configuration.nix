@@ -51,6 +51,7 @@ in
         ".config/zed" = "zed";
         ".config/github-copilot/xcode/mcp.json" = "github-copilot/xcode/mcp.json";
         ".config/raycast" = "raycast";
+        ".config/unifiedql" = "unifiedql";
       };
     };
   };
