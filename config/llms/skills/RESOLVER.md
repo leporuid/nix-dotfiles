@@ -54,9 +54,48 @@ All skills in `config/llms/skills/` are authored strictly in English. User-facin
 4. **Release Action vs. Release Prose**: Writing changelog/announcement copy -> `@write`; tagging, verifying artifacts, pushing, or closing issues -> `@check`.
 5. **Pedagogy vs. Diagnostics**: Designing sprints, scopes, or exam items -> `@plato`; dissecting student output, working-memory load, or 4-quadrant errors -> `@ludus`.
 
-## Standard Chaining
+## Unified Graph Workflow
 
-- `@socratic` (Phase 0/1 plan + Simplicity Gate) -> implement (Flash) -> `@check`
-- `@hunt` (confirm single-sentence root cause + regression test) -> fix -> `@check`
-- `@plato` (lock student + craft exercises) -> `@ludus` (diagnose student responses)
-- `@health` (detect instruction drift) -> prune/align -> `@health` (re-verify)
+Agents should treat multi-step work as a state graph rather than a rigid linear script. Transition along explicit edges, run independent multi-target branches in parallel (`run_workflow` / subagents), and route failures back through `@hunt` or `@health` before committing.
+
+```mermaid
+flowchart TD
+    Start(["User Request"]) --> P0["Phase 0: Ground and Route (@socratic)"]
+
+    P0 -->|"Visual / Icon / UI Craft"| V1["Draft Prompt and Material Constraints"]
+    P0 -->|"Multi-file Arch or Spec"| A1["Phase 1: Deep Spec (@socratic)"]
+    P0 -->|"Bug / Regression / Crash"| H1["@hunt: 5-Step Evidence Ladder"]
+    P0 -->|"Isolated Single-file Edit"| B2["Direct Implement (Flash / gcli)"]
+    P0 -->|"Pedagogy / Student Review"| T1["@plato: Lock Cohort and Scope"] --> T2["@ludus: Diagnose Output"]
+
+    V1 --> V2["Generate Asset (image-generator or Web Ref)"]
+    V2 --> V3["Inspect Image and Alpha/Rim Bounds"]
+    V3 -->|"Geometry or Blur Defect"| V1
+    V3 -->|"Clean Asset"| V4["Render Production Sizes + Clipboard Preview"]
+    V4 -->|"User Tweaks Hue or Rim"| V1
+    V4 -->|"Approved"| V5["Install Assets and Update Color Docs"] --> Gate
+
+    A1 -->|"Design Fork?"| Persp["@get-more-perspectives (5+2 Panel)"] --> A2
+    A1 -->|"Clear Scope"| A2["Simplicity Gate + Freeze Spec in TODO.md"]
+    A2 -->|"Dual-CLI Lock: Pause Planner Edits"| B2
+    B2 --> Gate
+
+    H1 --> H2["Single-Sentence Root Cause + Regression Test"] --> B2
+
+    Gate{"Repo Verification Gate"}
+    Gate -->|"Fail / Regression"| H1
+    Gate -->|"Pass"| Check["@check: Diff Audit and Conventional Commit"]
+
+    Guard["Cross-Cutting: Quota or Context >= 93%"] -.->|"Freeze from Any Node"| Handover["Checkpoint TODO.md and Hand Off"]
+    Drift["Cross-Cutting: Agent Instruction Drift"] -.->|"Detour"| Health["@health: Prune AGENTS.md or Skills"] -.-> P0
+```
+
+### Node Contracts & Transition Guards
+
+| Edge / Gate | Condition & Required Evidence | Fallback / Handoff Rule |
+| :--- | :--- | :--- |
+| **Visual Asset Loop** | Always inspect generated images visually and verify pixel bounds/alpha before copying or bundling. | Never overwrite final project assets on an unverified draft; loop prompt deltas first. |
+| **Dual-CLI Spec Handoff** | Freeze unambiguous values (paths, signatures, hex tokens) in `TODO.md` before handing Phase 2 to `gcli` or Flash. | Never mutate the same files concurrently across `agy` and `gcli`. |
+| **Fan-Out Dispatch** | When tasks split cleanly across independent files or review lenses, use `run_workflow` or scoped subagents. | Aggregate results into one verification pass before committing. |
+| **Verification Gate** | Apply repo precedence (`@nix-dotfiles-workflow` matrix for Nix; `swift test` + `xcodebuild` + `codesign` for Apple; `pytest` / `vitest` for `ktoolbox`). | Any non-zero exit routes directly back to `@hunt` instead of ad-hoc patches. |
+| **93% Quota Guard** | Stop starting new graph branches when session quota or context approaches 93%. | Checkpoint completed state and exact remaining specs into `TODO.md`. |
