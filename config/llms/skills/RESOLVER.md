@@ -77,7 +77,9 @@ flowchart TD
 
     A1 -->|"Design Fork?"| Persp["@get-more-perspectives (5+2 Panel)"] --> A2
     A1 -->|"Clear Scope"| A2["Simplicity Gate + Freeze Spec in TODO.md"]
-    A2 -->|"Dual-CLI Lock: Pause Planner Edits"| B2
+    A2 -->|"Dual-CLI Lock: Pause Planner Edits"| Handoff{"Builder Dispatch"}
+    Handoff -->|"User asks for herdr and HERDR_ENV=1"| Herdr["@herdr: Start or Inspect gcli Pane"] --> B2
+    Handoff -->|"Manual Terminal or Subagent"| B2
     B2 --> Gate
 
     H1 --> H2["Single-Sentence Root Cause + Regression Test"] --> B2
@@ -96,6 +98,7 @@ flowchart TD
 | :--- | :--- | :--- |
 | **Visual Asset Loop** | Always inspect generated images visually and verify pixel bounds/alpha before copying or bundling. | Never overwrite final project assets on an unverified draft; loop prompt deltas first. |
 | **Dual-CLI Spec Handoff** | Freeze unambiguous values (paths, signatures, hex tokens) in `TODO.md` before handing Phase 2 to `gcli` or Flash. | Never mutate the same files concurrently across `agy` and `gcli`. |
+| **`@herdr` Pane Orchestration** | Engage only when the user explicitly asks to use Herdr AND `test "${HERDR_ENV:-}" = 1` succeeds. | Outside `HERDR_ENV=1`, report unavailability cleanly and fall back to manual terminal handoff or native subagents. |
 | **Fan-Out Dispatch** | When tasks split cleanly across independent files or review lenses, use `run_workflow` or scoped subagents. | Aggregate results into one verification pass before committing. |
 | **Verification Gate** | Apply repo precedence (`@nix-dotfiles-workflow` matrix for Nix; `swift test` + `xcodebuild` + `codesign` for Apple; `pytest` / `vitest` for `ktoolbox`). | Any non-zero exit routes directly back to `@hunt` instead of ad-hoc patches. |
 | **93% Quota Guard** | Stop starting new graph branches when session quota or context approaches 93%. | Checkpoint completed state and exact remaining specs into `TODO.md`. |
