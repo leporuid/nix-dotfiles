@@ -41,6 +41,8 @@ let
     relativePath:
     if cfg.useOutOfStoreSymlinks then
       "${cfg.directory}/${relativePath}"
+    else if builtins.isPath cfg.storeDirectory then
+      cfg.storeDirectory + "/${relativePath}"
     else
       "${cfg.storeDirectory}/${relativePath}";
 
@@ -130,7 +132,16 @@ let
     else if builtins.isAttrs val then
       let
         hasBase = builtins.hasAttr "base" val;
-        baseFile = if hasBase then "${cfg.storeDirectory}/${val.base}" else null;
+        baseFile =
+          if hasBase then
+            (
+              if builtins.isPath cfg.storeDirectory then
+                cfg.storeDirectory + "/${val.base}"
+              else
+                "${cfg.storeDirectory}/${val.base}"
+            )
+          else
+            null;
         overrides = builtins.removeAttrs val [ "base" ];
 
         baseAttrs =

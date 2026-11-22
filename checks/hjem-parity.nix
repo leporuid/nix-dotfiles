@@ -29,16 +29,20 @@ let
     if isDarwin && self ? darwinConfigurations.MacBook-Pro then
       let
         user = self.darwinConfigurations.MacBook-Pro.config.hjem.users.leporuid;
-        files = lib.mapAttrsToList (name: f: {
-          target = name;
-          source = if f.source != null then toString f.source else "text:${f.text or ""}";
-        }) (lib.filterAttrs (_: f: f.enable or true) user.files);
-        xdgFiles = lib.mapAttrsToList (name: f: {
-          target = ".config/${name}";
-          source = if f.source != null then toString f.source else "text:${f.text or ""}";
-        }) (lib.filterAttrs (_: f: f.enable or true) (user.xdg.config.files or { }));
+        mapFiles =
+          prefix: fileSet:
+          lib.mapAttrsToList (name: f: {
+            target = if prefix == "" then name else "${prefix}/${name}";
+            source = if f.source != null then toString f.source else "text:${f.text or ""}";
+          }) (lib.filterAttrs (_: f: f.enable or true) fileSet);
+
+        files = mapFiles "" user.files;
+        xdgConfigFiles = mapFiles ".config" (user.xdg.config.files or { });
+        xdgCacheFiles = mapFiles ".cache" (user.xdg.cache.files or { });
+        xdgDataFiles = mapFiles ".local/share" (user.xdg.data.files or { });
+        xdgStateFiles = mapFiles ".local/state" (user.xdg.state.files or { });
       in
-      files ++ xdgFiles
+      files ++ xdgConfigFiles ++ xdgCacheFiles ++ xdgDataFiles ++ xdgStateFiles
     else
       [ ];
 
