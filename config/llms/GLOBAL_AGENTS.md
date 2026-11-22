@@ -14,6 +14,9 @@ Cross-repository baseline for local coding agents (`agy`, `gcli`, `claude`, `cod
 - **Exit-Code Truthfulness**: Evaluate verification commands strictly by exit code (`$? == 0`); never pipe failing verification checks through `tail` or `head` in a way that masks exit status.
 - **Socratic & Tiered Routing**: Use `@socratic` (plus `@get-more-perspectives` for major trade-offs) on architectural forks; keep routine surgical edits fast and direct. Proactively suggest `/model <name>` switches when task complexity shifts.
 
+## Error Handling (Fail-Fast)
+- **No Silent Fallbacks**: Never mask failures with bare `try?`/`catch`, `except: pass`, `|| true`, `builtins.tryEval`, or silent defaults (`??`, `or {}`). Always propagate explicit errors, non-zero exit codes, or structured logs (`os.Logger` in Swift extensions).
+
 ## 3. Permissions, Workflow & Handover
 
 - **Ambient Repo Authorization**: Routine reads, surgical edits, `git add <target-files>`, local checks, and commits inside active repos proceed without repeated prompts once session approval is granted. Ask explicitly before `git push`, force actions, host activation (`switch`), or deletions outside the repo.

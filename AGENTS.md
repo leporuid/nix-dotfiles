@@ -54,6 +54,9 @@ This repository collects project-specific expectations, tool contracts, and arch
   | Newly added / deleted files referenced by Nix expressions | Must run `git add` before evaluating (`nix flake check` requires tracked files) |
   - **Never Mask Exit Codes**: Never pipe verification commands directly into `tail` or `head` without preserving pipeline status. Evaluate success strictly by exit code (`$? == 0`).
 
+## Error Handling (Fail-Fast)
+- **No Silent Fallbacks**: Never mask Nix or shell failures with `|| true`, `builtins.tryEval`, or silent defaults (`or {}`). Always propagate explicit errors or non-zero exit codes.
+
 ---
 
 ## 3. Core Architecture Guardrails
