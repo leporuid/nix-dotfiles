@@ -1,20 +1,20 @@
 {
   "appearance" : "light",
   "colors" : {
-    "canvas" : "#FAF7FD",
-    "comment" : "#7D6D8C",
-    "error" : "#C41A16",
-    "escape" : "#C026D3",
-    "function" : "#B65F43",
-    "keyword" : "#762C91",
-    "number" : "#C15F3C",
-    "operator" : "#7E5D75",
-    "selection" : "#E2D2F2",
-    "string" : "#5B7342",
-    "text" : "#2B1B3D",
-    "type" : "#446F9C"
+    "canvas" : "#F5F6FB",
+    "comment" : "#76709E",
+    "error" : "#C93B4E",
+    "escape" : "#9A3EC4",
+    "function" : "#3553D2",
+    "keyword" : "#6C4FD7",
+    "number" : "#B84C65",
+    "operator" : "#5F5785",
+    "selection" : "#DFE7FF",
+    "string" : "#1F7A68",
+    "text" : "#1E164A",
+    "type" : "#1C78A8"
   },
-  "name" : "soft-violet-light",
+  "name" : "aurora-glass-light",
   "typography" : {
     "fontFamily" : "SF Mono, Menlo, Monaco, monospace",
     "fontSize" : 13.5,

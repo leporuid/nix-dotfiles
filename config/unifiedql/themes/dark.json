@@ -1,24 +1,24 @@
 {
   "appearance" : "dark",
   "colors" : {
-    "canvas" : "#170032",
-    "comment" : "#9D8BAE",
-    "error" : "#FF4C4C",
-    "escape" : "#FF8CF0",
-    "function" : "#FF9A7A",
-    "keyword" : "#BB55FF",
-    "number" : "#FFB08E",
-    "operator" : "#D1B3C4",
-    "selection" : "#3F0474",
-    "string" : "#C0D698",
-    "text" : "#FFFFFF",
-    "type" : "#8AC3FF"
+    "canvas" : "#161038",
+    "comment" : "#9B96C2",
+    "error" : "#F18B94",
+    "escape" : "#E2A5FF",
+    "function" : "#8EA8FF",
+    "keyword" : "#CC82F7",
+    "number" : "#F4A2B8",
+    "operator" : "#C7BCE8",
+    "selection" : "#2B1990",
+    "string" : "#7FDEC8",
+    "text" : "#F5F6FB",
+    "type" : "#68C8F0"
   },
-  "name" : "claude-soft-violet",
+  "name" : "aurora-glass",
   "typography" : {
     "fontFamily" : "SF Mono, Menlo, Monaco, monospace",
     "fontSize" : 13.5,
     "lineHeight" : 1.45
   },
-  "version" : "1.0.1"
+  "version" : "1.0.0"
 }
