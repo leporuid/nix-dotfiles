@@ -41,7 +41,7 @@ Maintains user-level Hjem configurations (`modules/hjem/*.nix`, `users/leporuid/
 - **Helix (`modules/hjem/helix.nix`, `config/helix/`)**: Always use nixpkgs `pkgs.helix` (never upstream `helix` flake input due to `tree-sitter-perl` glibc issues). Keybindings integrate `ccase`, `schemat`, `fish-lsp` (`fish_lsp_show_client_popups = "false"`), `nil`, `taplo`, `vtsls`, `rust-analyzer`.
 - **Ghostty & Themes (`modules/hjem/ghostty.nix`, `themes.nix`)**: Links `os-config-{darwin,linux}` + `inputs.ghostty-cursor-shaders`; precompiles `config/bat` into `batCache` and wraps `bat` with `Catppuccin Mocha`.
 - **Jujutsu & Git (`modules/hjem/jujutsu.nix`, `git.nix`, `config/jj/config.toml`)**: Sets `JJ_CONFIG` and maps `jj` config to `Library/Application Support/jj` on Darwin vs `.config/jj` on Linux (`sign-on-push = true`).
-- **Agents (`modules/hjem/agents.nix`)**: Maps `.agents/skills`, `.claude/skills`, and `.gemini/skills` to `llms/skills`, and distributes `AGENTS.md` to `.claude/CLAUDE.md`, `.codex/AGENTS.md`, and `.config/opencode/AGENTS.md`.
+- **Agents (`modules/hjem/agents.nix`)**: Maps `.agents/skills`, `.claude/skills`, and `.gemini/skills` to `llms/skills`, and distributes `config/llms/GLOBAL_AGENTS.md` to `.claude/CLAUDE.md`, `.codex/AGENTS.md`, `.config/opencode/AGENTS.md`, and `.gemini/GEMINI.md`.
 
 ## Standalone vs. Host Parity (`check-links` in `run.fish`)
 

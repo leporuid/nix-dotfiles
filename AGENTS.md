@@ -133,33 +133,6 @@ This repository collects project-specific expectations, tool contracts, and arch
 
 ---
 
-## 6. Available Skills & Agent Instructions
+## 6. Skills & Progressive-Disclosure Docs
 
-Automated agents operating on this repository have access to modular skills located in `config/llms/skills/` (symlinked from `.agents/skills/`):
-
-| Skill | Path | Description & When to Load |
-| :--- | :--- | :--- |
-| `@socratic` | `.agents/skills/socratic/SKILL.md` | Master engineering orchestrator enforcing source-grounding, zero-placeholder pre-build plans, Simplicity Gate, and 3-phase model routing. |
-| `@get-more-perspectives` | `.agents/skills/get-more-perspectives/SKILL.md` | Simulated 5+2 advisory panel for decision trade-offs, single-target viability verdicts, and batch triage. |
-| `@nix-dotfiles-workflow` | `.agents/skills/nix-dotfiles-workflow/SKILL.md` | Core Nix architecture guardrails (no `flake.lock` reading, `pedantix.toml` module headers, hjem/hjem-rum, `nix-secrets` keys, out-of-store symlinks, verification matrix). |
-| `@nix-packaging-and-overlays` | `.agents/skills/nix-packaging-and-overlays/SKILL.md` | Custom derivations (`packages/`, `fileset.toSource`, `pin.json`, `uv2nix`), `overlays/default.nix`, `checks/schemas.nix`, and CI lint compliance. |
-| `@darwin-host-and-unifi-dev` | `.agents/skills/darwin-host-and-unifi-dev/SKILL.md` | `hosts/MacBook-Pro`, `modules/darwin/` (`determinateNix`, `mkAppSyncScript`, `nix-homebrew`, `launchd`), and `packages/vpn-pack` UniFi ARM64 cross-builds. |
-| `@hjem-module-scaffolder` | `.agents/skills/hjem-module-scaffolder/SKILL.md` | Hjem / Hjem-Rum module boilerplate generator adhering to `pedantix.toml`, RFC 166 `nixfmt`, Manifest v3, and collision guards. |
-| `@dotfiles-and-hjem-config` | `.agents/skills/dotfiles-and-hjem-config/SKILL.md` | `my.config` synthesis, `config/` tool setups (`zsh`/`fish`/`nushell`/`nvim`/`helix`/`ghostty`/`jj`), and `check-links` Manifest v3 parity. |
-| `@nixos-cloud-deploy` | `.agents/skills/nixos-cloud-deploy/SKILL.md` | Pre-flight evaluation, zero-lockout SSH/Tailscale audit, remote builder, and `nixos-anywhere` / `nixos-rebuild` deployment workflow. |
-| `@red-tape-framework-dev` | `.agents/skills/red-tape-framework-dev/SKILL.md` | `~/Developer/red-tape` `adios-flake` DAG, `lib/internal.nix` discovery, `contrib/hjem.nix` Manifest v3, `hjemSchemas`, and offline `nix-unit` tests. |
-| `@ktoolbox-fullstack-dev` | `.agents/skills/ktoolbox-fullstack-dev/SKILL.md` | `~/Developer/ktoolbox` (`uv2nix`, FastAPI, `FastMCP`, OpenAPI codegen, React 19/Vite WebUI craft, `ruff`/`mypy`/`pytest`/`vitest`/`playwright`, `uv-pawchive` rebase). |
-| `@nix-secrets-and-enclave` | `.agents/skills/nix-secrets-and-enclave/SKILL.md` | `~/Developer/nix-secrets`, `agenix-rules.nix`, Apple Secure Enclave `age-plugin-se` (`age` vs `rage`), and cross-repo secret hygiene. |
-| `@apple-swift-cocoa-dev` | `.agents/skills/apple-swift-cocoa-dev/SKILL.md` | Swift 6.2 SwiftPM (`~/Developer/MyLibrary`, `swiftly`), Xcode MCP, `__noChroot` SDK builds (`age-plugin-se`), and Objective-C Cocoa bundles (`m3u8dl-protocol`). |
-| `@gemini-api-dev-bridge` | `.agents/skills/gemini-api-dev-bridge/SKILL.md` | Cross-harness Gemini API dev bridge (`google-genai`/`@google/genai` >= 3.2.0, `gemini-api` CLI dev/CI workflows, `gemini-api-docs` MCP). |
-| `@fast-repo-reader` | `.agents/skills/fast-repo-reader/SKILL.md` | Rapidly inspect and synthesize external Git/GitHub Nix/repo architectures, URLs, and PDFs without terminal permission prompts. |
-| `@check` | `.agents/skills/check/SKILL.md` | Diff/PR code review, triage, and release gate (`nix-dotfiles` verification matrix & guardrails in `@nix-dotfiles-workflow` take precedence). |
-| `@hunt` | `.agents/skills/hunt/SKILL.md` | Root-cause diagnosis before any fix, 5-step evidence ladder, bisect, and regression guardrails. |
-| `@write` | `.agents/skills/write/SKILL.md` | Precision prose editor and anti-AI-slop polisher (respects `zh-Hant-TW` for Chinese; code comments and technical copy stay English). |
-| `@health` | `.agents/skills/health/SKILL.md` | Agent config, instruction surface, and AI maintainability audit (`nix-dotfiles` guardrails take precedence; `@mole` handles disk cleanup). |
-| `@mole` | `.agents/skills/mole/SKILL.md` | Independent macOS disk analysis and read-only-first cleanup via `mo` CLI. |
-| `@herdr` | `.agents/skills/herdr/SKILL.md` | Terminal multiplexer and multi-agent orchestrator controller via `herdr` CLI (inspect panes, workspaces, agents, tabs; requires `HERDR_ENV=1`). |
-| `@plato` | `.agents/skills/plato/SKILL.md` | Teaching strategist, target cohort guard, and Miller Mutually Exclusive exam crafting engine for junior/senior high English. |
-| `@ludus` | `.agents/skills/ludus/SKILL.md` | Linguistic, speech-language clinical, and Hermit diagnostic trinity for student error analysis and portfolio authenticity. |
-
-Agents must consult the relevant `SKILL.md` (and `config/llms/skills/RESOLVER.md` for workflow routing) before executing multi-repo analyses or structural modifications.
+Modular skills live under `config/llms/skills/` (symlinked from `.agents/skills/` and `~/.agents/skills/`), with domain precedence and the **Unified Graph Workflow** governed by `config/llms/skills/RESOLVER.md`. Reference guides (`nix-architecture.md`, `credential-guard.md`) live in `docs/ai/`. Load the matching `SKILL.md` before cross-repo analyses or structural edits rather than duplicating domain rules here.

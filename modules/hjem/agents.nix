@@ -31,16 +31,16 @@ in
       ".claude/skills" = "llms/skills";
     };
 
-    # Unified agent instructions and progressive-disclosure docs across harnesses
+    # Unified global agent baseline and progressive-disclosure docs across harnesses
     files = {
-      ".claude/CLAUDE.md".source = ../../AGENTS.md;
+      ".claude/CLAUDE.md".source = ../../config/llms/GLOBAL_AGENTS.md;
       ".claude/docs".source = ../../docs/ai;
-      ".codex/AGENTS.md".source = ../../AGENTS.md;
+      ".codex/AGENTS.md".source = ../../config/llms/GLOBAL_AGENTS.md;
       ".codex/docs".source = ../../docs/ai;
-      ".config/opencode/AGENTS.md".source = ../../AGENTS.md;
+      ".config/opencode/AGENTS.md".source = ../../config/llms/GLOBAL_AGENTS.md;
       ".config/opencode/docs".source = ../../docs/ai;
       ".gemini/docs".source = ../../docs/ai;
-      ".gemini/GEMINI.md".source = ../../AGENTS.md;
+      ".gemini/GEMINI.md".source = ../../config/llms/GLOBAL_AGENTS.md;
     };
   };
 }
