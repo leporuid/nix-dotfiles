@@ -19,6 +19,7 @@ let
   inherit (lib.strings)
     concatMapStringsSep
     concatStringsSep
+    hasInfix
     hasPrefix
     hasSuffix
     splitString
@@ -39,6 +40,12 @@ let
 
   mkConfigSymlink =
     relativePath:
+    assert
+      !(hasPrefix "/" relativePath)
+      || throw "my.config: relativePath cannot be absolute: ${relativePath}";
+    assert
+      !(hasInfix ".." relativePath)
+      || throw "my.config: relativePath cannot contain '..': ${relativePath}";
     if cfg.useOutOfStoreSymlinks then
       "${cfg.directory}/${relativePath}"
     else if builtins.isPath cfg.storeDirectory then
@@ -48,6 +55,8 @@ let
 
   # Parses key-value formatted text (such as Ghostty themes) into a structured AttrSet.
   # Handles repeated keys like `palette = 0=...` as lists.
+  # NOTE: When using `base` merging on macOS, modifying the base file on disk requires
+  # a host rebuild (e.g. darwin-rebuild / nix flake check) to re-evaluate and re-serialize the output.
   parseKeyValue =
     text:
     let
@@ -66,7 +75,7 @@ let
           parts = builtins.match "([^=]+)=(.*)" line;
         in
         if parts == null then
-          acc
+          throw "my.config: invalid key-value line '${line}' (expected 'key = value')"
         else
           let
             key = trim (elemAt parts 0);
@@ -202,6 +211,8 @@ in
         - Relative path string: creates symlink to the repo file.
         - Attribute set: supports `{ base = "rel/path"; ...overrides }` or pure attributes,
           with automatic TOML/JSON/key-value serialization and native Nix merging.
+          Note: modifying the base template file on disk requires a host rebuild / re-evaluation
+          to regenerate the serialized output, unlike direct symlinks which reflect edits immediately.
       '';
     };
 
@@ -237,7 +248,12 @@ in
           inherit (cfg) clobber;
         }) nonNullText;
         textFiles = filterAttrs (_: v: v.text != "") renderedTextFiles;
+
+        collisions = builtins.filter (k: builtins.hasAttr k textFiles) (builtins.attrNames sourceFiles);
       in
-      sourceFiles // textFiles;
+      if collisions != [ ] then
+        throw "my.config: collision between my.config.source and my.config.text on target paths: ${builtins.toJSON collisions}"
+      else
+        sourceFiles // textFiles;
   };
 }

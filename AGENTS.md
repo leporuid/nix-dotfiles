@@ -42,6 +42,7 @@ This repository collects project-specific expectations, tool contracts, and arch
   - **Clobber Invariant**: Always ensure `hjem.clobberByDefault = true;` to avoid collisions with existing files. File overrides use the `clobber` attribute (never deprecated `force`).
   - **No Empty Files**: Hjem modules must never generate empty or placeholder files.
   - **Out-of-Store Symlinks (macOS)**: `my.config.useOutOfStoreSymlinks = isDarwin;` links `config/` directly on macOS for live edits without rebuilds, while keeping Linux hosts on pure Nix store paths.
+  - **Base Template Merging**: Modifying a `base = "rel/path"` template in `my.config.source` requires a host rebuild / evaluation to re-serialize the output, whereas direct symlinks reflect live edits immediately.
 - **Formatting & Style**:
   - Code formatting is managed via `treefmt` (`nix fmt`).
   - Function argument ordering is strictly enforced by `pedantix.toml`:
